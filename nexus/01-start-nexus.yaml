@@ -1,0 +1,127 @@
+---
+# Headless service для формирования записи в DNS
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus
+  namespace: nexus
+  labels:
+    app: nexus
+    section: tools
+spec:
+  ports:
+    - name: http-main
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app: nexus
+    section: tools
+  clusterIP: None
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: nexus
+    namespace: nexus
+    labels:
+      app: nexus
+      section: tools
+spec:
+  selector:
+    matchLabels:
+      app: nexus
+      section: tools
+  serviceName: nexus
+  template:
+    metadata:
+      labels:
+        app: nexus
+        section: tools
+    spec:
+      containers:
+        - name: nexus
+          image: sonatype/nexus3:3.27.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+          env:
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: "-Xms2g -Xmx2g -XX:MaxDirectMemorySize=2g"
+            # - name: NEXUS_CONTEXT
+            #  value: nexus
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 6
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          volumeMounts:
+            - mountPath: /nexus-data
+              name: nexus-data
+  volumeClaimTemplates:
+  - metadata:
+      name: nexus-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "managed-nfs-storage"
+      resources:
+        requests:
+          storage: 8Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-0
+  namespace: nexus
+spec:
+  ports:
+    - name: http-main
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app: nexus
+    section: tools
+    statefulset.kubernetes.io/pod-name: nexus-0
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+  name: nexus
+  namespace: nexus
+  labels:
+    app: nexus
+    section: tools
+spec:
+  rules:
+    - host: nexus.kryukov.local
+      http:
+        paths:
+          - backend:
+              serviceName: nexus-0
+              servicePort: 8081
+            path: /
+
