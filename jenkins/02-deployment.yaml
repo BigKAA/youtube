@@ -69,10 +69,11 @@ spec:
       containers:
       - name: jenkins
         image: n.kryukov.local/bigkaa/jenkins:v0.1
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
           - name: JAVA_OPTS
-            value: "-Xms2g -Xmx2g -Djenkins.install.runSetupWizard=false"
+#            value: "-Xms2g -Xmx2g -Djenkins.install.runSetupWizard=false"
+            value: "-Xms2g -Xmx2g"
           - name: JENKINS_SLAVE_AGENT_PORT
             value: "50000"
 #            - name: JENKINS_OPTS

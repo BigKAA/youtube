@@ -13,15 +13,28 @@ kubernetes.
     # docker tag bigkaa/inbound-agent:v0.1 n.kryukov.local/bigkaa/inbound-agent:v0.1
     # docker push n.kryukov.local/bigkaa/inbound-agent:v0.1
 
-## Создаем secret docker registry
-
-    # docker login -u docker-user -p password n.kryukov.local
-    # kubectl -n jenkins create secret generic kryukov-local \
-     --from-file=.dockerconfigjson=~/.docker/config.json \
-     --type=kubernetes.io/dockerconfigjson
-
 ## На каждой ноде кластера копируем сертификат CA kubernetes
 
     # mkdir -p /etc/docker/certs.d/n.kryukov.local
     # cp /etc/kubernetes/pki/ca.crt /etc/docker/certs.d/n.kryukov.local
 
+## Добавляем namespace
+
+    # kubectl apply 00-ns.yaml
+
+## Создаем secret docker registry
+
+    # docker login -u docker-user -p password n.kryukov.local
+    # cp ~/.docker/config.json ~
+    # kubectl -n jenkins create secret generic kryukov-local \
+     --from-file=.dockerconfigjson=config.json \
+     --type=kubernetes.io/dockerconfigjson
+
+## Деплоим приложения
+
+    # kubect apply -f 01-rbac.yaml
+    # kubectl apply -f 02-depliyment.yaml
+
+Смотрим логи jenkins, ищем первначальный пароль админа.
+
+После установки, удаляем внутренние executors и конфигурируем модуль kubernetes
