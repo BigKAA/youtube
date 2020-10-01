@@ -69,7 +69,7 @@ spec:
       containers:
       - name: jenkins
         image: n.kryukov.local/bigkaa/jenkins:v0.1
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
           - name: JAVA_OPTS
 #            value: "-Xms2g -Xmx2g -Djenkins.install.runSetupWizard=false"
