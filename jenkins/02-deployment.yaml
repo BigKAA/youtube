@@ -72,7 +72,8 @@ spec:
         imagePullPolicy: Always
         env:
           - name: JAVA_OPTS
-            value: "-Xms2g -Xmx2g -Djenkins.install.runSetupWizard=false"
+#            value: "-Xms2g -Xmx2g -Djenkins.install.runSetupWizard=false"
+            value: "-Xms2g -Xmx2g"
           - name: JENKINS_SLAVE_AGENT_PORT
             value: "50000"
 #            - name: JENKINS_OPTS
