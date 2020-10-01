@@ -17,7 +17,7 @@ kubernetes.
 
     # docker login -u docker-user -p password n.kryukov.local
     # kubectl -n jenkins create secret generic kryukov-local \
-     --from-file=.dockerconfigjson=~/.docker/config.json \
+     --from-file=.dockerconfigjson=config.json \
      --type=kubernetes.io/dockerconfigjson
 
 ## На каждой ноде кластера копируем сертификат CA kubernetes
