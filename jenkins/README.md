@@ -38,3 +38,8 @@ kubernetes.
 Смотрим логи jenkins, ищем первначальный пароль админа.
 
 После установки, удаляем внутренние executors и конфигурируем модуль kubernetes
+
+## Видео
+
+* https://youtu.be/FNTFVSavQY8
+* https://youtu.be/q4FjUpnWDFY
