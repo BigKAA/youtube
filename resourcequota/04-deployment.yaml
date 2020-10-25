@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openresty
+  namespace: q-test
+  labels:
+    app: openresty
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: openresty
+  template:
+    metadata:
+      labels:
+        app: openresty
+    spec:
+      containers:
+      - name: openresty
+        image: openresty/openresty:centos-rpm
+        env:
+        - name: NGINX_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        resources:
+          requests:
+            cpu: "0.1"
+            memory: "100Mi"
+          limits:
+            cpu: "0.2"
+            memory: "300Mi"
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        volumeMounts:
+          - name: empty-volume
+            mountPath: /empty
+      volumes:
+        - name: empty-volume
+          emptyDir: {}

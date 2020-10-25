@@ -1,0 +1,21 @@
+# При добавлении квот, рекомендуется определить LimitRange.
+# Или не определить, если хотите "воспитать" правильные рефлексы у
+# devops инженеров :)
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: q-test-lr
+  namespace: q-test
+spec:
+  limits:
+  - default:
+      memory: 512Mi
+      cpu: "0.1"
+    defaultRequest:
+      memory: 256Mi
+      cpu: "0.1"
+    max:
+      memory: 2Gi
+      cpu: "2"
+    type: Container
