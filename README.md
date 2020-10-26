@@ -11,3 +11,4 @@ Nexus внутри kubernetes, делаем свой docker registry.
     * https://youtu.be/FNTFVSavQY8
     * https://youtu.be/q4FjUpnWDFY
 * **resourcequota** - Накладываем ограничения на namespace.
+   * https://youtu.be/nsBeED5UNUw
