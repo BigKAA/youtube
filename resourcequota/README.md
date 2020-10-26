@@ -46,3 +46,7 @@ ResoqurceQuota определяет ограничения на namespace.
 ## Информация о квотах.
 
     kubectl -n q-test describe quota
+    
+## Видео
+  
+https://youtu.be/nsBeED5UNUw
