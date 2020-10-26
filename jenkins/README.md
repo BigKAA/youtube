@@ -39,6 +39,8 @@ kubernetes.
 
 После установки, удаляем внутренние executors и конфигурируем модуль kubernetes
 
-Видео: 
-- https://youtu.be/FNTFVSavQY8
-- https://youtu.be/q4FjUpnWDFY
+## Видео
+
+* https://youtu.be/FNTFVSavQY8
+* https://youtu.be/q4FjUpnWDFY
+
