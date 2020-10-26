@@ -1,0 +1,8 @@
+# namespace для тестов
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: q-test
+  labels:
+    app: q-tes
