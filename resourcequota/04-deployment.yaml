@@ -20,6 +20,7 @@ spec:
       containers:
       - name: openresty
         image: openresty/openresty:centos-rpm
+        imagePullPolicy: IfNotPresent
         env:
         - name: NGINX_HOST
           valueFrom:
