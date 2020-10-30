@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openresty
+  namespace: kubetest
+  labels:
+    app: openresty
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: openresty
+  template:
+    metadata:
+      labels:
+        app: openresty
+    spec:
+      priorityClassName: high-priority
+      containers:
+      - name: openresty
+        image: openresty/openresty:centos-rpm
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: NGINX_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        resources:
+          requests:
+            cpu: "1"
+            memory: "1Gi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        volumeMounts:
+          - name: empty-volume
+            mountPath: /empty
+      volumes:
+        - name: empty-volume
+          emptyDir: {}
