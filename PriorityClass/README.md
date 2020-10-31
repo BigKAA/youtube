@@ -60,7 +60,7 @@ description: "The maximal priority on the cluster"
 Если вы первый раз применяете PriorityClass в кластере, необходимо учитывать
 следующее:
 * У всех подов, созданных до введения PriorityClass приоритет равен нулю.
-* При добавлении PriorityClass с globalDefault: true, у подов у которых
+* При добавлении PriorityClass с globalDefault: true, у уже запущенных подов, у которых
 не был явно установлен приоритет, он все равно остается равным нулю.
 * При удалении PriorityClass, у подов, которых он был установлен, приоритет
 не обнуляется. Числовое значение приоритета остается прежним.
@@ -74,6 +74,7 @@ description: "The maximal priority on the cluster"
     k8s-cluster-critical      1000000000   false            33d
     system-cluster-critical   2000000000   false            33d
     system-node-critical      2000001000   false            33d
+    
     # kubectl get pc system-node-critical -o yaml
 
 Если убрать служебную информацию, то system-node-critical будет выглядеть так:
@@ -99,7 +100,8 @@ value: 2000001000
     Priority:             2000000000
     Priority Class Name:  system-cluster-critical
 
-Поэтому значения для своих PriorityClass используйте менбшие значения.
+Поэтому для своих PriorityClass используйте меньшие значения приоритета. 
+Для пользовательских приоритетов принято устанавливать значения около 1000000.
 
 ## priorityClassName
 
