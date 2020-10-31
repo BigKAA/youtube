@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: openresty
-  namespace: q-test
+  namespace: kubetest
   labels:
     app: openresty
 spec:
@@ -17,6 +17,7 @@ spec:
       labels:
         app: openresty
     spec:
+      priorityClassName: high-priority
       containers:
       - name: openresty
         image: openresty/openresty:centos-rpm
@@ -28,11 +29,11 @@ spec:
               fieldPath: metadata.name
         resources:
           requests:
-            cpu: "0.1"
-            memory: "100Mi"
+            cpu: "1"
+            memory: "1Gi"
           limits:
-            cpu: "0.2"
-            memory: "300Mi"
+            cpu: "1"
+            memory: "1Gi"
         ports:
         - containerPort: 80
           name: http
