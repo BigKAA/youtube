@@ -2,24 +2,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: openresty
+  name: openresty-never
   namespace: kubetest
   labels:
-    app: openresty
+    app: openresty-never
 spec:
   replicas: 3
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: openresty
+      app: openresty-never
   template:
     metadata:
       labels:
-        app: openresty
+        app: openresty-never
     spec:
-      priorityClassName: high-priority
+      priorityClassName: high-priority-never
       containers:
-      - name: openresty
+      - name: openresty-never
         image: openresty/openresty:centos-rpm
         imagePullPolicy: IfNotPresent
         env:
