@@ -6,13 +6,5 @@ metadata:
 value: 1000000
 globalDefault: false
 description: "Test preemptionPolicy - Never priorityclass"
----
-apiVersion: scheduling.k8s.io/v1
-kind: PriorityClass
-metadata:
-  name: high-priority-never
-value: 1005000
-preemptionPolicy: Never
-globalDefault: false
-description: "Test priorityclass"
+
 
