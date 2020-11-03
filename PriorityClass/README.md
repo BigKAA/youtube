@@ -122,3 +122,6 @@ spec:
     imagePullPolicy: IfNotPresent
   priorityClassName: high-priority
 ```
+## Видео
+
+https://youtu.be/Bm1pOKINqLQ
