@@ -13,4 +13,4 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **resourcequota** - Накладываем ограничения на namespace.
    * https://youtu.be/nsBeED5UNUw
 * **PriorityClass** - Приориеты. Больше вопросов, чем ответов.
-    * https://youtu.be/Bm1pOKINqLQ
+
