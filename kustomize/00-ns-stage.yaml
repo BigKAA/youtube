@@ -1,0 +1,8 @@
+# namespace для разработчиков
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubetest-stage
+  labels:
+    app: kubetest-stage

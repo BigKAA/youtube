@@ -1,0 +1,17 @@
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+clusterName: cluster.local
+dns:
+  type: CoreDNS
+networking:
+  dnsDomain: cluster.local
+  podSubnet: 192.168.180.0/24
+  serviceSubnet: 192.168.185.0/24
+scheduler:
+  extraArgs:
+    bind-address: 0.0.0.0
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: ipvs # iptables
