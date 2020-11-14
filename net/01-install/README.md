@@ -15,8 +15,7 @@
 ### Устанавливаем докер
 
 ```shell script
-chmod +x 00-install-docker-ce8.sh
-./00-install-docker-ce8.sh
+curl -s https://raw.githubusercontent.com/BigKAA/youtube/net/net/01-install/00-install-docker-ce8.sh | bash
 docker version
 ```
 
