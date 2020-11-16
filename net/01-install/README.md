@@ -66,7 +66,7 @@ mode: ipvs # iptables
 * Программу, которая будет использоваться для NAT преобразований.
 
 ```shell script
-curl -s https://raw.githubusercontent.com/BigKAA/youtube/net/net/01-install/03-kube-config.yaml -o kube-config.yaml
+curl -s https://raw.githubusercontent.com/BigKAA/youtube/master/net/01-install/03-kube-config.yaml -o kube-config.yaml
 ```
 
 Тестовый запуск установки, ищем ошибки.
