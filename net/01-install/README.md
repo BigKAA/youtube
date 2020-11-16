@@ -14,10 +14,8 @@
 
 ### Устанавливаем докер
 
-_Сссылка на бранч net. После слияния веток, вставить ссылку на master ветку._
-
 ```shell script
-curl -s https://raw.githubusercontent.com/BigKAA/youtube/net/net/01-install/00-install-docker-ce8.sh | bash
+curl -s https://raw.githubusercontent.com/BigKAA/youtube/master/net/01-install/00-install-docker-ce8.sh | bash
 docker version
 ```
 
@@ -27,18 +25,14 @@ docker version
 
 ##### Мастер нода
 
-_Сссылка на бранч net. После слияния веток, вставить ссылку на master ветку._
-
 ```shell script
-curl -s https://raw.githubusercontent.com/BigKAA/youtube/net/net/01-install/01-install-k8s-masternode-ce8.sh | bash
+curl -s https://raw.githubusercontent.com/BigKAA/youtube/master/net/01-install/01-install-k8s-masternode-ce8.sh | bash
 ```
 
 ##### Worker ноды
 
-_Сссылка на бранч net. После слияния веток, вставить ссылку на master ветку._
-
 ```shell script
-curl -s https://raw.githubusercontent.com/BigKAA/youtube/net/net/01-install/02-install-k8s-workernode-ce8.sh | bash
+curl -s https://raw.githubusercontent.com/BigKAA/youtube/master/net/01-install/02-install-k8s-workernode-ce8.sh | bash
 ```
 
 #### Мастер нода.
