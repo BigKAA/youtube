@@ -89,13 +89,13 @@ calicoctl позволяет управлять параметрами сети.
 непосредственно в Linux.
 
 ```shell script
-curl -s https://raw.githubusercontent.com/BigKAA/youtube/master/net/02-calico/01-install_calicoctl.sh | bash
+curl -s https://raw.githubusercontent.com/BigKAA/youtube/net/net/02-calico/01-install-calicoctl.sh | bash
 ```
 
 Создаем конфигурационный файл программы.
 
 ```shell script
-curl -s https://raw.githubusercontent.com/BigKAA/youtube/master/net/02-calico/02-calicoctl.cfg -o calicoctl.cfg 
+curl -s https://raw.githubusercontent.com/BigKAA/youtube/net/net/02-calico/02-calicoctl.cfg -o /etc/calico/calicoctl.cfg 
 ```
 
 Проверяем работу программы
@@ -128,9 +128,29 @@ spec:
 В файле заменим параметры
 
     ipipMode: Never -> Always
-    vxlanMode: CrossSubnet -> Never
 
 Применим полученную конфигурацию.
 
     calicoctl apply -f pool.yaml
 
+Смотри на всех нодах кластера таблицу маршрутизации.
+
+    route -n
+
+Пытаемся подключиться к nginx.
+
+Снова открываем на редактирование pool.yaml изаменяем
+
+    ipipMode: Always -> CrossSubnet
+
+Удаляем строки:
+
+    creationTimestamp:
+    resourceVersion:
+    uid: 
+    
+Применим полученную конфигурацию.
+
+    calicoctl apply -f pool.yaml
+
+Смотри на всех нодах кластера таблицу маршрутизации. Делаем выводы.
