@@ -14,3 +14,6 @@ Nexus внутри kubernetes, делаем свой docker registry.
    * https://youtu.be/nsBeED5UNUw
 * **PriorityClass** - Приориеты. Больше вопросов, чем ответов.
    * https://youtu.be/BGd-NsaQF7g
+* **net** - Про сеть в kubernetes.
+   * https://youtu.be/Xo14qjvbCmU - теория.
+   * https://youtu.be/N_eimgSDB_s - перед установкой драйвера сети.
