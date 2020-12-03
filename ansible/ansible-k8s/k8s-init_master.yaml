@@ -5,6 +5,7 @@
 
   roles:
     - k8s_master_setup
+    - k8s_calico_setup
 
 - name: Install k8s control plane in the other nodes
   hosts: k8s_other_masters
