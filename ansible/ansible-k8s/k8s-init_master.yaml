@@ -1,0 +1,14 @@
+---
+- name: Install k8s control plane in the 1st node
+  hosts: k8s_1st_master
+  become: yes
+
+  roles:
+    - k8s_master_setup
+
+- name: Install k8s control plane in the other nodes
+  hosts: k8s_other_masters
+  become: yes
+
+  roles:
+    - k8s_anoter_master_setup

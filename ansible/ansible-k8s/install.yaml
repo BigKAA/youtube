@@ -1,0 +1,22 @@
+---
+- name: Install docker and k8s packages
+  hosts: k8s_cluster
+  become: yes
+
+  roles:
+    - docker_install
+    - k8s_packages_install
+
+- name: Install HA for k8s API access and vrrl on control plane servers
+  hosts: k8s_controls
+  become: yes
+
+  roles:
+    - ha_install
+
+#- name: Install k8s control plane in the 1st node
+#  hosts: k8s_1st_master
+#  become: yes
+
+#  roles:
+#    - k8s_master_setup

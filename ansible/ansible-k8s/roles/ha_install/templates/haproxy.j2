@@ -1,0 +1,36 @@
+global
+   log /dev/log local0
+   log /dev/log local1 notice
+   chroot /var/lib/haproxy
+   stats timeout 30s
+   user haproxy
+   group haproxy
+   daemon
+defaults
+log global
+#mode http
+#option httplog
+option dontlognull
+timeout connect 5000
+timeout client 50000
+timeout server 50000
+
+#frontend
+#---------------------------------
+frontend kubernetes-frontend
+bind *:7443
+#stats uri /haproxy?stats
+mode tcp
+option tcplog
+default_backend kubernetes-backend
+
+#-----------------------------------
+backend kubernetes-backend
+balance static-rr
+
+mode tcp
+option tcp-check
+
+{% for server in ha_install_control_servers %}
+server {{ server.name }} {{ server.ip }}:6443 check
+{% endfor %}
