@@ -14,9 +14,17 @@
   roles:
     - ha_install
 
-#- name: Install k8s control plane in the 1st node
-#  hosts: k8s_1st_master
-#  become: yes
+- name: Install k8s control plane and calico network on the 1st node
+  hosts: k8s_1st_master
+  become: yes
 
-#  roles:
-#    - k8s_master_setup
+  roles:
+    - k8s_master_setup
+    - k8s_calico_setup
+
+- name: Install k8s control plane in the other nodes
+  hosts: k8s_other_masters
+  become: yes
+
+  roles:
+    - k8s_anoter_master_setup
