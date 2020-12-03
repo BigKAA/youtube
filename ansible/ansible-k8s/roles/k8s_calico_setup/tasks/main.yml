@@ -11,14 +11,14 @@
     mode: 0644
 
 - name: Install calico network
-    shell: kubect apply -f calico.yaml >> .ansible_k8s/calico_installed.txt
-    args:
-      chdir: $HOME
-      creates: .ansible_k8s/calico_installed.txt
+  shell: kubect apply -f calico.yaml >> .ansible_k8s/calico_installed.txt
+  args:
+    chdir: $HOME
+    creates: .ansible_k8s/calico_installed.txt
 
 - name: Get calico version
-    shell: grep 'docker.io/calico/node' $HOME/calico.yaml | cut -d':' -f3
-    register: calico_version
+  shell: grep 'docker.io/calico/node' $HOME/calico.yaml | cut -d':' -f3
+  register: calico_version
 
 # Install calicoctl
 - name: Get calicoctl
