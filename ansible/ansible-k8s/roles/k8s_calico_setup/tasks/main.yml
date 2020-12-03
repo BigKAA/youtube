@@ -20,8 +20,6 @@
   shell: grep 'docker.io/calico/node' $HOME/calico.yaml | cut -d':' -f3
   register: calico_version
 
-- debug:
-    var: calico_version
 # Install calicoctl
 - name: Get calicoctl
   get_url:
