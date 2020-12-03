@@ -13,3 +13,10 @@
 
   roles:
     - k8s_anoter_master_setup
+
+- name: Add k8s worker nodes
+  hosts: k8s_workers
+  become: yes
+
+  roles:
+    - k8s_workers_setup
