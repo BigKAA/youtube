@@ -32,7 +32,7 @@
     path: /usr/local/bin/calicoctl
     owner: root
     group: root
-    mode: 0700
+    mode: 0755
 
 - name: Create /etc/calico direcory
   file:

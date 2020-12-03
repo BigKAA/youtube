@@ -21,6 +21,7 @@
   run_once: True
   args:
     creates: .ansible_k8s/node_joined.txt
+
 - name: join cluster
   shell: "{{ join_command_raw.stdout_lines[0] }} >> .ansible_k8s/node_joined.txt"
   args:
