@@ -1,15 +1,10 @@
-Для работы с модулями ядра
+# Install k8s HA cluster on Centos 8.
 
-ansible-galaxy collection install community.general
+Наброски плейбука для установки HA кластера на базе Centos 8.
 
-- name: Add the 802.1q module
-  community.general.modprobe:
-    name: 8021q
-    state: present
+## Дополнительные модули.
 
-- name: Add the dummy module
-  community.general.modprobe:
-    name: dummy
-    state: present
-    params: 'numdummies=2'
+Для работы с модулями ядра добавить
+
+    ansible-galaxy collection install community.general
 
