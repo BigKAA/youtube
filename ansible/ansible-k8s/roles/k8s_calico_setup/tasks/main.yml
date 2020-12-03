@@ -11,7 +11,7 @@
     mode: 0644
 
 - name: Install calico network
-  shell: kubect apply -f calico.yaml >> .ansible_k8s/calico_installed.txt
+  shell: kubectl apply -f calico.yaml >> .ansible_k8s/calico_installed.txt
   args:
     chdir: $HOME
     creates: .ansible_k8s/calico_installed.txt
