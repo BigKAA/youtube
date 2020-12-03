@@ -6,7 +6,7 @@ k8s_calico_setup
 Role Variables
 --------------
 
-**8s_calico_setup_ip_ip_mode** - Режим ip-ip
+**k8s_calico_setup_ip_ip_mode** - Режим ip-ip
 
 Example Playbook
 ----------------
