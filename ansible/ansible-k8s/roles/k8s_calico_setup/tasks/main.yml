@@ -19,8 +19,6 @@
 - name: Get calico version
   shell: grep 'docker.io/calico/node' $HOME/calico.yaml | cut -d':' -f3
   register: calico_version
-  args:
-    creates: /usr/local/bin/calicoctl
 
 # Install calicoctl
 - name: Get calicoctl
