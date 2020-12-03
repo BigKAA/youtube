@@ -5,12 +5,16 @@
   register: certificate_key_raw
   delegate_to: "{{ groups['k8s_1st_master'][0] }}"
   run_once: True
+  args:
+    creates: .ansible_k8s/node_joined.txt
 
 - name: get join command
   shell: kubeadm token create --print-join-command
   register: join_command_raw
   delegate_to: "{{ groups['k8s_1st_master'][0] }}"
   run_once: True
+  args:
+    creates: .ansible_k8s/node_joined.txt
 
 - name: Start Kubelet service
   service:
