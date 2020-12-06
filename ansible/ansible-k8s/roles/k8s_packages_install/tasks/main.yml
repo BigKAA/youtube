@@ -58,7 +58,7 @@
     dest: /etc/modules-load.d/containerd.conf
     owner: root
     group: root
-    mode: u=rw,g=r,o=r
+    mode: 0644
 
 - name: Set some sysctl-settings
   sysctl:

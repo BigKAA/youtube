@@ -1,0 +1,61 @@
+---
+# tasks file for docker_insatll
+- name: Install packages
+  dnf:
+    name: 
+      - tc
+      - ipvsadm
+      - network-scripts
+    state: latest
+
+- name: Disable NetworkManager
+  service:
+    name: NetworkManager
+    state: stopped
+    enabled: no
+
+- name: Enable network service
+  service:
+    name: network
+    state: started
+    enabled: yes
+
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docer-ce.repo
+
+- name: Enable Docker Edge repo
+  ini_file:
+    dest: /etc/yum.repos.d/docer-ce.repo
+    section: 'docker-ce-edge'
+    option: enabled
+    value: '0'
+
+- name: Install package containerd.io
+  dnf:
+    name: containerd.io
+    state: latest
+
+- name: Create /etc/containerd direcory
+  file:
+    path: /etc/containerd
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy config.toml
+  copy:
+    src: config.toml
+    dest: /etc/containerd/config.toml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Start containerd service
+  service:
+    name: containerd
+    state: started
+    enabled: yes
+

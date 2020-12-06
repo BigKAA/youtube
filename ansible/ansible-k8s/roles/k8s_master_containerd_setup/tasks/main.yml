@@ -22,7 +22,7 @@
 # tasks file for k8s_master_setup on the 1st node
 # --upload-certs
 - name: initialize the cluster
-  shell: kubeadm init --config kube-config.yaml >> .ansible_k8s/cluster_initialized.txt
+  shell: kubeadm init  --config kube-config.yaml >> .ansible_k8s/cluster_initialized.txt
   args:
    chdir: $HOME
    creates: .ansible_k8s/cluster_initialized.txt
