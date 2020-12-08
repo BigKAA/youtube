@@ -33,7 +33,7 @@ kubernetes.
 ## Деплоим приложения
 
     # kubect apply -f 01-rbac.yaml
-    # kubectl apply -f 02-depliyment.yaml
+    # kubectl apply -f 02-deployment.yaml
 
 Смотрим логи jenkins, ищем первначальный пароль админа.
 
