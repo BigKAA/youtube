@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus
+  labels:
+    app: nexus
+    section: tools
+spec:
+  ports:
+    - name: http-main
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app: nexus
+    section: tools
+  clusterIP: None
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: nexus
+    labels:
+      app: nexus
+      section: tools
+spec:
+  selector:
+    matchLabels:
+      app: nexus
+      section: tools
+  serviceName: nexus
+  template:
+    metadata:
+      labels:
+        app: nexus
+        section: tools
+    spec:
+      containers:
+        - name: nexus
+          image: sonatype/nexus3:3.27.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+            - containerPort: 8083
+              protocol: TCP
+          env:
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: "-Xms2g -Xmx2g -XX:MaxDirectMemorySize=3g"
+            # - name: NEXUS_CONTEXT
+            #  value: nexus
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 6
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-0
+  labels:
+    app: nexus
+    section: tools
+spec:
+  ports:
+    - name: http-main
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+    - name: http-docker-rep
+      port: 8083
+      protocol: TCP
+      targetPort: 8083
+  selector:
+    app: nexus
+    section: tools
+    statefulset.kubernetes.io/pod-name: nexus-0
