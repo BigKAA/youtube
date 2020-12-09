@@ -1,0 +1,6 @@
+---
+# vars file for k8s_master_setup
+k8s_master_setup_dns_domain: cluster.local
+k8s_master_setup_pod_subnet: 10.233.0.0/18
+k8s_master_setup_sevice_subnet: 10.233.64.0/18
+k8s_master_setup_control_plane_endpoint: 192.168.218.179:7443

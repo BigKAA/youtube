@@ -1,0 +1,4 @@
+---
+# vars file for k8s_calico_setup
+
+k8s_calico_setup_ip_ip_mode: CrossSubnet

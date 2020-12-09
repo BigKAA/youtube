@@ -1,0 +1,62 @@
+---
+# tasks file for docker_insatll
+- name: Install packages
+  dnf:
+    name: 
+      - tc
+      - ipvsadm
+      - network-scripts
+    state: latest
+
+- name: Disable NetworkManager
+  service:
+    name: NetworkManager
+    state: stopped
+    enabled: no
+
+- name: Enable network service
+  service:
+    name: network
+    state: started
+    enabled: yes
+
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docer-ce.repo
+
+- name: Enable Docker Edge repo
+  ini_file:
+    dest: /etc/yum.repos.d/docer-ce.repo
+    section: 'docker-ce-edge'
+    option: enabled
+    value: '0'
+
+- name: Install Docker
+  dnf:
+    name: docker-ce
+    state: latest
+
+- name: Create /etc/docker direcory
+  file:
+    path: /etc/docker
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy daemon.json
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  notify: Restart Docker
+
+- name: Start Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+

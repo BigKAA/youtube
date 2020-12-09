@@ -1,9 +1,7 @@
----
 apiVersion: v1
 kind: Service
 metadata:
   name: nexus
-  namespace: nexus
   labels:
     app: nexus
     section: tools
@@ -23,7 +21,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
     name: nexus
-    namespace: nexus
     labels:
       app: nexus
       section: tools
@@ -74,25 +71,12 @@ spec:
             limits:
               memory: "2Gi"
               cpu: "2"
-          volumeMounts:
-            - mountPath: /nexus-data
-              name: nexus-data
-  volumeClaimTemplates:
-  - metadata:
-      name: nexus-data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "managed-nfs-storage"
-      resources:
-        requests:
-          storage: 8Gi
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: nexus-0
-  namespace: nexus
   labels:
     app: nexus
     section: tools
@@ -110,36 +94,3 @@ spec:
     app: nexus
     section: tools
     statefulset.kubernetes.io/pod-name: nexus-0
-
----
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-  name: nexus
-  namespace: nexus
-  labels:
-    app: nexus
-    section: tools
-spec:
-  rules:
-    - host: nexus.kryukov.local
-      http:
-        paths:
-          - backend:
-              serviceName: nexus-0
-              servicePort: 8081
-            path: /
-    - host: n.kryukov.local
-      http:
-        paths:
-          - backend:
-              serviceName: nexus-0
-              servicePort: 8083
-            path: /
-  tls:
-    - hosts:
-      - n.kryukov.local
-      secretName: nexus-tls

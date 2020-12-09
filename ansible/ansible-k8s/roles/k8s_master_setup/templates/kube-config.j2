@@ -1,0 +1,21 @@
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+clusterName: {{ k8s_master_setup_dns_domain }}
+controlPlaneEndpoint: {{ k8s_master_setup_control_plane_endpoint }}
+apiServer:
+  extraArgs:
+    advertise-address: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+dns:
+  type: CoreDNS
+networking:
+  dnsDomain: {{ k8s_master_setup_dns_domain }}
+  podSubnet: {{ k8s_master_setup_pod_subnet }}
+  serviceSubnet: {{ k8s_master_setup_sevice_subnet }}
+scheduler:
+  extraArgs:
+    bind-address: 0.0.0.0
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: ipvs

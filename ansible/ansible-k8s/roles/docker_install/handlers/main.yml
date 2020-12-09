@@ -1,0 +1,6 @@
+---
+# handlers file for docker_insatll
+- name: Restart Docker
+  service:
+    name: docker
+    state: restarted

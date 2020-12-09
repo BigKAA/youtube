@@ -1,0 +1,50 @@
+---
+# tasks file for k8s_calico_setup
+
+# Install calico
+# https://docs.projectcalico.org/manifests/calico.yaml
+
+- name: Generate calico.yaml
+  template:
+    src: calico.j2
+    dest: $HOME/calico.yaml
+    mode: 0644
+
+- name: Install calico network
+  shell: kubectl apply -f calico.yaml >> .ansible_k8s/calico_installed.txt
+  args:
+    chdir: $HOME
+    creates: .ansible_k8s/calico_installed.txt
+
+- name: Get calico version
+  shell: grep 'docker.io/calico/node' $HOME/calico.yaml | cut -d':' -f3
+  register: calico_version
+
+# Install calicoctl
+- name: Get calicoctl
+  get_url:
+    url: https://github.com/projectcalico/calicoctl/releases/download/{{ calico_version.stdout_lines[0] }}/calicoctl
+    dest: /usr/local/bin/calicoctl
+
+- file:
+    path: /usr/local/bin/calicoctl
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create /etc/calico direcory
+  file:
+    path: /etc/calico
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy calicoctl.cfg
+  copy:
+    src: calicoctl.cfg
+    dest: /etc/calico/calicoctl.cfg
+    owner: root
+    group: root
+    mode: 0644
+

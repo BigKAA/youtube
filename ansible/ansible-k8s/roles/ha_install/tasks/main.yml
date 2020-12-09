@@ -1,0 +1,36 @@
+---
+# tasks file for ha_install
+- name: Install packages haproxy and keepalived
+  dnf:
+    name:
+      - haproxy
+      - keepalived
+    state: latest
+
+- name: Generate keepalived.conf
+  template:
+    src: keepalived.j2
+    dest: /etc/keepalived/keepalived.conf
+    mode: 0644
+  notify:
+    - Restart keepalived
+
+- name: Enable keepalived service
+  service:
+    name: keepalived
+    state: started
+    enabled: yes
+
+- name: Generate haproxy.cfg
+  template:
+    src: haproxy.j2
+    dest: /etc/haproxy/haproxy.cfg
+    mode: 0644
+  notify:
+    - Restart haproxy
+
+- name: Enable haproxy service
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
