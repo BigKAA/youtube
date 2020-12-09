@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat
+  labels:
+    app: tomcat
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: tomcat
+  template:
+    metadata:
+      labels:
+        app: tomcat
+    spec:
+      containers:
+      - name: tomcat
+        image: tomcat:10-jdk15
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "0.2"
+            memory: "200Mi"
+          limits:
+            cpu: "0.5"
+            memory: "500Mi"
+        ports:
+        - containerPort: 8080
+          name: tomcat
+          protocol: TCP

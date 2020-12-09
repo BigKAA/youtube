@@ -1,0 +1,32 @@
+global_defs {
+{% if ansible_hostname == ha_install_control_servers[0].name %}
+ router_id {{ ha_install_control_servers[0].name }}
+{% elif ansible_hostname == ha_install_control_servers[1].name %}
+ router_id {{ ha_install_control_servers[1].name }}
+{% else %}
+ router_id {{ ha_install_control_servers[2].name }}
+{% endif %}
+}
+
+vrrp_instance VI_1 {
+state MASTER
+interface ens33
+
+{% if ansible_hostname == ha_install_control_servers[0].name %}
+priority {{ ha_install_control_servers[0].priority }}
+{% elif ansible_hostname == ha_install_control_servers[1].name %}
+priority {{ ha_install_control_servers[1].priority }}
+{% else %}
+priority {{ ha_install_control_servers[2].priority }}
+{% endif %}
+
+virtual_router_id 51
+advert_int 1
+authentication {
+auth_type PASS
+auth_pass Joh$tiPasS
+}
+virtual_ipaddress {
+{{ ha_insatll_control_cluster_ip }} dev ens33 label ens33:0
+}
+}

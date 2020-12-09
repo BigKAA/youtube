@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-main
+  labels:
+    app: tomcat
+spec:
+  selector:
+    app: tomcat
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: tomcat

@@ -1,0 +1,23 @@
+# Не советую вам экспериментировать с externalIPs.
+# Если решитесь на эксперименты - не подставляете ip адреса, на которых висит API сервер кластера.
+# Используйте multimaster установку кластера, если ошибётесь, можно переключиться на другую ноду и исправить ошибку.
+# И не говорите, что я вас не предупреждал.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-svc
+  labels:
+    app: nexus
+    section: tools
+spec:
+  ports:
+    - name: http-main
+      port: 8888
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app: nexus
+    section: tools
+  externalIPs:
+    - 192.168.218.178

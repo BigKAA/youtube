@@ -1,0 +1,16 @@
+---
+# vars file for ha_install
+ha_install_control_servers:
+   - ip: 192.168.218.171
+     name: control1
+     priority: 150
+   - ip: 192.168.218.172
+     name: control2
+     priority: 120
+   - ip: 192.168.218.173
+     name: control3
+     priority: 100
+
+ha_insatll_control_cluster_ip: 192.168.218.179
+
+
