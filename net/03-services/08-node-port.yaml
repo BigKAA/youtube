@@ -7,8 +7,6 @@ metadata:
   name: tomcat-nodeport
 spec:
   type: NodePort
-  # Открываем порты только на тех машинах, где находятся
-  # поды контроллера
   # externalTrafficPolicy: Local
   selector:
     app: tomcat
