@@ -15,5 +15,9 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **PriorityClass** - Приориеты. Больше вопросов, чем ответов.
    * https://youtu.be/BGd-NsaQF7g
 * **net** - Про сеть в kubernetes.
-   * https://youtu.be/Xo14qjvbCmU - теория.
-   * https://youtu.be/N_eimgSDB_s - перед установкой драйвера сети.
+   * [Теория](https://youtu.be/Xo14qjvbCmU)
+   * [перед установкой драйвера сети](https://youtu.be/N_eimgSDB_s) 
+   * [Calico](https://youtu.be/GRlMC-7qZv8)
+   * [Calico-IPAM](https://youtu.be/4kQB6fR5vm8)
+   * [Services 1](https://youtu.be/OWUOHM_08mc)
+   * [Services 2](https://youtu.be/OHBv_OdjVIU)
