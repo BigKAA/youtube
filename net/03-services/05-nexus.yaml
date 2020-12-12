@@ -30,6 +30,7 @@ spec:
       app: nexus
       section: tools
   serviceName: nexus
+  replicas: 1
   template:
     metadata:
       labels:
