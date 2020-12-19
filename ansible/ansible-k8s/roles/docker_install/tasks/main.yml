@@ -3,7 +3,7 @@
 - name: Install packages
   dnf:
     name: 
-      - tc
+      - nc
       - ipvsadm
       - network-scripts
     state: latest
