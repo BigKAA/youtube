@@ -1,3 +1,0 @@
-ansible_user: ansible
-env: k8s_cluster
-
