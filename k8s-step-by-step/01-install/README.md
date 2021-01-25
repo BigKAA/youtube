@@ -59,3 +59,10 @@
     ssh-copy-id worker2
     ssh-copy-id worker3
 
+Переходим в директорию 00-ansible.
+
+Проверяем подключение ansible к хостам:
+
+    ansible-playbook ping.yaml
+
+Если ping не проходит, ищем ошибки и исправляем.
