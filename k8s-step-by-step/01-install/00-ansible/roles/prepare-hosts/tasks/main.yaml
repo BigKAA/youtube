@@ -9,7 +9,9 @@
 - name: Install packages
   yum:
     name:
-      - network-scripts
+      - net-tools
+      - mc
+      - vim
     state: latest
 
 - name: Disable NetworkManager
