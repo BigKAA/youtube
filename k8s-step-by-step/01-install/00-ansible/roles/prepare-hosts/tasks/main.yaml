@@ -1,4 +1,3 @@
----
 # 3 steps:
 # - disable swap
 # - disable selinux
@@ -6,6 +5,7 @@
 # optional:
 # - disable NetworkManager
 # - enable network service
+---
 - name: Install packages
   yaml:
     name:
