@@ -10,4 +10,16 @@
   yaml:
     name:
       - network-scripts
-    state: lates
+    state: latest
+
+- name: Disable NetworkManager
+  service:
+    name: NetworkManager
+    state: stopped
+    enabled: no
+
+- name: Enable network service
+  service:
+    name: network
+    state: started
+    enabled: yes
