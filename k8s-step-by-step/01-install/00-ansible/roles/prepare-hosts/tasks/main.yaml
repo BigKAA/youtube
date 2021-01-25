@@ -7,7 +7,7 @@
 # - enable network service
 ---
 - name: Install packages
-  yaml:
+  yum:
     name:
       - network-scripts
     state: latest
