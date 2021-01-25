@@ -66,3 +66,4 @@
     ansible-playbook ping.yaml
 
 Если ping не проходит, ищем ошибки и исправляем.
+
