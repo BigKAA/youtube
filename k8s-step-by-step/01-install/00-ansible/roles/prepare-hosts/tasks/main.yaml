@@ -1,0 +1,13 @@
+---
+# 3 steps:
+# - disable swap
+# - disable selinux
+# - disable firewall
+# optional:
+# - disable NetworkManager
+# - enable network service
+- name: Install packages
+  yaml:
+    name:
+      - network-scripts
+    state: lates

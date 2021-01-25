@@ -1,0 +1,8 @@
+---
+- name: Test playbook
+  hosts: k8s_cluster
+  become: yes
+
+  tasks:
+  - name: Ping my servers
+    ping:
