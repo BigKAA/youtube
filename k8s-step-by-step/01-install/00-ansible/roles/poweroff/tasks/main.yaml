@@ -1,0 +1,9 @@
+# 3 steps:
+# - disable swap
+# - disable selinux
+# - disable firewall
+# optional:
+# - disable NetworkManager
+# - enable network service
+- name: Poweroff
+  shell: poweroff

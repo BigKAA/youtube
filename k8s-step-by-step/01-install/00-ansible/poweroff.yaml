@@ -1,0 +1,6 @@
+---
+- name: Prepare hosts to kubesparay
+  hosts: k8s_cluster
+
+  roles:
+    - poweroff
