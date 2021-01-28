@@ -12,6 +12,8 @@
       - net-tools
       - mc
       - vim
+      - git
+      - bash-completion
     state: latest
 
 - name: Disable NetworkManager
