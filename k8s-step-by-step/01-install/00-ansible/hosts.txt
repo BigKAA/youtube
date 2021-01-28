@@ -1,0 +1,19 @@
+[k8s_1st_master]
+control1.kryukov.local ansible_host=192.168.218.171
+
+[k8s_other_masters]
+control2.kryukov.local ansible_host=192.168.218.172
+control3.kryukov.local ansible_host=192.168.218.173
+
+[k8s_controls:children]
+k8s_1st_master
+k8s_other_masters
+
+[k8s_workers]
+worker1.kryukov.local  ansible_host=192.168.218.174
+worker2.kryukov.local  ansible_host=192.168.218.175
+worker3.kryukov.local  ansible_host=192.168.218.176
+
+[k8s_cluster:children]
+k8s_controls
+k8s_workers
