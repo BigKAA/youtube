@@ -2,7 +2,7 @@
 
 ## Ingress controller
 
-* Ставим два контроллера.
+* Ставим два пода.
 * Сервис типа NodePort.
   * nodePort: 31080
   * nodePort: 31443
