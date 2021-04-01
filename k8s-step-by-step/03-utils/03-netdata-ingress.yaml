@@ -6,7 +6,7 @@ metadata:
   namespace: monitoring
   annotations:
     kubernetes.io/ingress.class: "system-ingress"
-    certmanager.k8s.io/cluster-issuer: ca-issuer
+    certmanager.k8s.io/cluster-issuer: monitoring-issuer
 spec:
   tls:
     - hosts:
