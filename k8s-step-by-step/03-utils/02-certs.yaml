@@ -32,6 +32,8 @@ spec:
   dnsNames:
   - kryukov.local
   - mon.kryukov.local
+  - grafana.kryukov.local
+  - prom.kryukov.local
   - netdata.kryukov.local
   ipAddresses:
   - 192.168.218.174

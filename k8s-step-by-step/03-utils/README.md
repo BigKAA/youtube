@@ -37,7 +37,7 @@ https://github.com/helm/helm/releases
     --cert=/etc/kubernetes/ssl/ca.crt \
     --key=/etc/kubernetes/ssl/ca.key
 
-Изучаем файл 02-certs.yaml. В файле используются CRD, добавленный при
+Изучаем файл 02-certs.yaml. В файле используются CRD, добавленные при
 установке certmanager.
 
 Применяем файл.
