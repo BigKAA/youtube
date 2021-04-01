@@ -98,7 +98,7 @@ spec:
       priorityClassName: high-priority
       containers:
         - name: nfs-client-provisioner
-          image: quay.io/external_storage/nfs-client-provisioner:latest
+          image: gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.1
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: nfs-client-root

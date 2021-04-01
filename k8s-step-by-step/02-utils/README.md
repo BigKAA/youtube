@@ -20,6 +20,7 @@ comfigMap. [Образ](https://hub.docker.com/r/stakater/reloader/tags?page=1&o
 
 ## Metrics server
 
+
 [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) - собирает метрики по использованию CPU и RAM.
 Добавляет metrics API, используемый в инструментах горизонтального масштабирования подов. 
 
