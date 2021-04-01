@@ -1,0 +1,25 @@
+# Это пример ингресс. Не применяете его. Нужный ingress ставит helm
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: netdata-ingress
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: "system-ingress"
+    certmanager.k8s.io/cluster-issuer: ca-issuer
+spec:
+  tls:
+    - hosts:
+      - netdata.kryukov.local
+      secretName: mon-tls
+  rules:
+    - host: "netdata.kryukov.local"
+      http:
+        paths:
+          - path: /
+            backend:
+              service:
+                name: netdata
+                port:
+                  name: http

@@ -44,10 +44,11 @@ https://learn.netdata.cloud/docs
 
 https://github.com/netdata/helmchart/tree/master/charts/netdata
 
-    helm install --set image.pullPolicy=IfNotPresent --set ingress.enabled=true --set ingress.hosts={mon.kryukov.local} \
-    --set ingress.annotations={kubernetes.io/ingress.class: system-ingress} \
+    helm install --set image.pullPolicy=IfNotPresent --set ingress.enabled=true --set ingress.hosts={netdata.kryukov.local} \
+    --set ingress.annotations={kubernetes.io/ingress.class: system-ingress, certmanager.k8s.io/cluster-issuer: ca-issuer} \
+    --set tls.secretName=mon-tls --set tls.hosts={netdata.kryukov.local} \
     --set parent.database.storageclass=managed-nfs-storage --set parent.alarms.storageclass=managed-nfs-storage \
-    --set image.tag=1.30.0 --set sd.image.pullPolicy=IfNotPresent  --namespace monitoring \
+    --set image.tag=1.30.0 --set sd.image.pullPolicy=IfNotPresent  \
     --set child.resources.limits.cpu=1 --set child.resources.limits.memory=1024Mi \
-    netdata netdata/netdata \
+    --namespace monitoring netdata netdata/netdata \
     --debug --dry-run
