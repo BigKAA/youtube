@@ -346,6 +346,16 @@ spec:
         prometheus.io.path: /metrics
         prometheus.io.port: "10254"
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                      - ingress-nginx
+              topologyKey: "kubernetes.io/hostname"
       priorityClassName: high-priority
       serviceAccountName: ingress-nginx
       containers:
