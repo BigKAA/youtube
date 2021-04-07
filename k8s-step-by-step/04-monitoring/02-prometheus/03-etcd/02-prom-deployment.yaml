@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: prometheus-sys
+  labels:
+    app: prometheus-sys
+  namespace: monitoring
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  serviceName: prometheus-sys
+  selector:
+    matchLabels:
+      app: prometheus-sys
+  template:
+    metadata:
+      labels:
+        app: prometheus-sys
+    spec:
+      serviceAccountName: prometheus
+      priorityClassName: low-priority
+      containers:
+      - name: prometheus-sys
+        image: quay.io/prometheus/prometheus:v2.23.0
+        imagePullPolicy: IfNotPresent
+        args:
+          - --storage.tsdb.retention.time=2h
+          - --config.file=/etc/prometheus/prometheus.yml
+          - --web.listen-address=0.0.0.0:9090
+          - --storage.tsdb.min-block-duration=2h
+          - --storage.tsdb.max-block-duration=2h
+          - --storage.tsdb.path=/prometheus
+          - --web.console.libraries=/usr/share/prometheus/console_libraries
+          - --web.console.templates=/usr/share/prometheus/consoles
+          - --web.external-url=http://mon.kryukov.local:31080/prometheus/
+        volumeMounts:
+          - name: prometheus-config-volume
+            mountPath: /etc/prometheus/prometheus.yml
+            subPath: prometheus.yml
+          - name: data
+            mountPath: /prometheus
+          - name: etcd-client-volume
+            mountPath: /opt/prometheus/secrets
+        ports:
+        - containerPort: 9090
+      volumes:
+        - name: prometheus-config-volume
+          configMap:
+            name: prometheus-config
+        - name: etcd-client-volume
+          secret:
+            defaultMode: 420
+            secretName:
+              etcd-client
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "managed-nfs-storage"
+        resources:
+          requests:
+            storage: 10Gi

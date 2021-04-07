@@ -1,0 +1,33 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: monitoring
+  namespace: monitoring
+  annotations:
+    ingress.kubernetes.io/rewrite-target: "/"
+    kubernetes.io/ingress.class: "system-ingress"
+    certmanager.k8s.io/cluster-issuer: monitoring-issuer
+spec:
+  tls:
+    - hosts:
+        - mon.kryukov.local
+      secretName: mon-tls
+  rules:
+    - host: "mon.kryukov.local"
+      http:
+        paths:
+          - pathType: Prefix
+            path: /prometheus
+            backend:
+              service:
+                name: prometheus-sys-connect
+                port:
+                  number: 9090
+          - pathType: Prefix
+            path: /grafana
+            backend:
+              service:
+                name: grafana-sys-connect
+                port:
+                  number: 3000

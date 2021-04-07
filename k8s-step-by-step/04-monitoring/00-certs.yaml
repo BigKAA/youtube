@@ -1,0 +1,48 @@
+# Этот манифест был применен в предыдущем видео. См. 03-utils/02-certs.yaml
+# Если вы не делали шаги из предыдущего видео, сначала создайте сикрет:
+# kubectl -n monitoring create secret tls kube-ca-secret --cert=/etc/kubernetes/ssl/ca.crt --key=/etc/kubernetes/ssl/ca.key
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: monitoring-issuer
+  namespace: monitoring
+spec:
+  ca:
+    secretName: kube-ca-secret
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mon-certificate
+  namespace: monitoring
+spec:
+  secretName: mon-tls
+  duration: 9125h # 1y
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+    - arturs k8s
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+    rotationPolicy: Always
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - kryukov.local
+  - mon.kryukov.local
+  - grafana.kryukov.local
+  - prom.kryukov.local
+  - netdata.kryukov.local
+  ipAddresses:
+  - 192.168.218.174
+  - 192.168.218.175
+  - 192.168.218.176
+  issuerRef:
+    name: monitoring-issuer
+    kind: Issuer
+    group: cert-manager.io
