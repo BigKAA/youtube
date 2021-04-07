@@ -13,15 +13,15 @@
 
 ## Схема
 
-![](images/scheme.jpg)
+![схема](images/scheme.jpg)
 
 ### Хранилище метрик - victoriametrics
 
-[victoriamerics](01-victoriamerics/README.md)
+[victoriamerics](01-victoriametrics/README.md)
 
 ### Сбор метрик - prometheus
 
-[promatheus](02-promatheus/README.md)
+[prometheus](02-prometheus/README.md)
 
 ### Отображение метрик - grafana
 
