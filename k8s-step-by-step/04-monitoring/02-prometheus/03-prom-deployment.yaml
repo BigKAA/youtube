@@ -79,6 +79,7 @@ metadata:
   namespace: monitoring
   annotations:
     reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: "prometheus-config"
 spec:
   replicas: 1
   serviceName: prometheus-sys
