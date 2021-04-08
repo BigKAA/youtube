@@ -27,3 +27,6 @@
 
 [grafana](03-grafana/README.md)
 
+### Видео
+
+https://youtu.be/nEzXmDYDqg8
