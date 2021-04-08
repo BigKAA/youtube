@@ -1,0 +1,31 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval:     15s
+      external_labels:
+        monitor: 'k8s-dev-monitor'
+    remote_write:
+      - url: http://victoriametrics-sys-connect:8428/api/v1/write
+    scrape_configs:
+
+      #==========================================================================
+      - job_name: 'kubernetes-nodelocaldns'
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names:
+              - kube-system
+
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: keep
+          regex: nodelocaldns-.*
+        - source_labels: [__meta_kubernetes_pod_container_port_number]
+          action: keep
+          regex: 9253

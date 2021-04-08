@@ -1,0 +1,95 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-sys
+  namespace: monitoring
+  labels:
+    app: grafana-sys
+spec:
+  ports:
+  - port: 3000
+    name: http
+    protocol: TCP
+  clusterIP: None
+  selector:
+    app: grafana-sys
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-sys-connect
+  namespace: monitoring
+  labels:
+    app: grafana-sys
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    name: http
+    protocol: TCP
+  selector:
+    app: grafana-sys
+    statefulset.kubernetes.io/pod-name: grafana-sys-0
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: grafana-sys
+  name: grafana-sys
+  namespace: monitoring
+spec:
+  replicas: 1
+  serviceName: grafana-sys
+  selector:
+    matchLabels:
+      app: grafana-sys
+  template:
+    metadata:
+      labels:
+        app: grafana-sys
+    spec:
+      containers:
+      - env: []
+        image: grafana/grafana:7.5.2
+        name: grafana-sys
+        ports:
+        - containerPort: 3000
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+          - name: data
+            mountPath: /var/lib/grafana
+          - name: grafana-datasource
+            mountPath: /etc/grafana/provisioning/datasources
+            readOnly: false
+          - name: grafana-ini
+            mountPath: /etc/grafana/grafana.ini
+            subPath: grafana.ini
+      volumes:
+        - name: grafana-datasource
+          configMap:
+            name: grafana-datasource
+        - name: grafana-ini
+          configMap:
+            name: grafana-ini
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "managed-nfs-storage"
+        resources:
+          requests:
+            storage: 5Gi

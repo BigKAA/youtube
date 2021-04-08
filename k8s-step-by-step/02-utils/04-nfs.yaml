@@ -73,7 +73,7 @@ metadata:
   name: managed-nfs-storage
 provisioner: kryukov.local/nfs
 parameters:
-  archiveOnDelete: "false"
+  onDelete: delete
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -428,7 +428,7 @@ spec:
             - name: webhook
               containerPort: 8443
               protocol: TCP
-            # порт для достпа к метрикам prometheus
+            # порт для доступа к метрикам prometheus
             - name: metrics
               containerPort: 10254
               protocol: TCP
