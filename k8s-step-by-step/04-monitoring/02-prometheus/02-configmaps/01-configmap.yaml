@@ -12,12 +12,9 @@ data:
         monitor: 'k8s-dev-monitor'
     remote_write:
       - url: http://victoriametrics-sys-connect:8428/api/v1/write
-    scrape_configs:
-      - job_name: 'prometheus'
-        scrape_interval: 5s
-        static_configs:
-          - targets: ['localhost:9090']
 
+
+    scrape_configs:
       # Метрики API сервера
       - job_name: 'kubernetes-apiservers'
         kubernetes_sd_configs:

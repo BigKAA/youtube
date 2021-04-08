@@ -48,7 +48,7 @@ spec:
       labels:
         app: victoriametrics-sys
     spec:
-      priorityClassName: medium-priority
+      priorityClassName: low-priority
       containers:
         - name: victoriametrics-sys
           image: victoriametrics/victoria-metrics:v1.57.1
