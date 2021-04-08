@@ -11,7 +11,7 @@
         "type": "dashboard"
       },
       {
-        "datasource": "victoriametrics",
+        "datasource": "victoriametrics-system",
         "enable": true,
         "expr": "sum(changes(nginx_ingress_controller_config_last_reload_successful_timestamp_seconds{instance!=\"unknown\",controller_class=~\"$controller_class\",namespace=~\"$namespace\"}[30s])) by (controller_class)",
         "hide": false,
@@ -43,7 +43,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -126,7 +126,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -214,7 +214,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -301,7 +301,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -390,7 +390,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -475,7 +475,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "decimals": 2,
       "editable": true,
       "error": false,
@@ -597,7 +597,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "decimals": 2,
       "editable": false,
       "error": false,
@@ -711,7 +711,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "decimals": 2,
       "editable": true,
       "error": false,
@@ -839,7 +839,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "decimals": 2,
       "editable": false,
       "error": false,
@@ -954,7 +954,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "decimals": 3,
       "editable": false,
       "error": false,
@@ -1069,7 +1069,7 @@
     },
     {
       "columns": [],
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -1308,7 +1308,7 @@
           "value": "current"
         }
       ],
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -1425,7 +1425,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "victoriametrics",
+        "datasource": "victoriametrics-system",
         "definition": "",
         "error": null,
         "hide": 0,
@@ -1452,7 +1452,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "victoriametrics",
+        "datasource": "victoriametrics-system",
         "definition": "label_values(nginx_ingress_controller_config_hash{controller_namespace=~\"$namespace\"}, controller_class) ",
         "error": null,
         "hide": 0,
@@ -1479,7 +1479,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "victoriametrics",
+        "datasource": "victoriametrics-system",
         "definition": "label_values(nginx_ingress_controller_config_hash{controller_namespace=~\"$namespace\",controller_class=~\"$controller_class\"}, controller_pod) ",
         "error": null,
         "hide": 0,
@@ -1506,7 +1506,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "victoriametrics",
+        "datasource": "victoriametrics-system",
         "definition": "label_values(nginx_ingress_controller_requests{controller_namespace=~\"$namespace\",controller_class=~\"$controller_class\",controller_pod=~\"$controller\"}, ingress) ",
         "error": null,
         "hide": 0,

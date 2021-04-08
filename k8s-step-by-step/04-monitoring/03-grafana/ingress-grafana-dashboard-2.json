@@ -25,7 +25,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "description": "Total time taken for nginx and upstream servers to process a request and send a response",
       "fieldConfig": {
         "defaults": {
@@ -134,7 +134,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "description": "The time spent on receiving the response from the upstream server",
       "fieldConfig": {
         "defaults": {
@@ -245,7 +245,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -344,7 +344,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "description": "For each path observed, its median upstream response time",
       "fieldConfig": {
         "defaults": {
@@ -444,7 +444,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "description": "Percentage of 4xx and 5xx responses among all responses.",
       "fieldConfig": {
         "defaults": {
@@ -544,7 +544,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "description": "For each path observed, the sum of upstream request time",
       "fieldConfig": {
         "defaults": {
@@ -644,7 +644,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -743,7 +743,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -850,7 +850,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "victoriametrics",
+      "datasource": "victoriametrics-system",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -979,7 +979,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "victoriametrics",
+        "datasource": "victoriametrics-system",
         "definition": "label_values(nginx_ingress_controller_requests, ingress) ",
         "error": null,
         "hide": 0,
