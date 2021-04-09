@@ -126,8 +126,8 @@ spec:
             cpu: 200m
             memory: 200Mi
           limits:
-            cpu: 1Gi
-            memory: 200Mi
+            cpu: 500m
+            memory: 600Mi
         volumeMounts:
           - name: prometheus-config-volume
             mountPath: /etc/prometheus.yml
