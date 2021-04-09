@@ -86,13 +86,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /victoria-metrics-data
-            - name: prometheus-config-volume
-              mountPath: /etc/prometheus.yml
-              subPath: prometheus.yml
-      volumes:
-        - name: prometheus-config-volume
-          configMap:
-            name: prometheus-config
   volumeClaimTemplates:
     - metadata:
         name: data
