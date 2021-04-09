@@ -58,19 +58,20 @@ spec:
             - -loggerLevel=INFO
             - -loggerFormat=json
             - -selfScrapeInterval=15s
+            - -http.pathPrefix=/vm
           ports:
             - containerPort: 8428
               name: victoria
               protocol: TCP
           readinessProbe:
             httpGet:
-              path: /metrics
+              path: /vm/metrics
               port: victoria
             initialDelaySeconds: 5
             periodSeconds: 15
           livenessProbe:
             httpGet:
-              path: /metrics
+              path: /vm/metrics
               port: victoria
             initialDelaySeconds: 5
             periodSeconds: 15

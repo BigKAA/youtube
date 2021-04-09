@@ -15,7 +15,7 @@ data:
                 "name": "victoriametrics-system",
                 "orgId": 1,
                 "type": "prometheus",
-                "url": "http://victoriametrics-sys-connect:8428",
+                "url": "http://victoriametrics-sys-connect:8428/vm",
                 "version": 1
             }
         ]
