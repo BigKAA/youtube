@@ -28,6 +28,6 @@ victoriametrics собирать свои собственные метрики.
 ## vmagent
 
 В больших системах, для сбора метрик рекомендуется использовать [vmagent](https://victoriametrics.github.io/vmagent.html).
-Он тоже понимает формат конфигурационного файла prometheus. 
+Он тоже понимает формат конфигурационного файла prometheus.
 
-Примеры использования vmagent начинаются с файла 03-victoriametrics.yaml.
+Образ [контейнера](https://hub.docker.com/r/victoriametrics/vmagent).
