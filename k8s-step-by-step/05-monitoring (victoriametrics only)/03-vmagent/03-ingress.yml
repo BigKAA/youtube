@@ -1,0 +1,32 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: monitoring
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: "system-ingress"
+    certmanager.k8s.io/cluster-issuer: monitoring-issuer
+spec:
+  tls:
+    - hosts:
+        - mon.kryukov.local
+      secretName: mon-tls
+  rules:
+    - host: "mon.kryukov.local"
+      http:
+        paths:
+          - pathType: Prefix
+            path: /grafana
+            backend:
+              service:
+                name: grafana-sys-connect
+                port:
+                  number: 3000
+          - pathType: Prefix
+            path: /vmagent
+            backend:
+              service:
+                name: vmagent-sys-connect
+                port:
+                  number: 8429
