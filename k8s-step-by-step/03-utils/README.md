@@ -66,3 +66,7 @@ https://github.com/netdata/helmchart/tree/master/charts/netdata
     helm --namespace monitoring list
 
 Применяем файл 03-netdata-ingress.yaml
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/e3JTpfpMG3E/maxresdefault.jpg" width="50%">](https://www.youtube.com/watch?v=e3JTpfpMG3E)

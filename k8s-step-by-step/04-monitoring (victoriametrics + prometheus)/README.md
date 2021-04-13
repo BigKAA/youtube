@@ -30,3 +30,5 @@
 ### Видео
 
 [<img src="https://img.youtube.com/vi/nEzXmDYDqg8/maxresdefault.jpg" width="50%">](https://youtu.be/nEzXmDYDqg8)
+
+[<img src="https://img.youtube.com/vi/trHNN-X_BUE/maxresdefault.jpg" width="50%">](https://youtu.be/trHNN-X_BUE)
