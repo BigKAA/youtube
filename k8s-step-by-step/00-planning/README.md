@@ -55,3 +55,7 @@ PV provisioner. Удобный способ подключения NFS диск�
 * Система мониторинга.
 
 * Система сбора логов.
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/vycrJTvyk98/maxresdefault.jpg" width="50%">](https://www.youtube.com/watch?v=vycrJTvyk98)

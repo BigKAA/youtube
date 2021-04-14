@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluentd-forward
+  namespace: logging
+  labels:
+    log-app: fluentd-forward
+spec:
+  type: ClusterIP
+  selector:
+    app: fluentd-forward
+  ports:
+    - name: fluentd
+      port: 24224
+      targetPort: 24224
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fluentd-forward
+  namespace: logging
+  labels:
+    log-app: fluentd-forward
+  annotations:
+    reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: "fluentd-forward-config"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fluentd-forward
+  template:
+    metadata:
+      labels:
+        app: fluentd-forward
+    spec:
+      priorityClassName: low-priority
+      containers:
+        - image: fluent/fluentd:v1.12.2-debian-1.0
+          imagePullPolicy: IfNotPresent
+          name: fluentd-forward
+          ports:
+            - containerPort: 24224
+              name: forward
+              protocol: TCP
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+          volumeMounts:
+            - name: fluentd-forward-config
+              mountPath: /fluentd/etc/
+            - name: fluentd-forward-logs
+              mountPath: /fluentd/log/
+      volumes:
+        - name: fluentd-forward-config
+          configMap:
+            name: fluentd-forward-config
+        - name: fluentd-forward-logs
+          persistentVolumeClaim:
+            claimName: fluentd-router-pvc
+            readOnly: false

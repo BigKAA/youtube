@@ -31,3 +31,8 @@ victoriametrics собирать свои собственные метрики.
 Он тоже понимает формат конфигурационного файла prometheus.
 
 Образ [контейнера](https://hub.docker.com/r/victoriametrics/vmagent).
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/4f_UYSeoJrs/maxresdefault.jpg" width="50%">](https://youtu.be/4f_UYSeoJrs)
+

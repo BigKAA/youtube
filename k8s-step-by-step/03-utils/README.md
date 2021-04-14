@@ -67,4 +67,7 @@ https://github.com/netdata/helmchart/tree/master/charts/netdata
 
 Применяем файл 03-netdata-ingress.yaml
 
-Видео: https://youtu.be/e3JTpfpMG3E
+## Видео
+
+[<img src="https://img.youtube.com/vi/e3JTpfpMG3E/maxresdefault.jpg" width="50%">](https://www.youtube.com/watch?v=e3JTpfpMG3E)
+

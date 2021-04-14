@@ -80,7 +80,7 @@
     cp sample cluster
     cd cluster
 
-Параметры смотрим [тут](cluster/README.md).
+Параметры смотрим [тут](01-kubespray/README.md).
 
 Переходим в корень kubespray и запускаем установку кластера. Для этого в системе должны быть установлены интерпретатор 
 python и pip.
@@ -127,3 +127,7 @@ python и pip.
 
     source <(kubectl completion bash)
     echo "source <(kubectl completion bash)" >> ~/.bashrc
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/g9nPFS6dF50/maxresdefault.jpg" width="50%">](https://www.youtube.com/watch?v=g9nPFS6dF50)

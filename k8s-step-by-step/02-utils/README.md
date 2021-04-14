@@ -44,3 +44,7 @@ https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner
 
 Необходимо отредактировать деплоймент в части указания
 правильных параметров nfs сервера.
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/dHQXtsKUUzo/maxresdefault.jpg" width="50%">](https://www.youtube.com/watch?v=dHQXtsKUUzo)
