@@ -35,6 +35,7 @@ spec:
       labels:
         app: fluentd-forward
     spec:
+      priorityClassName: low-priority
       containers:
         - image: fluent/fluentd:v1.12.2-debian-1.0
           imagePullPolicy: IfNotPresent
