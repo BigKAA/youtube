@@ -27,4 +27,4 @@ Fluent Bit
 
 ## Ссылка на видео.
 
-
+[<img src="https://img.youtube.com/vi/ifCwBprcvA4/maxresdefault.jpg" width="50%">](https://youtu.be/ifCwBprcvA4)
