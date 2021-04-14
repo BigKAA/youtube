@@ -70,3 +70,4 @@ https://github.com/netdata/helmchart/tree/master/charts/netdata
 ## Видео
 
 [<img src="https://img.youtube.com/vi/e3JTpfpMG3E/maxresdefault.jpg" width="50%">](https://www.youtube.com/watch?v=e3JTpfpMG3E)
+
