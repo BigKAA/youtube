@@ -103,7 +103,7 @@ spec:
         imagePullPolicy: IfNotPresent
         args:
           - -promscrape.config=/etc/prometheus.yml
-          - -remoteWrite.url=http://victoriametrics-sys-connect:8428/api/v1/write
+          - -remoteWrite.url=http://victoriametrics-sys-connect:8428/vm/api/v1/write
           - -http.pathPrefix=/vmagent
         ports:
           - containerPort: 8429
