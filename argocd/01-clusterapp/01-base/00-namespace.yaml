@@ -7,11 +7,6 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: logging
----
-apiVersion: v1
-kind: Namespace
-metadata:
   name: nfs-client
   labels:
     app: nfs-client-provisioner

@@ -26,6 +26,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: fluent-bit
+    namespace: logging
 ---
 apiVersion: apps/v1
 kind: DaemonSet
