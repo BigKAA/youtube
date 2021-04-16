@@ -11,3 +11,8 @@ spec:
   - 'https://github.com/BigKAA/youtube'
   destinations:
   - server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: Namespace
+    - group: scheduling.k8s.io
+      kind: PriorityClass
