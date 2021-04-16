@@ -39,6 +39,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: vmagent
+  namespace: monitoring
 ---
 apiVersion: v1
 kind: Service

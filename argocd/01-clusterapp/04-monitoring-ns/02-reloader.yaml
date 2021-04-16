@@ -61,6 +61,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: reloader-reloader
+    namespace: monitoring
 
 ---
 apiVersion: apps/v1
