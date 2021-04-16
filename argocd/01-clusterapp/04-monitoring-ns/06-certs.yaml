@@ -9,8 +9,6 @@ kind: Issuer
 metadata:
   name: monitoring-issuer
   namespace: monitoring
-  annotations:
-    up: "1"
 spec:
   ca:
     secretName: kube-ca-secret
@@ -20,8 +18,6 @@ kind: Certificate
 metadata:
   name: mon-certificate
   namespace: monitoring
-  annotations:
-    up: "1"
 spec:
   secretName: mon-tls
   duration: 9125h # 1y
