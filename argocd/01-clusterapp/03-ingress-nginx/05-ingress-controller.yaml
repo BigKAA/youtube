@@ -446,6 +446,7 @@ webhooks:
       - v1beta1
     clientConfig:
       service:
+        namespace: ingress-nginx
         name: ingress-nginx-controller-admission
         path: /extensions/v1beta1/ingresses
 ---
