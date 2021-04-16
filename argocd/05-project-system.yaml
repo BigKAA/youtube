@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  description: Cluster utilites, monitoring, logs and etc.
+  description: Cluster utilites, monitoring, logs and etc
   sourceRepos:
   - 'https://github.com/BigKAA/youtube'
   destinations:

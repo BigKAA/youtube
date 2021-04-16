@@ -2,36 +2,57 @@
 
 [Документация](https://argo-cd.readthedocs.io/en/stable/)
 
-    kubectl create namespace argocd
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.0.0/manifests/install.yaml
+    # kubectl create namespace argocd
+    # kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.0.1/manifests/install.yaml
 
-# Установка CLI
+## Cert-manager
 
-    curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/v2.0.0/argocd-linux-amd64
-    chmod +x /usr/local/bin/argocd
-    argocd version
+[cert-manager](https://cert-manager.io/docs/installation/kubernetes/) - утилита
+для управления сертификатами.
 
-# CA сикрет
+    # kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.yaml
+    # kubectl get pods --namespace cert-manager
 
-    kubectl -n argocd create secret tls kube-ca-secret \
-    --cert=/etc/kubernetes/ssl/ca.crt \
-    --key=/etc/kubernetes/ssl/ca.key
+Namespace cert-manager создаётся автоматически.
 
-# Пароль админа
+## Настраиваем ingress для доступа.
 
-    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-    argocd login argocd.kryukov.local:30443
-    argocd account update-password
+Для argocd ставим отдельный ingress controller.
+    
+    # kubect apply -f 01-ingress-con.yaml
 
-# Добавление пользователя
+Добавляем ingress
+
+    # kubectl apply -f 02-ingress.yaml
+
+## Установка CLI
+
+    # curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/v2.0.1/argocd-linux-amd64
+    # chmod +x /usr/local/bin/argocd
+    # argocd version
+
+## Пароль админа
+
+    # kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+Добавим в /etc/hosts имя argocd.kryukov.local
+
+    # argocd login argocd.kryukov.local:30443
+    # argocd account update-password
+
+## Добавление пользователя
 
 Добавляем пользователя в argocd-cm
 
+    # kubectl apply -f 03-argocd-cm.yaml
+
 Добавляем пользователю роль админа в argocd-rbac-cm
+
+    # kubectl apply -f 04-argocd-rbac-cm.yaml
 
 Затем в командной строке получаем список
 
-    argocd account list
+    # argocd account list
 
     # argocd account update-password --account artur
     *** Enter current password:        <---- admin password
@@ -39,11 +60,11 @@
     *** Confirm new password:
     Password updated
 
-Логинимся этим пользователем в систему
+Логинимся новым пользователем в систему
 
-    argocd login argocd.kryukov.local:30443
+    # argocd login argocd.kryukov.local:30443
+    # argocd cluster list
 
-Подключение кластера
+Заходм в WEB интерфейс
 
-    argocd cluster add kubernetes-admin@cluster.local # контекст кластера из config файла
-    argocd cluster list
+    https://argocd.kryukov.local:30443/
