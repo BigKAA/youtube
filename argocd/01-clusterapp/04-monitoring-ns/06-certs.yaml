@@ -1,9 +1,16 @@
+### Перед использованием необходимо создать secret, содержащий сертификат CA кластера
+# kubectl -n monitoring create secret tls kube-ca-secret \
+# --cert=/etc/kubernetes/ssl/ca.crt \
+# --key=/etc/kubernetes/ssl/ca.key
+#
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: monitoring-issuer
   namespace: monitoring
+  annotations:
+    up: "1"
 spec:
   ca:
     secretName: kube-ca-secret
@@ -13,6 +20,8 @@ kind: Certificate
 metadata:
   name: mon-certificate
   namespace: monitoring
+  annotations:
+    up: "1"
 spec:
   secretName: mon-tls
   duration: 9125h # 1y
