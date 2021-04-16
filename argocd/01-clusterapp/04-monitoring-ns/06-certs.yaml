@@ -3,6 +3,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: monitoring-issuer
+  namespace: monitoring
 spec:
   ca:
     secretName: kube-ca-secret
@@ -11,6 +12,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: mon-certificate
+  namespace: monitoring
 spec:
   secretName: mon-tls
   duration: 9125h # 1y
