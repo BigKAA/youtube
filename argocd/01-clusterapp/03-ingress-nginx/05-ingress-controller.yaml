@@ -131,6 +131,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: ingress-nginx
+    namespace: ingress-nginx
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -482,6 +483,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: ingress-nginx-admission
+    namespace: ingress-nginx
 
 ---
 apiVersion: batch/v1
