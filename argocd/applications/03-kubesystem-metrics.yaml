@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubesystem-metrics
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: system-utils
+  source:
+    repoURL: 'https://github.com/BigKAA/youtube'
+    path: argocd/01-clusterapp/02-kube-system-ns
+    targetRevision: argocd
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: kube-system
