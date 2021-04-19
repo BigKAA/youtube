@@ -336,7 +336,6 @@ spec:
             - --election-id=ingress-controller-leader
             - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller
             - --ingress-class=argocd-ingress
-            - --enable-ssl-passthrough
           securityContext:
             capabilities:
               drop:
@@ -389,5 +388,3 @@ spec:
               cpu: 100m
               memory: 90Mi
       terminationGracePeriodSeconds: 300
-
-

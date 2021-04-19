@@ -9,8 +9,6 @@ metadata:
 data:
   url: https://argocd.kryukov.local:30443
 
-  # Enables application status badge feature
-  statusbadge.enabled: "true"
   accounts.artur: apiKey, login
   accounts.artur.enabled: "true"
 

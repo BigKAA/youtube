@@ -32,6 +32,6 @@ spec:
   dnsNames:
   - argocd.kryukov.local
   issuerRef:
-    name: monitoring-issuer
+    name: argocd-issuer
     kind: Issuer
     group: cert-manager.io

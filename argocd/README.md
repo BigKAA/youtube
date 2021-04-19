@@ -2,18 +2,6 @@
 
 [Документация](https://argo-cd.readthedocs.io/en/stable/)
 
-## Установка
-
-    # kubectl create namespace argocd
-    # curl -o install.yaml https://raw.githubusercontent.com/argoproj/argo-cd/v2.0.1/manifests/install.yaml
-
-Я разбил это файл на два: argo-1.yaml и argo-2.yaml. В первом файле находятся CRD и мы его менять не будем.
-
-Во втором файле будем изменять аргументы командной строки.
-
-    # kubectl apply -f
-    # kubectl apply -f 
-
 ## Cert-manager
 
 [cert-manager](https://cert-manager.io/docs/installation/kubernetes/) - утилита
@@ -24,9 +12,20 @@
     --key=/etc/kubernetes/ssl/ca.key
 
     # kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.yaml
-    # kubectl get pods --namespace cert-manager
 
 Namespace cert-manager создаётся автоматически.
+
+## Установка
+
+    # curl -o install.yaml https://raw.githubusercontent.com/argoproj/argo-cd/v2.0.1/manifests/install.yaml
+
+Я разбил это файл на два: argo-1.yaml и argo-2.yaml. В первом файле находятся CRD и мы его менять не будем.
+
+Во втором файле будем изменять аргументы командной строки.
+
+    # kubectl create namespace argocd
+    # kubectl -n argocd apply -f https://raw.githubusercontent.com/BigKAA/youtube/argocd/argocd/argo-1.yaml
+    # kubectl -n argocd apply -f https://raw.githubusercontent.com/BigKAA/youtube/argocd/argocd/argo-2.yaml
 
 ## Настраиваем ingress для доступа.
 
@@ -48,12 +47,11 @@ Namespace cert-manager создаётся автоматически.
 
 ## Пароль админа
 
-    # kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-
 Добавим в /etc/hosts имя argocd.kryukov.local
 
-    # argocd login argocd.kryukov.local:30443
-    # argocd account update-password
+    # kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d ; echo
+    # argocd login argocd.kryukov.local:30443 --grpc-web
+    # argocd account update-password --grpc-web
 
 ## Добавление пользователя
 
@@ -67,9 +65,9 @@ Namespace cert-manager создаётся автоматически.
 
 Затем в командной строке получаем список
 
-    # argocd account list
+    # argocd account list --grpc-web
 
-    # argocd account update-password --account artur
+    # argocd account update-password --account artur --grpc-web
     *** Enter current password:        <---- admin password
     *** Enter new password:
     *** Confirm new password:
@@ -77,9 +75,9 @@ Namespace cert-manager создаётся автоматически.
 
 Логинимся новым пользователем в систему
 
-    # argocd login argocd.kryukov.local:30443
+    # argocd login argocd.kryukov.local:30443 -grpc-web
     # argocd cluster list
 
-Заходм в WEB интерфейс
+Заходим в WEB интерфейс
 
     https://argocd.kryukov.local:30443/
