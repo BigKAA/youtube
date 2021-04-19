@@ -5,8 +5,8 @@ metadata:
   namespace: argocd
   annotations:
     kubernetes.io/ingress.class: "argocd-ingress"
-    ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+#    ingress.kubernetes.io/force-ssl-redirect: "true"
+#    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     cert-manager.io/cluster-issuer: "argocd-issuer"
 spec:
   rules:

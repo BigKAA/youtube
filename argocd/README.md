@@ -5,12 +5,23 @@
 ## Установка
 
     # kubectl create namespace argocd
-    # kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.0.1/manifests/install.yaml
+    # curl -o install.yaml https://raw.githubusercontent.com/argoproj/argo-cd/v2.0.1/manifests/install.yaml
+
+Я разбил это файл на два: argo-1.yaml и argo-2.yaml. В первом файле находятся CRD и мы его менять не будем.
+
+Во втором файле будем изменять аргументы командной строки.
+
+    # kubectl apply -f
+    # kubectl apply -f 
 
 ## Cert-manager
 
 [cert-manager](https://cert-manager.io/docs/installation/kubernetes/) - утилита
 для управления сертификатами.
+
+    # kubectl -n argocd create secret tls kube-ca-secret \
+    --cert=/etc/kubernetes/ssl/ca.crt \
+    --key=/etc/kubernetes/ssl/ca.key
 
     # kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.yaml
     # kubectl get pods --namespace cert-manager
@@ -18,6 +29,8 @@
 Namespace cert-manager создаётся автоматически.
 
 ## Настраиваем ingress для доступа.
+
+    # kubectl apply -f 00-certs.yaml
 
 Для argocd ставим отдельный ingress controller.
     
