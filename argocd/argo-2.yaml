@@ -722,6 +722,8 @@ spec:
         - --staticassets
         - /shared/app
         - --insecure
+#        - --basehref
+#        - /argocd
         image: quay.io/argoproj/argocd:v2.0.1
         imagePullPolicy: IfNotPresent
         livenessProbe:

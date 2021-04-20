@@ -4,7 +4,7 @@ metadata:
   name: argocd-server-http
   namespace: argocd
   annotations:
-    kubernetes.io/ingress.class: "argocd-ingress"
+    kubernetes.io/ingress.class: "system-ingress"
     cert-manager.io/cluster-issuer: "argocd-issuer"
 spec:
   rules:

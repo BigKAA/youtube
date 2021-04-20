@@ -7,6 +7,7 @@
 [cert-manager](https://cert-manager.io/docs/installation/kubernetes/) - утилита
 для управления сертификатами.
 
+    # kubectl create namespace argocd
     # kubectl -n argocd create secret tls kube-ca-secret \
     --cert=/etc/kubernetes/ssl/ca.crt \
     --key=/etc/kubernetes/ssl/ca.key
@@ -19,11 +20,10 @@ Namespace cert-manager создаётся автоматически.
 
     # curl -o install.yaml https://raw.githubusercontent.com/argoproj/argo-cd/v2.0.1/manifests/install.yaml
 
-Я разбил это файл на два: argo-1.yaml и argo-2.yaml. В первом файле находятся CRD и мы его менять не будем.
+Я разбил это файл на два: argo-1.yaml и argo-2.yaml. В первом файле находятся CRD. Его менять не будем.
 
 Во втором файле будем изменять аргументы командной строки.
 
-    # kubectl create namespace argocd
     # kubectl -n argocd apply -f https://raw.githubusercontent.com/BigKAA/youtube/argocd/argocd/argo-1.yaml
     # kubectl -n argocd apply -f https://raw.githubusercontent.com/BigKAA/youtube/argocd/argocd/argo-2.yaml
 
@@ -31,9 +31,9 @@ Namespace cert-manager создаётся автоматически.
 
     # kubectl apply -f 00-certs.yaml
 
-Для argocd ставим отдельный ingress controller.
+Ставим ingress controller. _После установки argocd этот контроллер будет добавлен в CD argo._
     
-    # kubect apply -f 01-ingress-con.yaml
+    # kubect apply -f 01-ingress-controller.yaml
 
 Добавляем ingress
 
@@ -50,7 +50,7 @@ Namespace cert-manager создаётся автоматически.
 Добавим в /etc/hosts имя argocd.kryukov.local
 
     # kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d ; echo
-    # argocd login argocd.kryukov.local:30443 --grpc-web
+    # argocd login argocd.kryukov.local:31443 --grpc-web
     # argocd account update-password --grpc-web
 
 ## Добавление пользователя
@@ -75,9 +75,9 @@ Namespace cert-manager создаётся автоматически.
 
 Логинимся новым пользователем в систему
 
-    # argocd login argocd.kryukov.local:30443 -grpc-web
+    # argocd login argocd.kryukov.local:31443 --grpc-web
     # argocd cluster list
 
 Заходим в WEB интерфейс
 
-    https://argocd.kryukov.local:30443/
+    https://argocd.kryukov.local:31443/
