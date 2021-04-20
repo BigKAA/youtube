@@ -77,6 +77,9 @@ metadata:
   name: vmagent-sys
   labels:
     app: vmagent-sys
+  annotations:
+    reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: "prometheus-config"
 spec:
   replicas: 1
   serviceName: vmagent-sys

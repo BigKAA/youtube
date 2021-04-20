@@ -178,3 +178,14 @@ data:
         - source_labels: [__meta_kubernetes_service_name]
           regex: prometheus-server
           action: drop
+      # Метрики Argo CD сервера ===============================================
+      - job_name: 'argo-cd'
+        kubernetes_sd_configs:
+        - role: endpoints
+          namespaces:
+            names:
+            - argocd
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: argocd-server-metrics;metrics
