@@ -21,7 +21,7 @@ metadata:
 spec:
   secretName: mon-tls
   duration: 9125h0m0s # 1y
-  renewBefore: 360h # 15d
+  renewBefore: 360h0m0s # 15d
   subject:
     organizations:
     - arturs k8s
