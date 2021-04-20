@@ -24,8 +24,8 @@ Namespace cert-manager создаётся автоматически.
 
 Во втором файле будем изменять аргументы командной строки.
 
-    # kubectl -n argocd apply -f https://raw.githubusercontent.com/BigKAA/youtube/argocd/argocd/argo-1.yaml
-    # kubectl -n argocd apply -f https://raw.githubusercontent.com/BigKAA/youtube/argocd/argocd/argo-2.yaml
+    # kubectl -n argocd apply -f https://raw.githubusercontent.com/BigKAA/youtube/master/argocd/argo-1.yaml
+    # kubectl -n argocd apply -f https://raw.githubusercontent.com/BigKAA/youtube/master/argocd/argo-2.yaml
 
 ## Настраиваем ingress для доступа.
 
