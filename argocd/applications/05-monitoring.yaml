@@ -1,0 +1,23 @@
+### Перед использованием необходимо создать secret, содержащий сертификат CA кластера
+# kubectl -n monitoring create secret tls kube-ca-secret \
+# --cert=/etc/kubernetes/ssl/ca.crt \
+# --key=/etc/kubernetes/ssl/ca.key
+#
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  project: system-utils
+  source:
+    repoURL: 'https://github.com/BigKAA/youtube'
+    path: argocd/01-clusterapp/04-monitoring-ns
+    targetRevision: argocd
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: monitoring
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

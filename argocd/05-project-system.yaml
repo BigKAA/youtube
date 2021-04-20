@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: system-utils
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Cluster utilites, monitoring, logs and etc
+  sourceRepos:
+  - 'https://github.com/BigKAA/youtube'
+  destinations:
+  - server: https://kubernetes.default.svc
+    namespace: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: Namespace
+    - group: scheduling.k8s.io
+      kind: PriorityClass
+    - group: rbac.authorization.k8s.io
+      kind: '*'
+    - group: storage.k8s.io
+      kind: '*'
+    - group: apiregistration.k8s.io
+      kind: APIService
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration

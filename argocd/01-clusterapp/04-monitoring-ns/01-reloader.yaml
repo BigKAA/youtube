@@ -1,0 +1,112 @@
+# https://github.com/stakater/Reloader
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: reloader-reloader
+  name: reloader-reloader
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: reloader-reloader
+  name: reloader-reloader-role
+
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - configmaps
+    verbs:
+      - list
+      - get
+      - watch
+  - apiGroups:
+      - "apps"
+    resources:
+      - deployments
+      - daemonsets
+      - statefulsets
+    verbs:
+      - list
+      - get
+      - update
+      - patch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - deployments
+      - daemonsets
+    verbs:
+      - list
+      - get
+      - update
+      - patch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: reloader-reloader
+  name: reloader-reloader-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: reloader-reloader-role
+subjects:
+  - kind: ServiceAccount
+    name: reloader-reloader
+    namespace: monitoring
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: reloader-reloader
+  name: reloader-reloader
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: reloader-reloader
+  template:
+    metadata:
+      labels:
+        app: reloader-reloader
+    spec:
+      containers:
+      - name: reloader-reloader
+        image: "stakater/reloader:v0.0.85"
+        args:
+          - "--namespaces-to-ignore=kube-system"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 9090
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: http
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "512Mi"
+          requests:
+            cpu: "10m"
+            memory: "128Mi"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: reloader-reloader
+      priorityClassName: low-priority
