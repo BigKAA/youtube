@@ -1,0 +1,67 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openresty-sts
+data:
+  index-0.html: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+    <h1>Тестовая страница</h1>
+    <p>
+      Это 0-й под
+    </p>
+    </body>
+    </html>
+  index-1.html: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+    <h1>Тестовая страница</h1>
+    <p>
+      Это 1-й под.
+    </p>
+    </body>
+    </html>
+  50x.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title>Error</title>
+    <style>
+        body {
+            width: 35em;
+            margin: 0 auto;
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+        }
+    </style>
+    </head>
+    <body>
+    <h1>An error occurred.</h1>
+    <p>Sorry, the page you are looking for is currently unavailable.<br/>
+    Please try again later.</p>
+    <p>If you are the system administrator of this resource then you should check
+    the <a href="http://nginx.org/r/error_log">error log</a> for details.</p>
+    <p>We have articles on troubleshooting issues like <a href="https://blog.openresty.com/en/lua-cpu-flame-graph/?src=wb">high CPU usage</a> and
+    <a href="https://blog.openresty.com/en/how-or-alloc-mem/">large memory usage</a> on <a href="https://blog.openresty.com/">our official blog site</a>.
+    <p><em>Faithfully yours, <a href="https://openresty.org/">OpenResty</a>.</em></p>
+    </body>
+    </html>
+  conf.sh: |
+    echo $POD
+    if [ $POD = "openresty-sts-0" ]; then
+        cp /tmp/index-0.html /var/tmp/index.html
+    elif [ $POD = "openresty-sts-1" ]; then
+        cp /tmp/index-1.html /var/tmp/index.html
+    fi
+    cp /tmp/50x.html  /var/tmp
+

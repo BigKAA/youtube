@@ -1,0 +1,169 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vmagent
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/metrics
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+  verbs: ["get"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vmagent
+  namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vmagent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vmagent
+subjects:
+- kind: ServiceAccount
+  name: vmagent
+  namespace: monitoring
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vmagent-sys
+  namespace: monitoring
+  labels:
+    app: vmagent-sys
+spec:
+  ports:
+  - protocol: TCP
+    port: 8429
+    targetPort: 8429
+  clusterIP: None
+  selector:
+    app: vmagent-sys
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vmagent-sys-0
+  namespace: monitoring
+  labels:
+    app: vmagent-sys
+spec:
+  ports:
+  - port: 8429
+    protocol: TCP
+    targetPort: 8429
+  selector:
+    app: vmagent-sys
+    statefulset.kubernetes.io/pod-name: vmagent-sys-0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vmagent-sys-1
+  namespace: monitoring
+  labels:
+    app: vmagent-sys
+spec:
+  ports:
+  - port: 8429
+    protocol: TCP
+    targetPort: 8429
+  selector:
+    app: vmagent-sys
+    statefulset.kubernetes.io/pod-name: vmagent-sys-1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vmagent-sys
+  labels:
+    app: vmagent-sys
+  namespace: monitoring
+  annotations:
+    reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: "prometheus-config"
+spec:
+  replicas: 2
+  serviceName: vmagent-sys
+  selector:
+    matchLabels:
+      app: vmagent-sys
+  template:
+    metadata:
+      labels:
+        app: vmagent-sys
+    spec:
+      serviceAccountName: vmagent
+      priorityClassName: low-priority
+      initContainers:
+      - name: init-configs
+        image: busybox:1.33.0
+        command: ['sh', '/tmp/conf.sh']
+        env:
+          - name: POD
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+        volumeMounts:
+          - name: prometheus-config-volume
+            mountPath: /tmp/
+          - name: config
+            mountPath: /var/tmp
+      containers:
+      - name: vmagent-sys
+        image: victoriametrics/vmagent:v1.58.0
+        imagePullPolicy: IfNotPresent
+        args:
+          - -promscrape.config=/etc/conf.d/prometheus.yml
+          - -remoteWrite.maxDiskUsagePerURL=1073741824
+          - -remoteWrite.url=http://victoriametrics-sys-connect:8428/vm/api/v1/write
+          - -remoteWrite.url=http://victoriametrics-sys-connect:8428/api/v1/write
+          - -http.pathPrefix=/vmagent
+        ports:
+          - containerPort: 8429
+            name: vmagent
+        readinessProbe:
+          httpGet:
+            path: /vmagent/metrics
+            port: vmagent
+          initialDelaySeconds: 5
+          periodSeconds: 15
+        livenessProbe:
+          httpGet:
+            path: /vmagent/metrics
+            port: vmagent
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+          limits:
+            cpu: 500m
+            memory: 600Mi
+        volumeMounts:
+          - name: config
+            mountPath: /etc/conf.d
+      volumes:
+        - name: prometheus-config-volume
+          configMap:
+            name: prometheus-config
+        - name: config
+          emptyDir: {}
