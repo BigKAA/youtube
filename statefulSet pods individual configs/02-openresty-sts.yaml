@@ -1,0 +1,117 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openresty-sts
+  labels:
+    app: openresty-sts
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  clusterIP: None
+  selector:
+    app: openresty-sts
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openresty-sts-0
+  labels:
+    app: openresty-sts
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30001
+  selector:
+    app: openresty-sts
+    statefulset.kubernetes.io/pod-name: openresty-sts-0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openresty-sts-1
+  labels:
+    app: openresty-sts
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30002
+  selector:
+    app: openresty-sts
+    statefulset.kubernetes.io/pod-name: openresty-sts-1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: openresty-sts
+  labels:
+    app: openresty-sts
+spec:
+  replicas: 2
+  serviceName: openresty-sts
+  selector:
+    matchLabels:
+      app: openresty-sts
+  template:
+    metadata:
+      labels:
+        app: openresty-sts
+    spec:
+      initContainers:
+      - name: init-configs
+        image: busybox:1.33.0
+        command: ['sh', '/tmp/conf.sh']
+        env:
+          - name: POD
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+        volumeMounts:
+          - name: prepare
+            mountPath: /tmp/
+          - name: html
+            mountPath: /var/tmp
+      containers:
+      - name: openresty-sts
+        image: openresty/openresty:centos-rpm
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 80
+            name: http
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 15
+        livenessProbe:
+          httpGet:
+            path: /index.html
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "0.2"
+            memory: "300Mi"
+          requests:
+            cpu: "0.1"
+            memory: "100Mi"
+        volumeMounts:
+          - name: html
+            mountPath: /usr/local/openresty/nginx/html
+      volumes:
+        - name: prepare
+          configMap:
+            name: openresty-sts
+        - name: html
+          emptyDir: {}
