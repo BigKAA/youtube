@@ -103,6 +103,8 @@ spec:
         imagePullPolicy: IfNotPresent
         args:
           - -promscrape.config=/etc/prometheus.yml
+          - -remoteWrite.tmpDataPath=/tmp/vmagent-remotewrite-data
+          - -remoteWrite.maxDiskUsagePerURL=1073741824
           - -remoteWrite.url=http://victoriametrics-sys-connect:8428/vm/api/v1/write
           - -http.pathPrefix=/vmagent
         ports:
@@ -132,8 +134,12 @@ spec:
           - name: prometheus-config-volume
             mountPath: /etc/prometheus.yml
             subPath: prometheus.yml
+          - name: persistent-queue-data
+            mountPath: /tmp/vmagent-remotewrite-data
       volumes:
         - name: prometheus-config-volume
           configMap:
             name: prometheus-config
+        - name: persistent-queue-data
+          emptyDir: {}
 
