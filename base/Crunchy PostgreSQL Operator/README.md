@@ -102,3 +102,9 @@
 sql сервера.
 
 Бекап подключает nfs PV и размещается на worker node. 
+
+## Видео.
+
+_Премьера 7 Мая 2021_
+
+[<img src="https://img.youtube.com/vi/PWb4ClEx3qo/maxresdefault.jpg" width="50%">](https://youtu.be/PWb4ClEx3qo)
