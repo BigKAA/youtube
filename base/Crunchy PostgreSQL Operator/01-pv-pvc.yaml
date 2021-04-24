@@ -1,0 +1,69 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: storage-main
+  labels:
+    storage: basemain
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 8Gi
+  local:
+    path: /var/pgsql-volume
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: db
+          operator: In
+          values:
+          - pgsql-main
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: storage-repl
+  labels:
+    storage: baserepl
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 8Gi
+  local:
+    path: /var/pgsql-volume
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: db
+          operator: In
+          values:
+          - pgsql-repl
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: storage-back
+  labels:
+    storage: baseback
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 10Gi
+  local:
+    path: /var/pgsql-volume
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: db
+          operator: In
+          values:
+          - pgsql-back
+  persistentVolumeReclaimPolicy: Retain

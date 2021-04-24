@@ -1,0 +1,87 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pgadmin-pvc
+  namespace: pgo
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: base-pgadmin-np
+  namespace: pgo
+  labels:
+    name: postgres-operator
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30861
+  selector:
+    app: pgadmin
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+  namespace: pgo
+  labels:
+    app: pgadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      initContainers:
+      - name: busibox
+        image: busybox:1.33.0
+        imagePullPolicy: IfNotPresent
+        command:
+          - 'sh'
+          - '-c'
+          - 'chown 5050:5050 /tmp/mount'
+        volumeMounts:
+          - mountPath: /tmp/mount
+            name: state
+      containers:
+      - name: pgadmin
+        image: dpage/pgadmin4:5.2
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
+        env:
+          - name: PGADMIN_DEFAULT_EMAIL
+            value: "artur@kryukov.biz"
+          - name: PGADMIN_DEFAULT_PASSWORD
+            value: "password"
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "0.2"
+          limits:
+            memory: "800Mi"
+            cpu: "0.8"
+        volumeMounts:
+          - mountPath: /var/lib/pgadmin
+            name: state
+      volumes:
+        - name: state
+          persistentVolumeClaim:
+            claimName: pgadmin-pvc

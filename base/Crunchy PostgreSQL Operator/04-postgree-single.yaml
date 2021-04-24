@@ -1,0 +1,83 @@
+---
+apiVersion: crunchydata.com/v1
+kind: Pgcluster
+metadata:
+  annotations:
+    current-primary: base
+  labels:
+    crunchy-pgha-scope: base
+    deployment-name: base
+    name: base
+    pg-cluster: base
+    pgo-version: 4.6.2
+    pgouser: admin
+  name: base
+  namespace: pgo
+spec:
+  BackrestStorage:
+    accessmode: ReadWriteMany
+    name: ""
+    size: 10G
+    storageclass: "managed-nfs-storage"
+    storagetype: dynamic
+    supplementalgroups: ""
+  PrimaryStorage:
+    accessmode: ReadWriteMany
+    matchLabels: "storage=basemain"
+    name: base
+    size: 8G
+    storageclass: ""
+    storagetype: create
+    supplementalgroups: ""
+  annotations: {}
+  ccpimage: crunchy-postgres-ha
+  ccpimageprefix: registry.developers.crunchydata.com/crunchydata
+  ccpimagetag: centos8-13.2-4.6.2
+  clustername: base
+  database: base
+  exporter: true
+  exporterport: "9187"
+  exporterLimits:
+    memory: "128Mi"
+    cpu: "400m"
+  resources:
+    memory: "1Gi"
+    cpu: "1"
+  limits:
+    memory: "1Gi"
+    cpu: "1"
+  name: base
+  namespace: pgo
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: db
+              operator: In
+              values:
+                - pgsql-main
+  pgDataSource:
+    restoreFrom: ""
+    restoreOpts: ""
+  pgbadgerport: "10000"
+  pgoimageprefix: registry.developers.crunchydata.com/crunchydata
+  podAntiAffinity:
+    default: preferred
+    pgBackRest: preferred
+    pgBouncer: preferred
+  pgBouncer:
+    limits:
+      memory: 36Mi
+    replicas: 1
+  port: "5432"
+  replicas: "0"
+  serviceType: NodePort
+  syncReplication: true
+  tolerations:
+    - key: "db"
+      operator: "Equal"
+      value: "pgsql"
+      effect: "NoSchedule"
+  user: artur
+  userlabels:
+    pgo-version: 4.6.2
