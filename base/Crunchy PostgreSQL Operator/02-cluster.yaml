@@ -16,11 +16,10 @@ metadata:
 spec:
   BackrestStorage:
     accessmode: ReadWriteMany
-    matchLabels: "storage=baseback"
     name: ""
     size: 10G
-    storageclass: ""
-    storagetype: create
+    storageclass: "managed-nfs-storage"
+    storagetype: dynamic
     supplementalgroups: ""
   PrimaryStorage:
     accessmode: ReadWriteMany
@@ -66,7 +65,6 @@ spec:
               values:
                 - pgsql-main
                 - pgsql-repl
-                - pgsql-back
   pgDataSource:
     restoreFrom: ""
     restoreOpts: ""

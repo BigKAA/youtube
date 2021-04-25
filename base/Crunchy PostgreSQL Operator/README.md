@@ -12,10 +12,8 @@
 
     kubectl taint nodes db1.kryukov.local db=pgsql:NoSchedule
     kubectl taint nodes db2.kryukov.local db=pgsql:NoSchedule
-    kubectl taint nodes dback.kryukov.local db=pgsql:NoSchedule
     kubectl label nodes db1.kryukov.local db=pgsql-main
     kubectl label nodes db2.kryukov.local db=pgsql-repl
-    kubectl label nodes dback.kryukov.local db=pgsql-back
 
 Создаём директории для локальных PV:
 
@@ -103,8 +101,8 @@ sql сервера.
 
 Бекап подключает nfs PV и размещается на worker node. 
 
-## Видео.
+[comment]: <> (## Видео.)
 
-_Премьера 7 Мая 2021_
+[comment]: <> (_Премьера 7 Мая 2021_)
 
-[<img src="https://img.youtube.com/vi/PWb4ClEx3qo/maxresdefault.jpg" width="50%">](https://youtu.be/PWb4ClEx3qo)
+[comment]: <> ([<img src="https://img.youtube.com/vi/PWb4ClEx3qo/maxresdefault.jpg" width="50%">]&#40;https://youtu.be/PWb4ClEx3qo&#41;)
