@@ -92,8 +92,6 @@
 
     kubectl apply -f 03-pgadmin.yaml
 
-Логин и пароль берем из созданного нами secret pgadmin-user.
-
 ## Конфигурация один sql сервер
 
 В файле [04-postgree-single.yaml](04-postgree-single.yaml) показано как развернуть один экземпляр
