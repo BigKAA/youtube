@@ -2,6 +2,8 @@
 
 [Документация](https://argo-cd.readthedocs.io/en/stable/)
 
+![image](images/image1.jpg)
+
 ## Cert-manager
 
 [cert-manager](https://cert-manager.io/docs/installation/kubernetes/) - утилита
