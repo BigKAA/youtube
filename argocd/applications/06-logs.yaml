@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/BigKAA/youtube'
     path: argocd/01-clusterapp/05-logs
-    targetRevision: argocd
+    targetRevision: master
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: logging
