@@ -20,6 +20,7 @@ metadata:
   name: fluentd-forward
   labels:
     log-app: fluentd-forward
+    test: "12345-678"
   annotations:
     reloader.stakater.com/auto: "true"
     configmap.reloader.stakater.com/reload: "fluentd-forward-config"
