@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: argocd-cm
     app.kubernetes.io/part-of: argocd
 data:
-  url: https://argocd.kryukov.local:30443
+  url: https://argocd.kryukov.local:31443
 
   accounts.artur: apiKey, login
   accounts.artur.enabled: "true"

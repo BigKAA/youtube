@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: 'https://github.com/BigKAA/youtube'
     path: argocd/01-clusterapp/04-monitoring-ns
-    targetRevision: argocd
+    targetRevision: master
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring

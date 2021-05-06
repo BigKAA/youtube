@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/BigKAA/youtube'
     path: argocd/01-clusterapp/03-ingress-nginx
-    targetRevision: argocd
+    targetRevision: master
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: ingress-nginx
