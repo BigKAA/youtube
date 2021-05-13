@@ -26,5 +26,5 @@ Values берем из файла [02-values.yaml](bitnami/02-values.yaml)
 ## Используем template
 
     helm repo add bitnami https://charts.bitnami.com/bitnami
-    helm template system-harbor bitnami/harbor -f 02-values.yaml > 03-harbor.yaml
+    helm template system-harbor bitnami/harbor -f 02-values.yaml > app/01-harbor.yaml
 
