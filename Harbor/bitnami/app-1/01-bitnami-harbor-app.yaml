@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: system-harbor
-  namespace: system-harbor
+  namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
