@@ -35,7 +35,7 @@ kubernetes.
     # kubectl apply -f 01-rbac.yaml
     # kubectl apply -f 02-deployment.yaml
 
-Смотрим логи jenkins, ищем первначальный пароль админа.
+Смотрим логи jenkins, ищем первоначальный пароль админа.
 
 После установки, удаляем внутренние executors и конфигурируем модуль kubernetes
 
