@@ -13,6 +13,7 @@ spec:
     targetRevision: Harbor
   destination:
     server: 'https://kubernetes.default.svc'
+    namespace: system-harbor
   syncPolicy:
     automated:
       prune: true

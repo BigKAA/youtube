@@ -19,7 +19,7 @@ spec:
           value: "false"
 
         - name: externalURL
-          value: https://harbor.kryukov.local
+          value: http://harbor.kryukov.local
 
         - name: persistence.persistentVolumeClaim.registry.storageClass
           value: managed-nfs-storage
@@ -40,8 +40,8 @@ spec:
 
         - name: logLevel
           value: info
-#        - name: harborAdminPassword
-#          value: "harborpassword"
+        - name: harborAdminPassword
+          value: "password01"
 
         - name: database.type
           value: external
