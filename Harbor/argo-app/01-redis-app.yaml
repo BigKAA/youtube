@@ -1,0 +1,60 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: system-redis
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: system-harbor
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    chart: redis
+    targetRevision: 14.1.1
+    helm:
+      parameters:
+        - name: global.storageClass
+          value: managed-nfs-storage
+        - name: global.redis.password
+          value: 'qUwTt8g9it'
+        - name: image.registry
+          value: quay.io
+        - name: image.tag
+          value: 6.2.3-debian-10-r6
+        - name: master.persistence.storageClass
+          value: managed-nfs-storage
+        - name: master.priorityClassName
+          value: high-priority
+        - name: pdb.create
+          value: 'true'
+        - name: replica.persistence.storageClass
+          value: managed-nfs-storage
+        - name: replica.priorityClassName
+          value: high-priority
+        - name: replica.replicaCount
+          value: '1'
+#        - name: master.resources.requests.memory
+#          value: "256Mi"
+#        - name: master.resources.requests.cpu
+#          value: "0.5"
+#        - name: master.resources.limits.memory
+#          value: "256Mi"
+#        - name: master.resources.limits.cpu
+#          value: "0.5"
+#        - name: replica.resources.requests.memory
+#          value: "256Mi"
+#        - name: replica.resources.requests.cpu
+#          value: "0.5"
+#        - name: replica.resources.limits.memory
+#          value: "256Mi"
+#        - name: replica.resources.limits.cpu
+#          value: "0.5"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: system-harbor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
