@@ -9,7 +9,7 @@ spec:
   project: system-harbor
   source:
     repoURL: 'https://github.com/BigKAA/youtube'
-    path: Harbor/bitnami/app1
+    path: Harbor/bitnami/app
     targetRevision: Harbor
   destination:
     server: 'https://kubernetes.default.svc'

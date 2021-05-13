@@ -19,7 +19,7 @@ https://github.com/bitnami/charts/tree/master/bitnami/redis
 
 ## Harbor ((bitnami))
 
-Готовим [Application](bitnami/app-1/01-bitnami-harbor-app.yaml) для ArgoCD
+Готовим [Application](argo-app/02-bitnami-harbor-helm-app.yaml) для ArgoCD
 
 Values берем из файла [02-values.yaml](bitnami/02-values.yaml)
 
