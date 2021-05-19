@@ -21,3 +21,15 @@ Nexus внутри kubernetes, делаем свой docker registry.
    * [Calico-IPAM](https://youtu.be/4kQB6fR5vm8)
    * [Services 1](https://youtu.be/OWUOHM_08mc)
    * [Services 2](https://youtu.be/OHBv_OdjVIU)
+* **k8s-step-by-step** - установка небольшого кластера шаг за шагом.
+  * [Планирование](k8s-step-by-step/00-planning/README.md)
+  * [Установка](k8s-step-by-step/01-install/README.md)
+  * [Утилиты 1](k8s-step-by-step/02-utils/README.md)
+  * [Утилиты 2](k8s-step-by-step/03-utils/README.md)
+  * [Мониторинг prometheus + victoriametyrics](k8s-step-by-step/04-monitoring%20victoriametrics%20+%20prometheus/README.md)
+  * [Мониторинг только victoriametyrics](k8s-step-by-step/05-monitoring%20victoriametrics%20only/README.md)
+  * [Логи](k8s-step-by-step/06-logs/README.md)
+  
+* **[ArgoCD](argocd/README.md)** - приложение для CD в k8s.
+* **[Harbor](harbor/README.md)** - хранилище образов контейнеров и много 
+дополнительных плюшек.
