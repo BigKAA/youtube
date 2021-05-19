@@ -83,3 +83,9 @@ Namespace cert-manager создаётся автоматически.
 Заходим в WEB интерфейс
 
     https://argocd.kryukov.local:31443/
+
+## Ссылка на видео.
+
+[<img src="https://img.youtube.com/vi/96K9ui-phE0/maxresdefault.jpg" width="50%">](https://youtu.be/96K9ui-phE0)
+
+[<img src="https://img.youtube.com/vi/jIMF5CQaW7c/maxresdefault.jpg" width="50%">](https://youtu.be/jIMF5CQaW7c)
