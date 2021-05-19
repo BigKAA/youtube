@@ -73,7 +73,7 @@ logLevel: debug
 
 ## The initial password of Harbor admin. Change it from portal after launching Harbor
 ##
-# harborAdminPassword: password
+harborAdminPassword: password01
 
 portal:
   resources:
