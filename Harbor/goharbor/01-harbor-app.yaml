@@ -1,0 +1,83 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: system-harbor
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: system-harbor
+  source:
+    repoURL: 'https://helm.goharbor.io'
+    chart: harbor
+    targetRevision: 1.6.1
+    helm:
+      parameters:
+        - name: expose.type
+          value: ClusterIP
+        - name: expose.tls.enabled
+          value: "false"
+
+        - name: externalURL
+          value: http://harbor.kryukov.local
+
+        - name: persistence.persistentVolumeClaim.registry.storageClass
+          value: managed-nfs-storage
+        - name: persistence.persistentVolumeClaim.registry.size
+          value: 5Gi
+        - name: persistence.persistentVolumeClaim.chartmuseum.storageClass
+          value: managed-nfs-storage
+        - name: persistence.persistentVolumeClaim.chartmuseum.size
+          value: 1Gi
+        - name: persistence.persistentVolumeClaim.jobservice.storageClass
+          value: managed-nfs-storage
+        - name: persistence.persistentVolumeClaim.jobservice.size
+          value: 1Gi
+        - name: persistence.persistentVolumeClaim.trivy.storageClass
+          value: managed-nfs-storage
+        - name: persistence.persistentVolumeClaim.trivy.size
+          value: 1Gi
+
+        - name: logLevel
+          value: info
+        - name: harborAdminPassword
+          value: "password01"
+
+        - name: database.type
+          value: external
+        - name: database.external.host
+          value: base-pgbouncer.pgo.svc
+        - name: database.external.port
+          value: "5432"
+        - name: database.external.username
+          value: harbor
+        - name: database.external.password
+          value: harborpassword
+        - name: database.external.coreDatabase
+          value: registry
+        - name: database.external.notaryServerDatabase
+          value: notary_server
+        - name: database.external.notarySignerDatabase
+          value: notary_signer
+        - name: database.external.sslmode
+          value: disable
+
+        - name: redis.type
+          value: external
+        - name: redis.external.addr
+          value: system-redis-master:6379
+        - name: redis.external.password
+          value: 96UeKkq7q8
+
+        - name: metrics.enabled
+          value: "true"
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: system-harbor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

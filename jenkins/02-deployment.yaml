@@ -77,7 +77,7 @@ spec:
           - name: JENKINS_SLAVE_AGENT_PORT
             value: "50000"
 #            - name: JENKINS_OPTS
-#              value: "--prefix=jenkins"
+#              value: "--prefix=/jenkins"
         livenessProbe:
           httpGet:
             path: "/prometheus/"

@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: system-harbor
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Harbor installation
+  sourceRepos:
+  - 'https://charts.bitnami.com/bitnami'
+  - 'https://helm.goharbor.io'
+  - 'https://github.com/BigKAA/youtube'
+  destinations:
+  - server: https://kubernetes.default.svc
+    namespace: 'system-harbor'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

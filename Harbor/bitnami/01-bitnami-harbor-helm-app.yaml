@@ -1,0 +1,220 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: system-harbor-1
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: system-harbor
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    chart: harbor
+    targetRevision: 10.0.2
+    helm:
+      values: |
+        coreImage:
+          registry: quay.io
+        portalImage:
+          registry: quay.io
+        jobserviceImage:
+          registry: quay.io
+        chartMuseumImage:
+          registry: quay.io
+        registryImage:
+          registry: quay.io
+        registryctlImage:
+          registry: quay.io
+        trivyImage:
+          registry: quay.io
+        clairImage:
+          registry: quay.io
+        clairAdapterImage:
+          registry: quay.io
+        notaryServerImage:
+          registry: quay.io
+        notarySignerImage:
+          registry: quay.io
+        nginxImage:
+          registry: quay.io
+
+        service:
+          type: ClusterIP
+          tls:
+            enabled: false
+
+        ingress:
+          enabled: true
+
+          hosts:
+            core: harbor.kryukov.local
+            notary: notary.kryukov.local
+          annotations:
+            ingress.kubernetes.io/ssl-redirect: 'true'
+            ingress.kubernetes.io/proxy-body-size: '0'
+            nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+            nginx.ingress.kubernetes.io/proxy-body-size: '0'
+            kubernetes.io/ingress.class: 'system-ingress'
+
+        externalURL: http://harbor.kryukov.local
+
+        persistence:
+          enabled: true
+          persistentVolumeClaim:
+            registry:
+              existingClaim: ''
+              storageClass: 'managed-nfs-storage'
+              subPath: ''
+              accessMode: ReadWriteOnce
+              size: 5Gi
+            jobservice:
+              existingClaim: ''
+              storageClass: 'managed-nfs-storage'
+              subPath: ''
+              accessMode: ReadWriteOnce
+              size: 1Gi
+            chartmuseum:
+              existingClaim: ''
+              storageClass: 'managed-nfs-storage'
+              subPath: ''
+              accessMode: ReadWriteOnce
+              size: 5Gi
+            trivy:
+              storageClass: 'managed-nfs-storage'
+              accessMode: ReadWriteOnce
+              size: 5Gi
+
+        logLevel: debug
+
+        ## The initial password of Harbor admin. Change it from portal after launching Harbor
+        ##
+        harborAdminPassword: password01
+
+        portal:
+          resources:
+            limits: {}
+            ##   cpu: 500m
+            ##   memory: 1Gi
+            requests: {}
+            ##   cpu: 250m
+            ##   memory: 256Mi
+        core:
+          replicas: 1
+          resources:
+            limits: {}
+            #  cpu: 500m
+            #  memory: 1Gi
+            requests: {}
+            #  cpu: 250m
+            #  memory: 256Mi
+        jobservice:
+          maxJobWorkers: 10
+          resources:
+            limits: {}
+            ##   cpu: 500m
+            ##   memory: 1Gi
+            requests: {}
+            ##   cpu: 250m
+            ##   memory: 256Mi
+
+        registry:
+          server:
+            resources:
+              limits: {}
+              ##   cpu: 500m
+              ##   memory: 1Gi
+              requests: {}
+              ##   cpu: 250m
+              ##   memory: 256Mi
+          controller:
+            resources:
+              limits: {}
+              ##   cpu: 500m
+              ##   memory: 1Gi
+              requests: {}
+              ##   cpu: 250m
+              ##   memory: 256Mi
+
+        chartmuseum:
+          enabled: true
+          contextPath:
+          indexLimit:
+          chartPostFormFieldName:
+          provPostFormFieldName:
+          maxStorageObjects:
+          maxUploadSize:
+          storageTimestampTolerance: "1s"
+          resources:
+            limits: {}
+            #  cpu: 500m
+            #  memory: 1Gi
+            requests: {}
+            #  cpu: 250m
+            #  memory: 256Mi
+
+        trivy:
+          enabled: true
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+        notary:
+          enabled: true
+          server:
+            resources:
+              limits: {}
+              ##   cpu: 500m
+              ##   memory: 1Gi
+              requests: {}
+              ##   cpu: 250m
+              ##   memory: 256Mi
+          signer:
+            resources:
+              limits: {}
+              ##   cpu: 500m
+              ##   memory: 1Gi
+              requests: {}
+              ##   cpu: 250m
+              ##   memory: 256Mi
+
+        redis:
+          enabled: false
+        externalRedis:
+          host: system-redis-master
+          port: 6379
+
+          password: 'qUwTt8g9it'
+
+        postgresql:
+          enabled: false
+        externalDatabase:
+          host: base-pgbouncer.pgo.svc
+          user: harbor
+          password: 'harborpassword'
+          port: 5432
+          sslmode: disable
+          coreDatabase: harborcore
+
+          clairDatabase: harborclair
+          clairUsername: harbor
+          clairPassword: 'harborpassword'
+          notaryServerDatabase: harbornotary
+          notaryServerUsername: harbor
+          notaryServerPassword: 'harborpassword'
+          notarySignerDatabase: harbornotarysigner
+          notarySignerUsername: harbor
+          notarySignerPassword: 'harborpassword'
+
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: system-harbor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
