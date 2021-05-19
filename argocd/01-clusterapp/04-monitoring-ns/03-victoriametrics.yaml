@@ -1,5 +1,28 @@
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-clear
+  namespace: monitoring
+data:
+  clear.sh: |
+    #! /bin/bash
+
+    for DIR in `find /victoria-metrics-data/data/small/ -type d | grep -E '^\S.*\/[0-9]{4}_[0-9]{2}\/[0-9].*'`
+    do
+        if [ ! -f $DIR/index.bin ]; then
+            rm -rf  $DIR
+        fi
+    done
+
+    for DIR in `find /victoria-metrics-data/data/big/ -type d | grep -E '^\S.*\/[0-9]{4}_[0-9]{2}\/[0-9].*'`
+    do
+        if [ ! -f $DIR/index.bin ]; then
+            rm -rf $DIR
+        fi
+    done
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: victoriametrics-sys
@@ -46,6 +69,15 @@ spec:
         app: victoriametrics-sys
     spec:
       priorityClassName: low-priority
+      initContainers:
+        - name: init-configs
+          image: busybox:1.33.0
+          command: [ 'sh', '/tmp/clear.sh' ]
+          volumeMounts:
+            - name: prepare
+              mountPath: /tmp/
+            - name: data
+              mountPath: /victoria-metrics-data
       containers:
         - name: victoriametrics-sys
           image: victoriametrics/victoria-metrics:v1.57.1
@@ -83,6 +115,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /victoria-metrics-data
+      volumes:
+        - name: prepare
+          configMap:
+            name: init-clear
   volumeClaimTemplates:
     - metadata:
         name: data
