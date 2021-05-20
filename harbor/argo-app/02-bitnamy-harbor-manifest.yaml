@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/BigKAA/youtube'
     path: harbor/bitnami/app
-    targetRevision: Harbor
+    targetRevision: master
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: system-harbor
