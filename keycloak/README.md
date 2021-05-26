@@ -6,7 +6,7 @@ helmchart https://github.com/codecentric/helm-charts/tree/master/charts/keycloak
 
 Если нет ClusterIssuer 
 
-    kubectl  create secret tls kube-ca-secret \
+    kubectl -n cert-manager create secret tls kube-ca-secret \
     --cert=/etc/kubernetes/ssl/ca.crt \
     --key=/etc/kubernetes/ssl/ca.key
     kubectl -n keycloak apply -f 00-certs.yaml
