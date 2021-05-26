@@ -133,12 +133,9 @@ extraEnv: |
   - name: KEYCLOAK_PASSWORD_FILE
     value: /secrets/creds/admin-password
   - name: JGROUPS_DISCOVERY_PROTOCOL
-    value: kubernetes.KUBE_PING
-  - name: KUBERNETES_NAMESPACE
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: metadata.namespace
+   value: dns.DNS_PING
+  - name: JGROUPS_DISCOVERY_PROPERTIES
+   value: 'dns_query={{ include "keycloak.serviceDnsName" . }}'
   - name: CACHE_OWNERS_COUNT
     value: "2"
   - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
@@ -146,6 +143,13 @@ extraEnv: |
   - name: PROXY_ADDRESS_FORWARDING
     value: "true"
 
+#- name: JGROUPS_DISCOVERY_PROTOCOL
+#    value: kubernetes.KUBE_PING
+#  - name: KUBERNETES_NAMESPACE
+#    valueFrom:
+#      fieldRef:
+#        apiVersion: v1
+#        fieldPath: metadata.namespace
 # Additional environment variables for Keycloak mapped from Secret or ConfigMap
 extraEnvFrom: ""
 
