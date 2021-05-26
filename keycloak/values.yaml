@@ -108,8 +108,12 @@ args: []
 extraEnv: |
   - name: JAVA_OPTS
     value: >-
-      -server -Xms1024m -Xmx2048m -XX:MetaspaceSize=192M
-      -XX:MaxMetaspaceSize=512m -Djava.net.preferIPv4Stack=true
+      -server
+      -Xms1024m
+      -Xmx2048m
+      -XX:MetaspaceSize=192M
+      -XX:MaxMetaspaceSize=512m
+      -Djava.net.preferIPv4Stack=true
       -Djboss.modules.system.pkgs=org.jboss.byteman
       -Djava.awt.headless=true
   - name: DB_VENDOR
