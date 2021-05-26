@@ -15,8 +15,8 @@ metadata:
   namespace: keycloak
 spec:
   secretName: keycloak-tls
-  duration: 9125h # 1y
-  renewBefore: 360h # 15d
+  duration: 9125h0m0s # 1y
+  renewBefore: 360h0m0s # 15d
   subject:
     organizations:
     - arturs k8s
