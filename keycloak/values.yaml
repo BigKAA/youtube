@@ -142,15 +142,6 @@ extraEnv: |
   - name: PROXY_ADDRESS_FORWARDING
     value: "true"
 
-  # - name: KEYCLOAK_LOGLEVEL
-  #   value: DEBUG
-  # - name: WILDFLY_LOGLEVEL
-  #   value: DEBUG
-  # - name: CACHE_OWNERS_COUNT
-  #   value: "2"
-  # - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
-  #   value: "2"
-
 # Additional environment variables for Keycloak mapped from Secret or ConfigMap
 extraEnvFrom: ""
 
