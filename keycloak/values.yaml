@@ -135,9 +135,9 @@ extraEnv: |
   - name: JGROUPS_DISCOVERY_PROTOCOL
     value: dns.DNS_PING
   - name: KUBERNETES_NAMESPACE
-      valueFrom:
-        fieldRef:
-          apiVersion: v1
+    valueFrom:
+      fieldRef:
+        apiVersion: v1
           fieldPath: metadata.namespace
   - name: JGROUPS_DISCOVERY_PROPERTIES
     value: 'dns_query={{ include "keycloak.serviceDnsName" . }}'
