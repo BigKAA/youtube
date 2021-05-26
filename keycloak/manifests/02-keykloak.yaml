@@ -1,0 +1,259 @@
+---
+# Source: keycloak/templates/configmap-startup.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-startup
+  labels:
+    helm.sh/chart: keycloak-11.0.0
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/version: "13.0.1"
+    app.kubernetes.io/managed-by: Helm
+data:
+  contextPath.cli: |
+    embed-server --server-config=standalone-ha.xml --std-out=echo
+    batch
+    /subsystem=keycloak-server/:write-attribute(name=web-context,value=iam)
+    run-batch
+    stop-embedded-server
+    
+  keycloak.cli: |
+    embed-server --server-config=standalone-ha.xml --std-out=echo
+    batch
+    
+    echo Configuring node identifier
+    
+    ## Sets the node identifier to the node name (= pod name). Node identifiers have to be unique. They can have a
+    ## maximum length of 23 characters. Thus, the chart's fullname template truncates its length accordingly.
+    /subsystem=transactions:write-attribute(name=node-identifier, value=${jboss.node.name})
+    
+    echo Finished configuring node identifier
+    
+    run-batch
+    stop-embedded-server
+---
+# Source: keycloak/templates/service-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-headless
+  labels:
+    helm.sh/chart: keycloak-11.0.0
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/version: "13.0.1"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: keycloak
+---
+# Source: keycloak/templates/service-http.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-http
+  labels:
+    helm.sh/chart: keycloak-11.0.0
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/version: "13.0.1"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: http
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: https
+      port: 8443
+      targetPort: https
+      protocol: TCP
+    - name: http-management
+      port: 9990
+      targetPort: http-management
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: keycloak
+---
+# Source: keycloak/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: keycloak
+  labels:
+    helm.sh/chart: keycloak-11.0.0
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/version: "13.0.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: keycloak
+      app.kubernetes.io/instance: keycloak
+  replicas: 2
+  serviceName: keycloak-headless
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config-startup: 82312fce10de9aacbaff5dbbfc35b09c7065bec41fbaad028b28f6017593cecc
+        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+      labels:
+        app.kubernetes.io/name: keycloak
+        app.kubernetes.io/instance: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+          image: "quay.io/keycloak/keycloak:13.0.1"
+          imagePullPolicy: IfNotPresent
+          command:
+            []
+          args:
+            []
+          env:
+            - name: JAVA_OPTS
+              value: >-
+                -server
+                -Xms1024m
+                -Xmx2048m
+                -XX:MetaspaceSize=192M
+                -XX:MaxMetaspaceSize=512m
+                -Djava.net.preferIPv4Stack=true
+                -Djboss.modules.system.pkgs=org.jboss.byteman
+                -Djava.awt.headless=true
+            - name: DB_VENDOR
+              value: postgres
+            - name: DB_ADDR
+              value: base-pgbouncer.pgo.svc
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE
+              value: keycloak
+            - name: DB_USER_FILE
+              value: /secrets/creds/db-user
+            - name: DB_PASSWORD_FILE
+              value: /secrets/creds/db-password
+            - name: KEYCLOAK_USER_FILE
+              value: /secrets/creds/admin-user
+            - name: KEYCLOAK_PASSWORD_FILE
+              value: /secrets/creds/admin-password
+            - name: JGROUPS_DISCOVERY_PROTOCOL
+              value: dns.DNS_PING
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: JGROUPS_DISCOVERY_PROPERTIES
+              value: 'dns_query=keycloak-headless'
+            - name: CACHE_OWNERS_COUNT
+              value: "2"
+            - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
+              value: "2"
+            - name: PROXY_ADDRESS_FORWARDING
+              value: "true"
+            
+          envFrom:
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+            - name: http-management
+              containerPort: 9990
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /iam/
+              port: http
+            initialDelaySeconds: 0
+            timeoutSeconds: 5
+            
+          readinessProbe:
+            httpGet:
+              path: /iam/realms/master
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            
+          startupProbe:
+            httpGet:
+              path: /iam/
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            failureThreshold: 60
+            periodSeconds: 5
+            
+          resources:
+            limits:
+              cpu: "1"
+              memory: 3072Mi
+            requests:
+              cpu: 100m
+              memory: 1024Mi
+          volumeMounts:
+            - name: startup
+              mountPath: "/opt/jboss/startup-scripts/contextPath.cli"
+              subPath: "contextPath.cli"
+              readOnly: true
+            - name: startup
+              mountPath: "/opt/jboss/startup-scripts/keycloak.cli"
+              subPath: "keycloak.cli"
+              readOnly: true
+            - name: creds
+              mountPath: /secrets/creds
+              readOnly: true
+            
+      serviceAccountName: default
+      securityContext:
+        fsGroup: 1000
+      enableServiceLinks: true
+      restartPolicy: Always
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                      - keycloak
+              topologyKey: "kubernetes.io/hostname"
+        
+      priorityClassName: high-priority
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: startup
+          configMap:
+            name: keycloak-startup
+            defaultMode: 0555
+            items:
+              - key: contextPath.cli
+                path: contextPath.cli
+              - key: keycloak.cli
+                path: keycloak.cli
+        - name: creds
+          secret:
+            secretName: keycloak-credentials
