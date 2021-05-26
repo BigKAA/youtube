@@ -209,7 +209,7 @@ readinessProbe: |
 # Startup probe configuration
 startupProbe: |
   httpGet:
-    path: /auth/
+    path: {{ if ne .Values.contextPath "" }}/{{ .Values.contextPath }}{{ end }}/auth/
     port: http
   initialDelaySeconds: 30
   timeoutSeconds: 1
