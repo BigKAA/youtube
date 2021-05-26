@@ -138,7 +138,7 @@ extraEnv: |
     valueFrom:
       fieldRef:
         apiVersion: v1
-          fieldPath: metadata.namespace
+        fieldPath: metadata.namespace
   - name: JGROUPS_DISCOVERY_PROPERTIES
     value: 'dns_query={{ include "keycloak.serviceDnsName" . }}'
   - name: CACHE_OWNERS_COUNT
