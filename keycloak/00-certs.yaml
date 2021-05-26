@@ -2,7 +2,7 @@
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: keycloak-issuer
+  name:
   namespace: keycloak
 spec:
   ca:
