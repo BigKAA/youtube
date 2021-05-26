@@ -20,7 +20,7 @@ spec:
   subject:
     organizations:
     - arturs k8s
-  isCA: false
+  #isCA: false
   privateKey:
     algorithm: RSA
     encoding: PKCS1
