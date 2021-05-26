@@ -7,4 +7,32 @@ metadata:
 spec:
   ca:
     secretName: kube-ca-secret
-
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: keycloak-certificate
+  namespace: keycloak
+spec:
+  secretName: keycloak-tls
+  duration: 9125h0m0s # 1y
+  renewBefore: 360h0m0s # 15d
+  subject:
+    organizations:
+    - arturs k8s
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+    rotationPolicy: Always
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - mon.kryukov.local
+  - keycloak.kryukov.local
+  issuerRef:
+    name: keycloak-issuer
+    kind: Issuer
+    group: cert-manager.io
