@@ -105,7 +105,7 @@ command: []
 args: []
 
 # Additional environment variables for Keycloak
-extraEnv:
+extraEnv: |
   - name: JAVA_OPTS
     value: >-
       -server -Xms1024m -Xmx2048m -XX:MetaspaceSize=192M
@@ -252,13 +252,13 @@ startupScripts:
   # echo 'Hello from my custom startup script!'
 
 # Add additional volumes, e. g. for custom themes
-extraVolumes:
+extraVolumes: |
   - name: creds
     secret:
       secretName: keycloak-credentials
 
 # Add additional volumes mounts, e. g. for custom themes
-extraVolumeMounts:
+extraVolumeMounts: |
   - name: creds
     mountPath: /secrets/creds
     readOnly: true
