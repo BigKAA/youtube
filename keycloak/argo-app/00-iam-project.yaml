@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: keycloak
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Keycloak cluster installation
+  sourceRepos:
+  - 'https://github.com/BigKAA/youtube'
+  destinations:
+  - server: https://kubernetes.default.svc
+    namespace: 'keycloak'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
