@@ -193,7 +193,7 @@ podAnnotations: {}
 # Liveness probe configuration
 livenessProbe: |
   httpGet:
-    path: path: {{ if ne .Values.contextPath "" }}/{{ .Values.contextPath }}{{ end }}/
+    path: {{ if ne .Values.contextPath "" }}/{{ .Values.contextPath }}{{ end }}/
     port: http
   initialDelaySeconds: 0
   timeoutSeconds: 5
