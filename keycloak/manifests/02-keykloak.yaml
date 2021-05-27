@@ -3,13 +3,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: keycloak-startup
+  name: kk-keycloak-startup
   labels:
-    helm.sh/chart: keycloak-11.0.0
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
-    app.kubernetes.io/managed-by: Helm
 data:
   contextPath.cli: |
     embed-server --server-config=standalone-ha.xml --std-out=echo
@@ -37,13 +35,11 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: keycloak-headless
+  name: kk-keycloak-headless
   labels:
-    helm.sh/chart: keycloak-11.0.0
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
-    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: headless
 spec:
   type: ClusterIP
@@ -55,19 +51,17 @@ spec:
       protocol: TCP
   selector:
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/instance: kk
 ---
 # Source: keycloak/templates/service-http.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: keycloak-http
+  name: kk-keycloak-http
   labels:
-    helm.sh/chart: keycloak-11.0.0
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
-    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: http
 spec:
   type: ClusterIP
@@ -86,37 +80,33 @@ spec:
       protocol: TCP
   selector:
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/instance: kk
 ---
 # Source: keycloak/templates/statefulset.yaml
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: keycloak
+  name: kk-keycloak
   labels:
-    helm.sh/chart: keycloak-11.0.0
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
-    app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: keycloak
-      app.kubernetes.io/instance: keycloak
+      app.kubernetes.io/instance: kk
   replicas: 2
-  serviceName: keycloak-headless
-  podManagementPolicy: Parallel
-  updateStrategy:
+  serviceName: kk-keycloak-headless
     type: RollingUpdate
   template:
     metadata:
       annotations:
-        checksum/config-startup: 82312fce10de9aacbaff5dbbfc35b09c7065bec41fbaad028b28f6017593cecc
+        checksum/config-startup: c4a54ee0b3b9bf6cb46912bf209db38d66591a74944f22d4d9f1ed87986f67cf
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app.kubernetes.io/name: keycloak
-        app.kubernetes.io/instance: keycloak
+        app.kubernetes.io/instance: kk
     spec:
       containers:
         - name: keycloak
@@ -164,7 +154,7 @@ spec:
                   apiVersion: v1
                   fieldPath: metadata.namespace
             - name: JGROUPS_DISCOVERY_PROPERTIES
-              value: 'dns_query=keycloak-headless'
+              value: 'dns_query=kk-headless'
             - name: CACHE_OWNERS_COUNT
               value: "2"
             - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
@@ -247,7 +237,7 @@ spec:
       volumes:
         - name: startup
           configMap:
-            name: keycloak-startup
+            name: kk-keycloak-startup
             defaultMode: 0555
             items:
               - key: contextPath.cli
