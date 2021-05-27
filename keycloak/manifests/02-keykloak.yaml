@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kk-keycloak-startup
+  name: kk-startup
   labels:
-    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
 data:
@@ -33,9 +33,9 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kk-keycloak-headless
+  name: kk-headless
   labels:
-    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
     app.kubernetes.io/component: headless
@@ -48,15 +48,15 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: kk-keycloak-http
+  name: kk-http
   labels:
-    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
     app.kubernetes.io/component: http
@@ -76,30 +76,30 @@ spec:
       targetPort: http-management
       protocol: TCP
   selector:
-    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kk-keycloak
+  name: kk
   labels:
-    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: keycloak
+      app.kubernetes.io/name: kk
       app.kubernetes.io/instance: kk
   replicas: 2
   template:
     metadata:
       annotations:
-        checksum/config-startup: c4a54ee0b3b9bf6cb46912bf209db38d66591a74944f22d4d9f1ed87986f67cf
+        checksum/config-startup: b635a3a7369208bc2e9bc40f592c13a845c2f697c23ffb431405cfeaeb346b6c
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
-        app.kubernetes.io/name: keycloak
+        app.kubernetes.io/name: kk
         app.kubernetes.io/instance: kk
     spec:
       containers:
@@ -231,7 +231,7 @@ spec:
       volumes:
         - name: startup
           configMap:
-            name: kk-keycloak-startup
+            name: kk-startup
             defaultMode: 0555
             items:
               - key: contextPath.cli
