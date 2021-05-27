@@ -1,5 +1,11 @@
 contextPath: iam
 
+# Optionally override the fully qualified name
+fullnameOverride: "kk"
+
+# Optionally override the name
+nameOverride: "kk"
+
 # The number of replicas to create (has no effect if autoscaling enabled)
 replicas: 2
 
