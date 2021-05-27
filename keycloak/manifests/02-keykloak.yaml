@@ -107,8 +107,8 @@ spec:
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
-          # image: "quay.io/keycloak/keycloak:13.0.1"
-          image: "quay.io/keycloak/keycloak:9.0.3"
+          image: "quay.io/keycloak/keycloak:13.0.1"
+          # image: "quay.io/keycloak/keycloak:9.0.3"
           imagePullPolicy: IfNotPresent
           command:
             []
