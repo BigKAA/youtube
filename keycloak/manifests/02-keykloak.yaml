@@ -93,7 +93,6 @@ spec:
       app.kubernetes.io/name: keycloak
       app.kubernetes.io/instance: kk
   replicas: 2
-  serviceName: kk-keycloak-headless
   template:
     metadata:
       annotations:
