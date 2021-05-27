@@ -106,7 +106,7 @@ affinity: |
             - key: "app.kubernetes.io/name"
               operator: In
               values:
-                - keycloak
+                - kk
         topologyKey: "kubernetes.io/hostname"
 
 # Node labels for Pod assignment
