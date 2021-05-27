@@ -11,8 +11,27 @@ helmchart https://github.com/codecentric/helm-charts/tree/master/charts/keycloak
     --key=/etc/kubernetes/ssl/ca.key
     kubectl -n keycloak apply -f 00-certs.yaml
 
+Подготовка манифестов
+
     helm repo add codecentric https://codecentric.github.io/helm-charts
-    helm template keycloak codecentric/keycloak -f values.yaml > manifests/02-keykloak.yaml
+    helm template kk codecentric/keycloak -f values.yaml | \
+    sed '/^#/d' | \
+    sed '/helm.sh\/chart/d' | \
+    sed '/managed-by: Helm/d' | \
+    sed '/serviceName: kk-headless/d' | \
+    sed '/podManagementPolicy/d' | \
+    sed '/updateStrategy/d' | \
+    sed '/type: RollingUpdate/d' | \
+    sed '/kind: StatefulSet/c\kind: Deployment' > manifests/02-keykloak.yaml
+
+Установка. Можно руками:
+
     kubectl -n keycloak apply -f manifests/01-secrets.yaml
     kubectl -n keycloak apply -f manifests/02-keykloak.yaml
     kubectl -n keycloak apply -f manifests/03-ingress.yaml
+
+Можно при помощи ArgoCD:
+    
+Пушим manifests/* в Git. Редактируем argo-app/{00-iam-project.yaml,01-keycloak-app.yaml}
+
+    kubect  apply -f argo-app
