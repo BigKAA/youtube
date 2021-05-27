@@ -2,16 +2,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kk-startup
+  name: kk-keycloak-startup
   labels:
-    app.kubernetes.io/name: kk
+    app.kubernetes.io/name: keycloak
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
 data:
   contextPath.cli: |
     embed-server --server-config=standalone-ha.xml --std-out=echo
     batch
-    /subsystem=keycloak-server/:write-attribute(name=web-context,value=iam)
+    /subsystem=keycloak-server/:write-attribute(name=web-context,value=/iam)
     run-batch
     stop-embedded-server
     
@@ -33,9 +33,9 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kk-headless
+  name: kk-keycloak-headless
   labels:
-    app.kubernetes.io/name: kk
+    app.kubernetes.io/name: keycloak
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
     app.kubernetes.io/component: headless
@@ -48,15 +48,15 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    app.kubernetes.io/name: kk
+    app.kubernetes.io/name: keycloak
     app.kubernetes.io/instance: kk
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: kk-http
+  name: kk-keycloak-http
   labels:
-    app.kubernetes.io/name: kk
+    app.kubernetes.io/name: keycloak
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
     app.kubernetes.io/component: http
@@ -76,30 +76,31 @@ spec:
       targetPort: http-management
       protocol: TCP
   selector:
-    app.kubernetes.io/name: kk
+    app.kubernetes.io/name: keycloak
     app.kubernetes.io/instance: kk
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kk
+  name: kk-keycloak
   labels:
-    app.kubernetes.io/name: kk
+    app.kubernetes.io/name: keycloak
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: kk
+      app.kubernetes.io/name: keycloak
       app.kubernetes.io/instance: kk
   replicas: 2
+  serviceName: kk-keycloak-headless
   template:
     metadata:
       annotations:
-        checksum/config-startup: b635a3a7369208bc2e9bc40f592c13a845c2f697c23ffb431405cfeaeb346b6c
+        checksum/config-startup: 012e04daa7e952648e222749834766fae053e40ebf11b49fd5cca1f671c8ea7f
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
-        app.kubernetes.io/name: kk
+        app.kubernetes.io/name: keycloak
         app.kubernetes.io/instance: kk
     spec:
       containers:
@@ -108,7 +109,6 @@ spec:
             runAsNonRoot: true
             runAsUser: 1000
           image: "quay.io/keycloak/keycloak:13.0.1"
-          # image: "quay.io/keycloak/keycloak:9.0.3"
           imagePullPolicy: IfNotPresent
           command:
             []
@@ -149,7 +149,7 @@ spec:
                   apiVersion: v1
                   fieldPath: metadata.namespace
             - name: JGROUPS_DISCOVERY_PROPERTIES
-              value: 'dns_query=kk-headless'
+              value: 'dns_query=keycloak-headless'
             - name: CACHE_OWNERS_COUNT
               value: "2"
             - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
@@ -232,7 +232,7 @@ spec:
       volumes:
         - name: startup
           configMap:
-            name: kk-startup
+            name: kk-keycloak-startup
             defaultMode: 0555
             items:
               - key: contextPath.cli
