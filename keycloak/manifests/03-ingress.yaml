@@ -18,7 +18,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: keycloak-http
+                name: kk-http
                 port:
                   name: http
   tls:
