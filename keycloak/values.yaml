@@ -1,11 +1,5 @@
 contextPath: iam
 
-# Optionally override the fully qualified name
-fullnameOverride: "kk"
-
-# Optionally override the name
-nameOverride: "kk"
-
 # The number of replicas to create (has no effect if autoscaling enabled)
 replicas: 2
 
@@ -77,7 +71,7 @@ extraEnv: |
         apiVersion: v1
         fieldPath: metadata.namespace
   - name: JGROUPS_DISCOVERY_PROPERTIES
-    value: 'dns_query=kk-headless'
+    value: 'dns_query=keycloak-headless'
   - name: CACHE_OWNERS_COUNT
     value: "2"
   - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
