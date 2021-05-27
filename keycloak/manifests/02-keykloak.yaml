@@ -212,7 +212,7 @@ spec:
                   - key: "app.kubernetes.io/name"
                     operator: In
                     values:
-                      - keycloak
+                      - kk
               topologyKey: "kubernetes.io/hostname"
         
       priorityClassName: high-priority
