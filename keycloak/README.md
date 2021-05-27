@@ -22,6 +22,7 @@ helmchart https://github.com/codecentric/helm-charts/tree/master/charts/keycloak
     sed '/podManagementPolicy/d' | \
     sed '/updateStrategy/d' | \
     sed '/type: RollingUpdate/d' | \
+    sed '/serviceName/d' | \
     sed '/kind: StatefulSet/c\kind: Deployment' > manifests/02-keykloak.yaml
 
 Установка. Можно руками:
