@@ -8,13 +8,6 @@ metadata:
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
 data:
-  contextPath.cli: |
-    embed-server --server-config=standalone-ha.xml --std-out=echo
-    batch
-    /subsystem=keycloak-server/:write-attribute(name=web-context,value=iam)
-    run-batch
-    stop-embedded-server
-    
   keycloak.cli: |
     embed-server --server-config=standalone-ha.xml --std-out=echo
     batch
@@ -96,7 +89,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-startup: b635a3a7369208bc2e9bc40f592c13a845c2f697c23ffb431405cfeaeb346b6c
+        checksum/config-startup: be35aa7c0655fc53f95522e7b172db448a3d18ddc59882b102fa28ee9d520254
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app.kubernetes.io/name: kk
@@ -167,28 +160,28 @@ spec:
             - name: http-management
               containerPort: 9990
               protocol: TCP
-#          livenessProbe:
-#            httpGet:
-#              path: /iam/
-#              port: http
-#            initialDelaySeconds: 0
-#            timeoutSeconds: 5
-#
-#          readinessProbe:
-#            httpGet:
-#              path: /iam/realms/master
-#              port: http
-#            initialDelaySeconds: 30
-#            timeoutSeconds: 1
-#
-#          startupProbe:
-#            httpGet:
-#              path: /iam/
-#              port: http
-#            initialDelaySeconds: 30
-#            timeoutSeconds: 1
-#            failureThreshold: 60
-#            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /auth/
+              port: http
+            initialDelaySeconds: 0
+            timeoutSeconds: 5
+            
+          readinessProbe:
+            httpGet:
+              path: /auth/realms/master
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            
+          startupProbe:
+            httpGet:
+              path: /auth/
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            failureThreshold: 60
+            periodSeconds: 5
             
           resources:
             limits:
@@ -198,10 +191,6 @@ spec:
               cpu: 100m
               memory: 1024Mi
           volumeMounts:
-            - name: startup
-              mountPath: "/opt/jboss/startup-scripts/contextPath.cli"
-              subPath: "contextPath.cli"
-              readOnly: true
             - name: startup
               mountPath: "/opt/jboss/startup-scripts/keycloak.cli"
               subPath: "keycloak.cli"
@@ -234,8 +223,6 @@ spec:
             name: kk-startup
             defaultMode: 0555
             items:
-              - key: contextPath.cli
-                path: contextPath.cli
               - key: keycloak.cli
                 path: keycloak.cli
         - name: creds
