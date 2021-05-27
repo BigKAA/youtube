@@ -11,10 +11,10 @@ metadata:
     cert-manager.io/cluster-issuer: "cluster-issuer"
 spec:
   rules:
-    - host: "mon.kryukov.local"
+    - host: "keycloak.kryukov.local"
       http:
         paths:
-          - path: /iam
+          - path: /
             pathType: Prefix
             backend:
               service:
@@ -23,5 +23,5 @@ spec:
                   name: http
   tls:
   - hosts:
-      - mon.kryukov.local
+      - keycloak.kryukov.local
     secretName: keycloak-tls

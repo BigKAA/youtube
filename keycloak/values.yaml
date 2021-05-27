@@ -1,5 +1,3 @@
-contextPath: iam
-
 # Optionally override the fully qualified name
 fullnameOverride: "kk"
 
@@ -126,7 +124,7 @@ podAnnotations: {}
 # Liveness probe configuration
 livenessProbe: |
   httpGet:
-    path: {{ if ne .Values.contextPath "" }}/{{ .Values.contextPath }}{{ end }}/
+    path: /auth/
     port: http
   initialDelaySeconds: 0
   timeoutSeconds: 5
@@ -134,7 +132,7 @@ livenessProbe: |
 # Readiness probe configuration
 readinessProbe: |
   httpGet:
-    path: {{ if ne .Values.contextPath "" }}/{{ .Values.contextPath }}{{ end }}/realms/master
+    path: /auth/realms/master
     port: http
   initialDelaySeconds: 30
   timeoutSeconds: 1
@@ -142,7 +140,7 @@ readinessProbe: |
 # Startup probe configuration
 startupProbe: |
   httpGet:
-    path: {{ if ne .Values.contextPath "" }}/{{ .Values.contextPath }}{{ end }}/
+    path: /auth/
     port: http
   initialDelaySeconds: 30
   timeoutSeconds: 1
@@ -160,17 +158,8 @@ resources:
 
 # Startup scripts to run before Keycloak starts up
 startupScripts:
-  contextPath.cli: |
-    embed-server --server-config=standalone-ha.xml --std-out=echo
-    batch
-    {{- if ne .Values.contextPath "auth" }}
-    /subsystem=keycloak-server/:write-attribute(name=web-context,value={{ if eq .Values.contextPath "" }}/{{ else }}{{ .Values.contextPath }}{{ end }})
-    {{- if eq .Values.contextPath "" }}
-    /subsystem=undertow/server=default-server/host=default-host:write-attribute(name=default-web-module,value=keycloak-server.war)
-    {{- end }}
-    {{- end }}
-    run-batch
-    stop-embedded-server
+  keycloak.cli: |
+    {{- .Files.Get "scripts/keycloak.cli" }}
 
 # Add additional volumes, e. g. for custom themes
 extraVolumes: |
