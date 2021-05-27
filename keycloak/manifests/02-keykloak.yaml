@@ -1,5 +1,4 @@
 ---
-# Source: keycloak/templates/configmap-startup.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -31,7 +30,6 @@ data:
     run-batch
     stop-embedded-server
 ---
-# Source: keycloak/templates/service-headless.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -53,7 +51,6 @@ spec:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/instance: kk
 ---
-# Source: keycloak/templates/service-http.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -82,7 +79,6 @@ spec:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/instance: kk
 ---
-# Source: keycloak/templates/statefulset.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -97,8 +93,6 @@ spec:
       app.kubernetes.io/name: keycloak
       app.kubernetes.io/instance: kk
   replicas: 2
-  serviceName: kk-keycloak-headless
-    type: RollingUpdate
   template:
     metadata:
       annotations:
