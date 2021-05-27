@@ -11,7 +11,7 @@ data:
   contextPath.cli: |
     embed-server --server-config=standalone-ha.xml --std-out=echo
     batch
-    /subsystem=keycloak-server/:write-attribute(name=web-context,value=/iam)
+    /subsystem=keycloak-server/:write-attribute(name=web-context,value=iam)
     run-batch
     stop-embedded-server
     
@@ -96,7 +96,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-startup: ed70fbc7e86ea263ca6f6e1040c14f129d91ace5d8f4e002f86715bd527f1b0c
+        checksum/config-startup: b635a3a7369208bc2e9bc40f592c13a845c2f697c23ffb431405cfeaeb346b6c
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app.kubernetes.io/name: kk

@@ -164,7 +164,7 @@ startupScripts:
     embed-server --server-config=standalone-ha.xml --std-out=echo
     batch
     {{- if ne .Values.contextPath "auth" }}
-    /subsystem=keycloak-server/:write-attribute(name=web-context,value={{ if eq .Values.contextPath "" }}/{{ else }}/{{ .Values.contextPath }}{{ end }})
+    /subsystem=keycloak-server/:write-attribute(name=web-context,value={{ if eq .Values.contextPath "" }}/{{ else }}{{ .Values.contextPath }}{{ end }})
     {{- if eq .Values.contextPath "" }}
     /subsystem=undertow/server=default-server/host=default-host:write-attribute(name=default-web-module,value=keycloak-server.war)
     {{- end }}
