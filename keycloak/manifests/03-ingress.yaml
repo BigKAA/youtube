@@ -14,7 +14,7 @@ spec:
     - host: "keycloak.kryukov.local"
       http:
         paths:
-          - path: /
+          - path: /iam/
             pathType: Prefix
             backend:
               service:
