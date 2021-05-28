@@ -177,9 +177,10 @@ resources:
 
 # Startup scripts to run before Keycloak starts up
 startupScripts:
-  contextPath.cli: |
+  keycloak.cli: |
     embed-server --server-config=standalone-ha.xml --std-out=echo
     batch
+    echo Configuring node identifier
     {{- if ne .Values.contextPath "auth" }}
     /subsystem=keycloak-server/:write-attribute(name=web-context,value={{ if eq .Values.contextPath "" }}/{{ else }}{{ .Values.contextPath }}{{ end }})
     {{- if eq .Values.contextPath "" }}
@@ -196,6 +197,7 @@ startupScripts:
     # Json log format
     /subsystem=logging/json-formatter=json:add(exception-output-type=formatted, pretty-print=false, meta-data={label=value})
     /subsystem=logging/console-handler=CONSOLE:write-attribute(name=named-formatter, value=json)
+    echo Finished configuring node identifier
     run-batch
     stop-embedded-server
 #  keycloak.cli: |

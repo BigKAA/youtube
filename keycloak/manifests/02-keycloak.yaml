@@ -8,9 +8,10 @@ metadata:
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
 data:
-  contextPath.cli: |
+  keycloak.cli: |
     embed-server --server-config=standalone-ha.xml --std-out=echo
     batch
+    echo Configuring node identifier
     /subsystem=keycloak-server/:write-attribute(name=web-context,value=iam/auth)
     # Allow log level to be configured via environment variable
     /subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=${env.WILDFLY_LOGLEVEL:INFO})
@@ -22,21 +23,7 @@ data:
     # Json log format
     /subsystem=logging/json-formatter=json:add(exception-output-type=formatted, pretty-print=false, meta-data={label=value})
     /subsystem=logging/console-handler=CONSOLE:write-attribute(name=named-formatter, value=json)
-    run-batch
-    stop-embedded-server
-    
-  keycloak.cli: |
-    embed-server --server-config=standalone-ha.xml --std-out=echo
-    batch
-    
-    echo Configuring node identifier
-    
-    ## Sets the node identifier to the node name (= pod name). Node identifiers have to be unique. They can have a
-    ## maximum length of 23 characters. Thus, the chart's fullname template truncates its length accordingly.
-    /subsystem=transactions:write-attribute(name=node-identifier, value=${jboss.node.name})
-    
     echo Finished configuring node identifier
-    
     run-batch
     stop-embedded-server
 ---
@@ -106,7 +93,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-startup: 1c87f24061884bc764923c11bf3625d5bad2605206ce025245adcbb1b962f17e
+        checksum/config-startup: 8b422677456a1f03322e6897e44c93c1b112fa9d3783ef11c7167091048931a3
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app.kubernetes.io/name: kk
@@ -209,10 +196,6 @@ spec:
               memory: 1024Mi
           volumeMounts:
             - name: startup
-              mountPath: "/opt/jboss/startup-scripts/contextPath.cli"
-              subPath: "contextPath.cli"
-              readOnly: true
-            - name: startup
               mountPath: "/opt/jboss/startup-scripts/keycloak.cli"
               subPath: "keycloak.cli"
               readOnly: true
@@ -244,8 +227,6 @@ spec:
             name: kk-startup
             defaultMode: 0555
             items:
-              - key: contextPath.cli
-                path: contextPath.cli
               - key: keycloak.cli
                 path: keycloak.cli
         - name: creds
