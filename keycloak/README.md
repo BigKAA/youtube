@@ -27,9 +27,7 @@ helmchart https://github.com/codecentric/helm-charts/tree/master/charts/keycloak
 
 Установка. Можно руками:
 
-    kubectl -n keycloak apply -f manifests/01-secrets.yaml
-    kubectl -n keycloak apply -f manifests/02-keykloak.yaml
-    kubectl -n keycloak apply -f manifests/03-ingress.yaml
+    kubectl -n keycloak apply -f manifests
 
 Можно при помощи ArgoCD:
     
