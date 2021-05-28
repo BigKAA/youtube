@@ -8,6 +8,23 @@ metadata:
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "13.0.1"
 data:
+  contextPath.cli: |
+    embed-server --server-config=standalone-ha.xml --std-out=echo
+    batch
+    /subsystem=keycloak-server/:write-attribute(name=web-context,value=iam/auth)
+    # Allow log level to be configured via environment variable
+    /subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=${env.WILDFLY_LOGLEVEL:INFO})
+    /subsystem=logging/root-logger=ROOT:write-attribute(name=level, value=${env.WILDFLY_LOGLEVEL:INFO})
+    # Configure datasource to connection before use
+    /subsystem=datasources/data-source=KeycloakDS/:write-attribute(name=validate-on-match,value=${env.DB_VALIDATE_ON_MATCH:true})
+    # Configure datasource to try all other connections before failing
+    /subsystem=datasources/data-source=KeycloakDS/:write-attribute(name=use-fast-fail,value=${env.DB_USE_CAST_FAIL:false})
+    # Json log format
+    /subsystem=logging/json-formatter=json:add(exception-output-type=formatted, pretty-print=false, meta-data={label=value})
+    /subsystem=logging/console-handler=CONSOLE:write-attribute(name=named-formatter, value=json)
+    run-batch
+    stop-embedded-server
+    
   keycloak.cli: |
     embed-server --server-config=standalone-ha.xml --std-out=echo
     batch
@@ -89,7 +106,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-startup: be35aa7c0655fc53f95522e7b172db448a3d18ddc59882b102fa28ee9d520254
+        checksum/config-startup: 1c87f24061884bc764923c11bf3625d5bad2605206ce025245adcbb1b962f17e
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app.kubernetes.io/name: kk
@@ -162,24 +179,24 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /auth/
+              path: /iam/auth/
               port: http
             initialDelaySeconds: 0
             timeoutSeconds: 5
             
           readinessProbe:
             httpGet:
-              path: /auth/realms/master
+              path: /iam/auth/realms/master
               port: http
             initialDelaySeconds: 30
             timeoutSeconds: 1
             
           startupProbe:
             httpGet:
-              path: /auth/
+              path: /iam/auth/
               port: http
-            initialDelaySeconds: 30
-            timeoutSeconds: 1
+            initialDelaySeconds: 45
+            timeoutSeconds: 5
             failureThreshold: 60
             periodSeconds: 5
             
@@ -191,6 +208,10 @@ spec:
               cpu: 100m
               memory: 1024Mi
           volumeMounts:
+            - name: startup
+              mountPath: "/opt/jboss/startup-scripts/contextPath.cli"
+              subPath: "contextPath.cli"
+              readOnly: true
             - name: startup
               mountPath: "/opt/jboss/startup-scripts/keycloak.cli"
               subPath: "keycloak.cli"
@@ -223,6 +244,8 @@ spec:
             name: kk-startup
             defaultMode: 0555
             items:
+              - key: contextPath.cli
+                path: contextPath.cli
               - key: keycloak.cli
                 path: keycloak.cli
         - name: creds
