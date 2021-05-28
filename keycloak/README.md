@@ -33,4 +33,4 @@ helmchart https://github.com/codecentric/helm-charts/tree/master/charts/keycloak
     
 Пушим manifests/* в Git. Редактируем argo-app/{00-iam-project.yaml,01-keycloak-app.yaml}
 
-    kubect  apply -f argo-app
+    kubectl  apply -f argo-app
