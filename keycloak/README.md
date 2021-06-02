@@ -4,7 +4,33 @@ https://www.keycloak.org/
 
 helmchart https://github.com/codecentric/helm-charts/tree/master/charts/keycloak
 
-Если нет ClusterIssuer 
+## Metallb
+
+Убедится, что KubeProxy запущен с параметром: 
+
+```yaml
+ipvs:
+  strictARP: true
+```
+
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/namespace.yaml
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/metallb.yaml
+
+Только при первой установке создаём сикрет:
+
+    kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+
+Применяем базовую конфигурацию layer2.
+
+    kubectl apply -f metallb/00-mlb.yaml
+
+Добавляем сервис для ingres-controller типа LoadBalancer
+
+    kubectl apply -f metallb/01-lb-ingress-controller-svc.yaml
+
+## Установка keycloak
+
+У нас установлен cert-manager. Добавляем ClusterIssuer (если он еще не установлен).
 
     kubectl -n cert-manager create secret tls kube-ca-secret \
     --cert=/etc/kubernetes/ssl/ca.crt \
