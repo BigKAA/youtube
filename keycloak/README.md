@@ -60,3 +60,8 @@ ipvs:
 Пушим manifests/* в Git. Редактируем argo-app/{00-iam-project.yaml,01-keycloak-app.yaml}
 
     kubectl  apply -f argo-app
+
+## Настройка ArgoCD
+
+https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/keycloak/
+
