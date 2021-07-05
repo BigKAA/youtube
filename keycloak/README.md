@@ -6,6 +6,8 @@ helmchart https://github.com/codecentric/helm-charts/tree/master/charts/keycloak
 
 ## Metallb
 
+[https://metallb.universe.tf/](https://metallb.universe.tf/)
+
 Убедится, что KubeProxy запущен с параметром: 
 
 ```yaml
@@ -13,8 +15,8 @@ ipvs:
   strictARP: true
 ```
 
-    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/namespace.yaml
-    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/metallb.yaml
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
 
 Только при первой установке создаём сикрет:
 
