@@ -67,3 +67,13 @@ ipvs:
 
 https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/keycloak/
 
+## Ссылка на видео.
+
+Metallb:
+
+[<img src="https://img.youtube.com/vi/B8FdhbNDS3Q/maxresdefault.jpg" width="50%">](https://youtu.be/B8FdhbNDS3Q)
+
+Keycloak + ArgoCD:
+
+[<img src="https://img.youtube.com/vi/r72L3rDr2Qw/maxresdefault.jpg" width="50%">](https://youtu.be/r72L3rDr2Qw)
+
