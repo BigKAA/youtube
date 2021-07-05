@@ -1,0 +1,250 @@
+contextPath: iam/auth
+
+# Optionally override the fully qualified name
+fullnameOverride: "kk"
+
+# Optionally override the name
+nameOverride: "kk"
+
+# The number of replicas to create (has no effect if autoscaling enabled)
+replicas: 2
+
+image:
+  # The Keycloak image repository
+  repository: quay.io/keycloak/keycloak
+  # Overrides the Keycloak image tag whose default is the chart version
+  tag: "13.0.1"
+  # The Keycloak image pull policy
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: false
+
+rbac:
+  create: false
+  # RBAC rules for KUBE_PING
+  #  - apiGroups:
+  #      - ""
+  #    resources:
+  #      - pods
+  #    verbs:
+  #      - get
+  #      - list
+
+# SecurityContext for the entire Pod. Every container running in the Pod will inherit this SecurityContext. This might be relevant when other components of the environment inject additional containers into running Pods (service meshes are the most prominent example for this)
+podSecurityContext:
+  fsGroup: 1000
+
+# SecurityContext for the Keycloak container
+securityContext:
+  runAsUser: 1000
+  runAsNonRoot: true
+
+# Additional environment variables for Keycloak
+extraEnv: |
+  - name: JAVA_OPTS
+    value: >-
+      -server
+      -Xms1024m
+      -Xmx2048m
+      -XX:MetaspaceSize=192M
+      -XX:MaxMetaspaceSize=512m
+      -Djava.net.preferIPv4Stack=true
+      -Djboss.modules.system.pkgs=org.jboss.byteman
+      -Djava.awt.headless=true
+  - name: DB_VENDOR
+    value: postgres
+  - name: DB_ADDR
+    value: base-pgbouncer.pgo.svc
+  - name: DB_PORT
+    value: "5432"
+  - name: DB_DATABASE
+    value: keycloak
+  - name: DB_USER_FILE
+    value: /secrets/creds/db-user
+  - name: DB_PASSWORD_FILE
+    value: /secrets/creds/db-password
+  - name: KEYCLOAK_USER_FILE
+    value: /secrets/creds/admin-user
+  - name: KEYCLOAK_PASSWORD_FILE
+    value: /secrets/creds/admin-password
+  - name: JGROUPS_DISCOVERY_PROTOCOL
+    value: dns.DNS_PING
+  - name: KUBERNETES_NAMESPACE
+    valueFrom:
+      fieldRef:
+        apiVersion: v1
+        fieldPath: metadata.namespace
+  - name: JGROUPS_DISCOVERY_PROPERTIES
+    value: 'dns_query=kk-headless'
+  - name: CACHE_OWNERS_COUNT
+    value: "2"
+  - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
+    value: "2"
+  - name: PROXY_ADDRESS_FORWARDING
+    value: "true"
+
+#- name: JGROUPS_DISCOVERY_PROTOCOL
+#    value: kubernetes.KUBE_PING
+#  - name: KUBERNETES_NAMESPACE
+#    valueFrom:
+#      fieldRef:
+#        apiVersion: v1
+#        fieldPath: metadata.namespace
+
+# Additional environment variables for Keycloak mapped from Secret or ConfigMap
+extraEnvFrom: ""
+
+#  Pod priority class name
+priorityClassName: "high-priority"
+
+# Pod affinity
+affinity: |
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: "app.kubernetes.io/name"
+              operator: In
+              values:
+                - kk
+        topologyKey: "kubernetes.io/hostname"
+
+# Node labels for Pod assignment
+nodeSelector: {}
+
+# Node taints to tolerate
+tolerations: []
+
+# Additional Pod labels
+podLabels: {}
+
+# Additional Pod annotations
+podAnnotations: {}
+
+# Liveness probe configuration
+livenessProbe: |
+  httpGet:
+    path: {{ if ne .Values.contextPath "" }}/{{ .Values.contextPath }}{{ end }}/
+    port: http
+  initialDelaySeconds: 0
+  timeoutSeconds: 5
+#  httpGet:
+#    path: /auth/
+#    port: http
+#  initialDelaySeconds: 0
+#  timeoutSeconds: 5
+
+# Readiness probe configuration
+readinessProbe: |
+  httpGet:
+    path: {{ if ne .Values.contextPath "" }}/{{ .Values.contextPath }}{{ end }}/realms/master
+    port: http
+  initialDelaySeconds: 30
+  timeoutSeconds: 1
+#  httpGet:
+#    path: /auth/realms/master
+#    port: http
+#  initialDelaySeconds: 30
+#  timeoutSeconds: 1
+
+# Startup probe configuration
+startupProbe: |
+  httpGet:
+    path: {{ if ne .Values.contextPath "" }}/{{ .Values.contextPath }}{{ end }}/
+    port: http
+  initialDelaySeconds: 45
+  timeoutSeconds: 5
+  failureThreshold: 60
+  periodSeconds: 5
+#  httpGet:
+#    path: /auth/
+#    port: http
+#  initialDelaySeconds: 30
+#  timeoutSeconds: 1
+#  failureThreshold: 60
+#  periodSeconds: 5
+
+# Pod resource requests and limits
+resources:
+  limits:
+    memory: "3072Mi"
+    cpu: "1"
+  requests:
+    cpu: "100m"
+    memory: "1024Mi"
+
+# Startup scripts to run before Keycloak starts up
+startupScripts:
+  keycloak.cli: |
+    embed-server --server-config=standalone-ha.xml --std-out=echo
+    batch
+    echo Configuring node identifier
+    {{- if ne .Values.contextPath "auth" }}
+    /subsystem=keycloak-server/:write-attribute(name=web-context,value={{ if eq .Values.contextPath "" }}/{{ else }}{{ .Values.contextPath }}{{ end }})
+    {{- if eq .Values.contextPath "" }}
+    /subsystem=undertow/server=default-server/host=default-host:write-attribute(name=default-web-module,value=keycloak-server.war)
+    {{- end }}
+    {{- end }}
+    # Allow log level to be configured via environment variable
+    /subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=${env.WILDFLY_LOGLEVEL:INFO})
+    /subsystem=logging/root-logger=ROOT:write-attribute(name=level, value=${env.WILDFLY_LOGLEVEL:INFO})
+    # Configure datasource to connection before use
+    /subsystem=datasources/data-source=KeycloakDS/:write-attribute(name=validate-on-match,value=${env.DB_VALIDATE_ON_MATCH:true})
+    # Configure datasource to try all other connections before failing
+    /subsystem=datasources/data-source=KeycloakDS/:write-attribute(name=use-fast-fail,value=${env.DB_USE_CAST_FAIL:false})
+    # Json log format
+    /subsystem=logging/json-formatter=json:add(exception-output-type=formatted, pretty-print=false, meta-data={label=value})
+    /subsystem=logging/console-handler=CONSOLE:write-attribute(name=named-formatter, value=json)
+    echo Finished configuring node identifier
+    run-batch
+    stop-embedded-server
+#  keycloak.cli: |
+#    {{- .Files.Get "scripts/keycloak.cli" }}
+
+# Add additional volumes, e. g. for custom themes
+extraVolumes: |
+  - name: creds
+    secret:
+      secretName: keycloak-credentials
+
+# Add additional volumes mounts, e. g. for custom themes
+extraVolumeMounts: |
+  - name: creds
+    mountPath: /secrets/creds
+    readOnly: true
+
+# Annotations for the StatefulSet
+statefulsetAnnotations: {}
+
+# Additional labels for the StatefulSet
+statefulsetLabels: {}
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: false
+
+networkPolicy:
+  # If true, the Network policies are deployed
+  enabled: false
+
+postgresql:
+  enabled: false
+
+serviceMonitor:
+  enabled: false
+
+extraServiceMonitor:
+  enabled: false
+
+prometheusRule:
+  enabled: false
+
+autoscaling:
+  enabled: false
+
+test:
+  enabled: false
