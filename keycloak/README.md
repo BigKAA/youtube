@@ -73,7 +73,10 @@ Metallb:
 
 [<img src="https://img.youtube.com/vi/B8FdhbNDS3Q/maxresdefault.jpg" width="50%">](https://youtu.be/B8FdhbNDS3Q)
 
+Keycloak:
+
+[<img src="https://img.youtube.com/vi/XlBd1BLysQI/maxresdefault.jpg" width="50%">](https://youtu.be/XlBd1BLysQI)
+
 Keycloak + ArgoCD:
 
-[<img src="https://img.youtube.com/vi/r72L3rDr2Qw/maxresdefault.jpg" width="50%">](https://youtu.be/r72L3rDr2Qw)
-
+[<img src="https://img.youtube.com/vi/kMPikjvdKXg/maxresdefault.jpg" width="50%">](https://youtu.be/kMPikjvdKXg)
