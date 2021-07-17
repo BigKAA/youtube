@@ -15,7 +15,7 @@ data:
         HTTP_Server   On
         HTTP_Listen   0.0.0.0
         HTTP_Port     2020
-     [INPUT]
+    [INPUT]
         Name              tail
         Tag               kube.kubesystem.*
         Path              /var/log/containers/*_kube-system_*.log
