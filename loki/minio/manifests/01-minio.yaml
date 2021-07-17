@@ -1,0 +1,202 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mi
+  namespace: loki
+  labels:
+    app.kubernetes.io/name: mi
+    app.kubernetes.io/instance: mi
+secrets:
+  - name: mi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mi
+  namespace: loki
+  labels:
+    app.kubernetes.io/name: mi
+    app.kubernetes.io/instance: mi
+type: Opaque
+data:
+  access-key: "MTIzYXNkNDU2"
+  secret-key: "YXNkMTIzcXdl"
+  key.json: ""
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi-headless
+  namespace: loki
+  labels:
+    app.kubernetes.io/name: mi
+    app.kubernetes.io/instance: mi
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: minio
+      port: 9000
+      targetPort: minio
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/name: mi
+    app.kubernetes.io/instance: mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi
+  namespace: loki
+  labels:
+    app.kubernetes.io/name: mi
+    app.kubernetes.io/instance: mi
+spec:
+  type: ClusterIP
+  ports:
+    - name: minio
+      port: 9000
+      targetPort: minio
+  selector:
+    app.kubernetes.io/name: mi
+    app.kubernetes.io/instance: mi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mi
+  namespace: loki
+  labels:
+    app.kubernetes.io/name: mi
+    app.kubernetes.io/instance: mi
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mi
+      app.kubernetes.io/instance: mi
+  serviceName: mi-headless
+  replicas: 2
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mi
+        app.kubernetes.io/instance: mi
+    spec:
+      serviceAccountName: mi
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: mi
+                    app.kubernetes.io/instance: mi
+                namespaces:
+                  - "loki"
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: minio
+                    operator: In
+                    values:
+                      - "yes"
+      securityContext:
+        fsGroup: 1001
+      initContainers:
+        - name: init-configs
+          image: busybox:1.33.0
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -d /data-0/data ]; then
+                mkdir /data-0/data
+                chown 1001:1001 /data-0/data
+              fi
+              if [ ! -d /data-1/data ]; then
+                mkdir /data-1/data
+                chown 1001:1001 /data-1/data
+              fi
+          volumeMounts:
+            - name: data-0
+              mountPath: /data-0
+            - name: data-1
+              mountPath: /data-1
+      containers:
+        - name: minio
+          image: quay.io/bitnami/minio:2021.6.17-debian-10-r14
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MINIO_DISTRIBUTED_MODE_ENABLED
+              value: "yes"
+            - name: MINIO_DISTRIBUTED_NODES
+              value: "mi-{0...1}.mi-headless.loki.svc.cluster.local/data-{0...1}/data"
+            - name: MINIO_SCHEME
+              value: "http"
+            - name: MINIO_FORCE_NEW_KEYS
+              value: "no"
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mi
+                  key: access-key
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mi
+                  key: secret-key
+            - name: MINIO_SKIP_CLIENT
+              value: "yes"
+            - name: MINIO_BROWSER
+              value: "on"
+            - name: MINIO_PROMETHEUS_AUTH_TYPE
+              value: "public"
+          ports:
+            - name: minio
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: minio
+              scheme: "HTTP"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
+          readinessProbe:
+            tcpSocket:
+              port: minio
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 5
+          resources:
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - name: data-0
+              mountPath: /data-0
+            - name: data-1
+              mountPath: /data-1
+      volumes:
+        - hostPath:
+            path: /var/minio-data-0
+            type: DirectoryOrCreate
+          name: data-0
+        - hostPath:
+            path: /var/minio-data-1
+            type: DirectoryOrCreate
+          name: data-1
