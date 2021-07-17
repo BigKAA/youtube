@@ -6,6 +6,10 @@
 везде, умеет многострочные логи. Мы его хорошо знаем. И не придется переделывать
 инфраструктуру сбора логов.
 
+## Обязательно посмотрите это видео
+
+[<img src="https://img.youtube.com/vi/vkdNY8QaCug/maxresdefault.jpg" width="50%">](https://youtu.be/vkdNY8QaCug)
+
 ## Minio
 
 В качестве хранилища, будем использовать minio.
@@ -13,8 +17,6 @@
 [Процесс установки minio](minio)
 
 ## Loki
-
-https://www.youtube.com/watch?v=vkdNY8QaCug
 
 [Процесс установки loki](loki)
 
