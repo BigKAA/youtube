@@ -1,6 +1,7 @@
 # Loki
 
-За основу берем официальный [helm chart](https://github.com/grafana/helm-charts/tree/main/charts/loki)
+За основу берем официальный [helm chart](https://github.com/grafana/helm-charts/tree/main/charts/loki-distributed)
+
 
     helm repo add grafana https://grafana.github.io/helm-charts
     helm repo update

@@ -55,7 +55,7 @@ config:
     - from: 2021-07-07
       store: boltdb-shipper     # Which store to use for the index. Either aws, aws-dynamo, gcp,
                                 # bigtable, bigtable-hashed, cassandra, or boltdb.
-      object_store: filesystem  # Which store to use for the chunks. Either aws, azure, gcp,
+      object_store: aws  # Which store to use for the chunks. Either aws, azure, gcp,
                                 # bigtable, gcs, cassandra, swift or filesystem. If omitted, defaults to the same
                                 # value as store.
       schema: v11
@@ -80,8 +80,8 @@ config:
       cache_ttl: 24h          # Can be increased for faster performance over longer query periods, uses more disk space
                               # рекомендуют делать кратным 24h
       shared_store: s3
-    filesystem:
-      directory: /data/loki/chunks
+    # filesystem:
+    #  directory: /data/loki/chunks
   chunk_store_config:
     max_look_back_period: 24h  # Должно быть <= table_manager.retention_period
   table_manager:            # https://grafana.com/docs/loki/latest/configuration/#table_manager_config
@@ -108,7 +108,7 @@ config:
 ## Additional Loki container arguments, e.g. log level (debug, info, warn, error)
 extraArgs:
   config.expand-env: true
-  # log.level: debug
+  log.level: debug
 
 livenessProbe:
   httpGet:
