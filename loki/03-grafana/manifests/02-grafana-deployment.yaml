@@ -3,7 +3,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grafana-sys
-  namespace: monitoring
   labels:
     app: grafana-sys
 spec:
@@ -19,7 +18,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grafana-sys-connect
-  namespace: monitoring
   labels:
     app: grafana-sys
 spec:
@@ -38,7 +36,6 @@ metadata:
   labels:
     app: grafana-sys
   name: grafana-sys
-  namespace: monitoring
 spec:
   replicas: 1
   serviceName: grafana-sys
