@@ -330,7 +330,32 @@ distributor:
     - -config.expand-env=true
     - -log.level=debug
   # -- Environment variables to add to the distributor pods
-  extraEnv: []
+  extraEnv:
+    - name: MINIO_PROTO
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_PROTO
+    - name: MINIO_HOST
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_HOST
+    - name: MINIO_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_USERNAME
+    - name: MINIO_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_PASSWORD
+    - name: MINIO_PORT
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_PORT
   # -- Environment variables from secrets or configmaps to add to the distributor pods
   extraEnvFrom: []
   # -- Volume mounts to add to the distributor pods
@@ -474,7 +499,32 @@ queryFrontend:
     - -config.expand-env=true
     - -log.level=debug
   # -- Environment variables to add to the query-frontend pods
-  extraEnv: []
+  extraEnv:
+    - name: MINIO_PROTO
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_PROTO
+    - name: MINIO_HOST
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_HOST
+    - name: MINIO_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_USERNAME
+    - name: MINIO_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_PASSWORD
+    - name: MINIO_PORT
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_PORT
   # -- Environment variables from secrets or configmaps to add to the query-frontend pods
   extraEnvFrom: []
   # -- Volume mounts to add to the query-frontend pods
