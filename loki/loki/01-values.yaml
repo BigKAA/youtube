@@ -236,7 +236,7 @@ ingester:
   # -- Additional CLI args for the ingester
   extraArgs:
     - -config.expand-env=true
-    - -log.level=debug
+    #- -log.level=debug
   # -- Environment variables to add to the ingester pods
   extraEnv:
     - name: MINIO_PROTO
@@ -328,7 +328,7 @@ distributor:
   # -- Additional CLI args for the distributor
   extraArgs:
     - -config.expand-env=true
-    - -log.level=debug
+    #- -log.level=debug
   # -- Environment variables to add to the distributor pods
   extraEnv:
     - name: MINIO_PROTO
@@ -407,7 +407,7 @@ querier:
   # -- Additional CLI args for the querier
   extraArgs:
     - -config.expand-env=true
-    - -log.level=debug
+    #- -log.level=debug
   # -- Environment variables to add to the querier pods
   extraEnv:
     - name: MINIO_PROTO
@@ -497,7 +497,7 @@ queryFrontend:
   # -- Additional CLI args for the query-frontend
   extraArgs:
     - -config.expand-env=true
-    - -log.level=debug
+    #- -log.level=debug
   # -- Environment variables to add to the query-frontend pods
   extraEnv:
     - name: MINIO_PROTO
