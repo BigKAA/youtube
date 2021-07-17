@@ -90,12 +90,12 @@ data:
         Url http://loki-loki-distributed-gateway:80/loki/api/v1/push
         # RemoveKeys source,container_id
         Labels {job="fluent-bit"}
-        LabelKeys container_name
+        # LabelKeys container_name
         BatchWait 1s
         BatchSize 1001024
         LineFormat json
         LogLevel info
-        # AutoKubernetesLabels true
+        AutoKubernetesLabels true
   parsers.conf: |
     [PARSER]
         Name   nginx
