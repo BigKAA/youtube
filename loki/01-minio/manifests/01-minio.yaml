@@ -56,7 +56,8 @@ spec:
   type: ClusterIP
   ports:
     - name: minio
-      port: 9000
+      # port: 9000
+      port: 80
       targetPort: minio
   selector:
     app.kubernetes.io/name: mi
