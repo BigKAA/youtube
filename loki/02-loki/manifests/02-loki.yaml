@@ -62,8 +62,11 @@ data:
     
     storage_config:
       aws:
-        s3: s3://${MINIO_USERNAME}:${MINIO_PASSWORD}@${MINIO_HOST}:${MINIO_PORT}/loki
-        # bucketnames: loki
+        #s3: s3://${MINIO_USERNAME}:${MINIO_PASSWORD}@${MINIO_HOST}:${MINIO_PORT}/loki
+        bucketnames: loki
+        endpoint: ${MINIO_HOST}
+        access_key_id: ${MINIO_USERNAME}
+        secret_access_key: ${MINIO_PASSWORD}
         s3forcepathstyle: true
       boltdb_shipper:
         shared_store: s3
@@ -405,7 +408,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 3825578b16c471e2635b88c71d51cce3608f7c974935a0e753e6c289fa763a72
+        checksum/config: f8bb6caf9d216b156d6781dfb1f75ac3050d785762ee062c48e12c016e4ea91c
       labels:
         app.kubernetes.io/name: loki-distributed
         app.kubernetes.io/instance: loki
@@ -622,7 +625,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 3825578b16c471e2635b88c71d51cce3608f7c974935a0e753e6c289fa763a72
+        checksum/config: f8bb6caf9d216b156d6781dfb1f75ac3050d785762ee062c48e12c016e4ea91c
       labels:
         app.kubernetes.io/name: loki-distributed
         app.kubernetes.io/instance: loki
@@ -738,7 +741,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 3825578b16c471e2635b88c71d51cce3608f7c974935a0e753e6c289fa763a72
+        checksum/config: f8bb6caf9d216b156d6781dfb1f75ac3050d785762ee062c48e12c016e4ea91c
       labels:
         app.kubernetes.io/name: loki-distributed
         app.kubernetes.io/instance: loki
@@ -868,7 +871,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 3825578b16c471e2635b88c71d51cce3608f7c974935a0e753e6c289fa763a72
+        checksum/config: f8bb6caf9d216b156d6781dfb1f75ac3050d785762ee062c48e12c016e4ea91c
       labels:
         app.kubernetes.io/name: loki-distributed
         app.kubernetes.io/instance: loki
