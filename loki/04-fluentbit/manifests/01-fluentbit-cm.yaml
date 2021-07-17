@@ -147,8 +147,8 @@ data:
     [OUTPUT]
         name            loki
         match           *
-        host            loki-loki-distributed-ingester
-        port            3100
+        host            loki-loki-distributed-gateway.loki.svc
+        port            80
         auto_kubernetes_labels on
   parsers.conf: |
     [PARSER]
