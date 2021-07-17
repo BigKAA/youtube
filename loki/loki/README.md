@@ -6,7 +6,7 @@
     helm repo add grafana https://grafana.github.io/helm-charts
     helm repo update
 
-    helm template loki grafana/loki -f values.yaml --namespace loki | \
+    helm template loki grafana/loki-distributed -f values.yaml --namespace loki | \
     sed '/^#/d' | \
     sed '/helm.sh\/chart/d' | \
     sed '/chart: loki/d' | \

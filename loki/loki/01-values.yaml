@@ -235,8 +235,8 @@ ingester:
   serviceLabels: {}
   # -- Additional CLI args for the ingester
   extraArgs:
-    - config.expand-env: true
-    - log.level: debug
+    - -config.expand-env=true
+    - -log.level=debug
   # -- Environment variables to add to the ingester pods
   extraEnv:
     - name: MINIO_PROTO
@@ -378,7 +378,9 @@ querier:
   # -- Labels for querier service
   serviceLabels: {}
   # -- Additional CLI args for the querier
-  extraArgs: []
+  extraArgs:
+    - -config.expand-env=true
+    - -log.level=debug
   # -- Environment variables to add to the querier pods
   extraEnv:
     - name: MINIO_PROTO
