@@ -79,6 +79,12 @@ data:
         Match sysapp.gen.log.cron
         Set app syslog
         Set file /var/log/cron
+    [OUTPUT]
+            Name            loki
+            Match           *
+            Host            loki-loki-distributed-ingester
+            Port            3100
+  parsers.conf: |
     [PARSER]
         Name   nginx
         Format regex
@@ -110,8 +116,4 @@ data:
         Time_Keep Off
         Time_Key time
         Time_Offset +0300
-    [OUTPUT]
-        Name            loki
-        Match           *
-        Host            loki-loki-distributed-ingester
-        Port            3100
+
