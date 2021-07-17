@@ -103,8 +103,11 @@ loki:
 
     storage_config:
       aws:
-        s3: s3://${MINIO_USERNAME}:${MINIO_PASSWORD}@${MINIO_HOST}:${MINIO_PORT}/loki
-        # bucketnames: loki
+        #s3: s3://${MINIO_USERNAME}:${MINIO_PASSWORD}@${MINIO_HOST}:${MINIO_PORT}/loki
+        bucketnames: loki
+        endpoint: ${MINIO_HOST}
+        access_key_id: ${MINIO_USERNAME}
+        secret_access_key: ${MINIO_PASSWORD}
         s3forcepathstyle: true
       boltdb_shipper:
         shared_store: s3
