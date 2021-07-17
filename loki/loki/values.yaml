@@ -68,11 +68,12 @@ config:
     http_listen_port: 3100
   storage_config:               # https://grafana.com/docs/loki/latest/configuration/#storage_config
     aws:
-      s3: ${LOKI_S3_HOST}
-      access_key_id: ${LOKI_S3_ACCESS_KEY_ID}
-      secret_access_key: ${LOKI_S3_SECRET_ACCESS_KEY}
+      # s3: http<s>://<username>:<secret>@<fqdn>:<port>
+      s3: ${MINIO_PROTO}://${MINIO_USERNAME}:${MINIO_PASSWORD}@${MINIO_HOST}:${MINIO_PORT}
+      #access_key_id: ${LOKI_S3_ACCESS_KEY_ID}
+      #secret_access_key: ${LOKI_S3_SECRET_ACCESS_KEY}
       s3forcepathstyle: true
-      region: ${LOKI_S3_REGION}
+      # region: ${LOKI_S3_REGION}
     boltdb_shipper:
       active_index_directory: /data/loki/boltdb-shipper-active
       cache_location: /data/loki/boltdb-shipper-cache
@@ -105,7 +106,8 @@ config:
 #    enable_api: true
 
 ## Additional Loki container arguments, e.g. log level (debug, info, warn, error)
-extraArgs: {}
+extraArgs:
+  config.expand-env: true
   # log.level: debug
 
 livenessProbe:
@@ -164,7 +166,7 @@ readinessProbe:
     port: http-metrics
   initialDelaySeconds: 45
 
-replicas: 1
+replicas: 2
 
 resources: {}
 # limits:
@@ -257,26 +259,31 @@ extraPorts: []
 
 # Extra env variables to pass to the loki container
 env:
-  - name: LOKI_S3_HOST
+  - name: MINIO_PROTO
     valueFrom:
       secretKeyRef:
         name: s3-credentials
-        key: LOKI_S3_HOST
-  - name: LOKI_S3_ACCESS_KEY_ID
+        key: MINIO_PROTO
+  - name: MINIO_HOST
     valueFrom:
       secretKeyRef:
         name: s3-credentials
-        key: LOKI_S3_ACCESS_KEY_ID
-  - name: LOKI_S3_SECRET_ACCESS_KEY
+        key: MINIO_HOST
+  - name: MINIO_USERNAME
     valueFrom:
       secretKeyRef:
         name: s3-credentials
-        key: LOKI_S3_SECRET_ACCESS_KEY
-  - name: LOKI_S3_REGION
+        key: MINIO_USERNAME
+  - name: MINIO_PASSWORD
     valueFrom:
       secretKeyRef:
         name: s3-credentials
-        key: LOKI_S3_SECRET_ACCESS_KEY
+        key: MINIO_PASSWORD
+  - name: MINIO_PORT
+    valueFrom:
+      secretKeyRef:
+        name: s3-credentials
+        key: MINIO_PORT
 
 # Specify Loki Alerting rules based on this documentation: https://grafana.com/docs/loki/latest/alerting/
 # When specified, you also need to add a ruler config section above. An example is shown in the alerting docs.

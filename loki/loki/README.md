@@ -8,5 +8,7 @@
     helm template loki grafana/loki -f values.yaml --namespace loki | \
     sed '/^#/d' | \
     sed '/helm.sh\/chart/d' | \
+    sed '/chart: loki/d' | \
+    sed '/heritage: Helm/d' | \
     sed '/managed-by: Helm/d' > manifests/loki.yaml
 
