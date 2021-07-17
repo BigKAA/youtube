@@ -145,10 +145,11 @@ data:
         Set file /var/log/cron
   output.conf: |
     [OUTPUT]
-        Name            loki
-        Match           *
-        Host            loki-loki-distributed-ingester
-        Port            3100
+        name            loki
+        match           *
+        host            loki-loki-distributed-ingester
+        port            3100
+        auto_kubernetes_labels on
   parsers.conf: |
     [PARSER]
         Name   nginx
