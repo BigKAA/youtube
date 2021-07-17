@@ -256,7 +256,27 @@ extraPorts: []
 #   targetPort: http
 
 # Extra env variables to pass to the loki container
-env: []
+env:
+  - name: LOKI_S3_HOST
+    valueFrom:
+      secretKeyRef:
+        name: s3-credentials
+        key: LOKI_S3_HOST
+  - name: LOKI_S3_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: s3-credentials
+        key: LOKI_S3_ACCESS_KEY_ID
+  - name: LOKI_S3_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: s3-credentials
+        key: LOKI_S3_SECRET_ACCESS_KEY
+  - name: LOKI_S3_REGION
+    valueFrom:
+      secretKeyRef:
+        name: s3-credentials
+        key: LOKI_S3_SECRET_ACCESS_KEY
 
 # Specify Loki Alerting rules based on this documentation: https://grafana.com/docs/loki/latest/alerting/
 # When specified, you also need to add a ruler config section above. An example is shown in the alerting docs.
