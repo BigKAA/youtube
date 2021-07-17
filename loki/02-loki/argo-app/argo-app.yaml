@@ -9,7 +9,7 @@ spec:
   project: loki
   source:
     repoURL: 'https://github.com/BigKAA/youtube'
-    path: loki/loki/manifests
+    path: loki/02-loki/manifests
     targetRevision: loki
   destination:
     server: 'https://kubernetes.default.svc'
