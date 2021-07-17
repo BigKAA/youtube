@@ -56,7 +56,7 @@ spec:
       priorityClassName: low-priority
       containers:
         - name: fluent-bit
-          image: fluent/fluent-bit:1.8.1
+          image: fluent/fluent-bit:1.7.9
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 2020
