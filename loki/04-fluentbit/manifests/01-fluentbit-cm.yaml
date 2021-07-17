@@ -28,33 +28,6 @@ data:
         Skip_Long_Lines   On
         Refresh_Interval  10
     [INPUT]
-        Name              tail
-        Tag               kube.monitoring.*
-        Path              /var/log/containers/*_monitoring_*.log
-        Parser            docker
-        DB                /var/log/_monitoring_.db
-        Mem_Buf_Limit     5MB
-        Skip_Long_Lines   On
-        Refresh_Interval  10
-    [INPUT]
-        Name              tail
-        Tag               kube.ingress-nginx.*
-        Path              /var/log/containers/*_ingress-nginx_*.log
-        Parser            docker
-        DB                /var/log/_ingress-nginx_.db
-        Mem_Buf_Limit     5MB
-        Skip_Long_Lines   On
-        Refresh_Interval  10
-    [INPUT]
-        Name              tail
-        Tag               kube.nfs-client.*
-        Path              /var/log/containers/*_nfs-client_*.log
-        Parser            docker
-        DB                /var/log/_nfs-client_.db
-        Mem_Buf_Limit     5MB
-        Skip_Long_Lines   On
-        Refresh_Interval  10
-    [INPUT]
         Name tail
         Tag sysapp.gen.log.mail
         Parser sys_log_file
@@ -91,39 +64,6 @@ data:
         K8S-Logging.Parser  Off
         K8S-Logging.Exclude Off
     [FILTER]
-        Name                kubernetes
-        Match               kube.monitoring.*
-        Kube_URL            https://kubernetes.default.svc.cluster.local:443
-        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Kube_Tag_Prefix     kube.monitoring.var.log.containers.
-        Merge_Log           On
-        Merge_Log_Key       log_processed
-        K8S-Logging.Parser  Off
-        K8S-Logging.Exclude Off
-    [FILTER]
-        Name                kubernetes
-        Match               kube.ingress-nginx.*
-        Kube_URL            https://kubernetes.default.svc.cluster.local:443
-        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Kube_Tag_Prefix     kube.ingress-nginx.var.log.containers.
-        Merge_Log           On
-        Merge_Log_Key       log_processed
-        K8S-Logging.Parser  Off
-        K8S-Logging.Exclude Off
-    [FILTER]
-        Name                kubernetes
-        Match               kube.nfs-client.*
-        Kube_URL            https://kubernetes.default.svc.cluster.local:443
-        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Kube_Tag_Prefix     kube.nfs-client.var.log.containers.
-        Merge_Log           On
-        Merge_Log_Key       log_processed
-        K8S-Logging.Parser  Off
-        K8S-Logging.Exclude Off
-    [FILTER]
         Name modify
         Match sysapp.gen.log.mail
         Set app syslog
@@ -145,11 +85,17 @@ data:
         Set file /var/log/cron
   output.conf: |
     [OUTPUT]
-        name            loki
-        match           *
-        host            loki-loki-distributed-gateway.loki.svc
-        port            80
-        auto_kubernetes_labels on
+        Name grafana-loki
+        Match *
+        Url http://loki-loki-distributed-gateway:80/loki/api/v1/push
+        # RemoveKeys source,container_id
+        Labels {job="fluent-bit"}
+        LabelKeys container_name
+        BatchWait 1s
+        BatchSize 1001024
+        LineFormat json
+        LogLevel info
+        # AutoKubernetesLabels true
   parsers.conf: |
     [PARSER]
         Name   nginx
