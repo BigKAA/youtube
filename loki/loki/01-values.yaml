@@ -326,7 +326,9 @@ distributor:
   # -- Labels for distributor service
   serviceLabels: {}
   # -- Additional CLI args for the distributor
-  extraArgs: []
+  extraArgs:
+    - -config.expand-env=true
+    - -log.level=debug
   # -- Environment variables to add to the distributor pods
   extraEnv: []
   # -- Environment variables from secrets or configmaps to add to the distributor pods
@@ -468,7 +470,9 @@ queryFrontend:
   # -- Labels for query-frontend service
   serviceLabels: {}
   # -- Additional CLI args for the query-frontend
-  extraArgs: []
+  extraArgs:
+    - -config.expand-env=true
+    - -log.level=debug
   # -- Environment variables to add to the query-frontend pods
   extraEnv: []
   # -- Environment variables from secrets or configmaps to add to the query-frontend pods
