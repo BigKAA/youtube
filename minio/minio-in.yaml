@@ -80,9 +80,6 @@ spec:
   serviceName: mi-headless
   replicas: 2
   podManagementPolicy: Parallel
-  updateStrategy:
-    type: Recreate
-    rollingUpdate: null
   template:
     metadata:
       labels:

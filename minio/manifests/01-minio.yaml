@@ -81,8 +81,6 @@ spec:
   serviceName: mi-headless
   replicas: 2
   podManagementPolicy: Parallel
-  updateStrategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -166,7 +164,6 @@ spec:
               value: "on"
             - name: MINIO_PROMETHEUS_AUTH_TYPE
               value: "public"
-          envFrom:
           ports:
             - name: minio
               containerPort: 9000
