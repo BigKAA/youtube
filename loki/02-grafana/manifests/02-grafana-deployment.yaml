@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana-loki
+  name: loki-grafana
   labels:
-    app: grafana-loki
+    app: loki-grafana
 spec:
   ports:
   - port: 3000
@@ -12,14 +12,14 @@ spec:
     protocol: TCP
   clusterIP: None
   selector:
-    app: grafana-loki
+    app: loki-grafana
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana-loki-connect
+  name: loki-grafana-connect
   labels:
-    app: grafana-loki
+    app: loki-grafana
 spec:
   type: ClusterIP
   ports:
@@ -27,30 +27,30 @@ spec:
     name: http
     protocol: TCP
   selector:
-    app: grafana-loki
-    statefulset.kubernetes.io/pod-name: grafana-loki-0
+    app: loki-grafana
+    statefulset.kubernetes.io/pod-name: loki-grafana-0
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    app: grafana-loki
-  name: grafana-loki
+    app: loki-grafana
+  name: loki-grafana
 spec:
   replicas: 1
-  serviceName: grafana-loki
+  serviceName: loki-grafana
   selector:
     matchLabels:
-      app: grafana-loki
+      app: loki-grafana
   template:
     metadata:
       labels:
-        app: grafana-loki
+        app: loki-grafana
     spec:
       containers:
       - env: []
         image: grafana/grafana:8.0.6
-        name: grafana-loki
+        name: loki-grafana
         ports:
         - containerPort: 3000
           name: http

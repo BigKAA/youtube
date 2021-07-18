@@ -15,6 +15,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: grafana-sys-connect
+                name: loki-grafana-connect
                 port:
                   name: http
