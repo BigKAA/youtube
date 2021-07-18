@@ -196,10 +196,10 @@ spec:
               name: data-1
       volumes:
         - hostPath:
-            path: /var/minio-data-0
+            path: /var/data-0
             type: DirectoryOrCreate
           name: data-0
         - hostPath:
-            path: /var/minio-data-1
+            path: /var/data-1
             type: DirectoryOrCreate
           name: data-1
