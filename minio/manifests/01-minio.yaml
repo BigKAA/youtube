@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: mi
-  namespace: loki
+  namespace: minio
   labels:
     app.kubernetes.io/name: mi
     app.kubernetes.io/instance: mi
@@ -14,7 +14,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mi
-  namespace: loki
+  namespace: minio
   labels:
     app.kubernetes.io/name: mi
     app.kubernetes.io/instance: mi
@@ -28,7 +28,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mi-headless
-  namespace: loki
+  namespace: minio
   labels:
     app.kubernetes.io/name: mi
     app.kubernetes.io/instance: mi
@@ -48,7 +48,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mi
-  namespace: loki
+  namespace: minio
   labels:
     app.kubernetes.io/name: mi
     app.kubernetes.io/instance: mi
@@ -58,7 +58,10 @@ spec:
     - name: minio
       port: 9000
       targetPort: minio
-      nodePort: null
+    # на всякий пожарный, бывают приложения в которых нельзя указать порт.
+    - name: http
+      port: 80
+      targetPort: minio
   selector:
     app.kubernetes.io/name: mi
     app.kubernetes.io/instance: mi
@@ -67,7 +70,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mi
-  namespace: loki
+  namespace: minio
   labels:
     app.kubernetes.io/name: mi
     app.kubernetes.io/instance: mi
@@ -79,20 +82,14 @@ spec:
   serviceName: mi-headless
   replicas: 2
   podManagementPolicy: Parallel
-  updateStrategy:
-    type: RollingUpdate
   template:
     metadata:
       labels:
         app.kubernetes.io/name: mi
         app.kubernetes.io/instance: mi
-      annotations:
-        checksum/credentials-secret: 2f64023dfa98924e341af77f2d347befc5c5c4946fa68c9117ac6580d7b7fa45
     spec:
-
       serviceAccountName: mi
       affinity:
-        podAffinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
             - podAffinityTerm:
@@ -101,9 +98,9 @@ spec:
                     app.kubernetes.io/name: mi
                     app.kubernetes.io/instance: mi
                 namespaces:
-                  - "loki"
+                  - "minio"
                 topologyKey: kubernetes.io/hostname
-              weight: 1
+              weight: 100
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
@@ -114,6 +111,26 @@ spec:
                       - "yes"
       securityContext:
         fsGroup: 1001
+      initContainers:
+        - name: init-configs
+          image: busybox:1.33.0
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -d /data-0/data ]; then
+                mkdir /data-0/data
+                chown 1001:1001 /data-0/data
+              fi
+              if [ ! -d /data-1/data ]; then
+                mkdir /data-1/data
+                chown 1001:1001 /data-1/data
+              fi
+          volumeMounts:
+            - name: data-0
+              mountPath: /data-0
+            - name: data-1
+              mountPath: /data-1
       containers:
         - name: minio
           image: quay.io/bitnami/minio:2021.6.17-debian-10-r14
@@ -127,7 +144,7 @@ spec:
             - name: MINIO_DISTRIBUTED_MODE_ENABLED
               value: "yes"
             - name: MINIO_DISTRIBUTED_NODES
-              value: "mi-{0...1}.mi-headless.loki.svc.cluster.local/data-{0...1}"
+              value: "mi-{0...1}.mi-headless.minio.svc.cluster.local/data-{0...1}/data"
             - name: MINIO_SCHEME
               value: "http"
             - name: MINIO_FORCE_NEW_KEYS
@@ -148,7 +165,6 @@ spec:
               value: "on"
             - name: MINIO_PROMETHEUS_AUTH_TYPE
               value: "public"
-          envFrom:
           ports:
             - name: minio
               containerPort: 9000
@@ -179,10 +195,6 @@ spec:
               mountPath: /data-0
             - name: data-1
               mountPath: /data-1
-            - mountPath: /data-0
-              name: data-0
-            - mountPath: /data-1
-              name: data-1
       volumes:
         - hostPath:
             path: /var/minio-data-0
@@ -192,27 +204,3 @@ spec:
             path: /var/minio-data-1
             type: DirectoryOrCreate
           name: data-1
-  volumeClaimTemplates:
-    - metadata:
-        name: data-0
-        labels:
-          app.kubernetes.io/name: mi
-          app.kubernetes.io/instance: mi
-      spec:
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "8Gi"
-
-    - metadata:
-        name: data-1
-        labels:
-          app.kubernetes.io/name: mi
-          app.kubernetes.io/instance: mi
-      spec:
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "8Gi"

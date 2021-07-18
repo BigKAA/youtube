@@ -3,7 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: minio
-  namespace: loki
+  namespace: minio
   annotations:
     kubernetes.io/ingress.class: "system-ingress"
 spec:

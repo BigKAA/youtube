@@ -78,7 +78,7 @@ accessKey:
   ## MinIO(R) Access Key
   ## ref: https://github.com/bitnami/bitnami-docker-minio/#setting-up-minio-in-distributed-mode
   ##
-  password: 123asd456  ## <--- change by Artur
+  password: admin  ## <--- change by Artur
   ## Option to force users to specify a password. That is required for 'helm upgrade' to work properly.
   ## If it is not force, a random password will be generated.
   ##
@@ -87,7 +87,7 @@ secretKey:
   ## MinIO(R) Secret Key
   ## ref: https://github.com/bitnami/bitnami-docker-minio/#setting-up-minio-in-distributed-mode
   ##
-  password: asd123qwe ## <--- change by Artur
+  password: password ## <--- change by Artur
   ## Option to force users to specify a password. That is required for 'helm upgrade' to work properly.
   ## If it is not force, a random password will be generated.
   ##
@@ -180,7 +180,7 @@ statefulset:
   ## Update strategy, can be set to RollingUpdate or OnDelete by default.
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
   ##
-  updateStrategy: RollingUpdate
+  updateStrategy: Recreate
 
   ## StatefulSet controller supports relax its ordering guarantees while preserving its uniqueness and identity guarantees. There are two valid pod management policies: OrderedReady and Parallel
   ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#pod-management-policy

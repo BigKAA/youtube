@@ -6,14 +6,14 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: loki
+  project: minio
   source:
     repoURL: 'https://github.com/BigKAA/youtube'
-    path: loki/01-minio/manifests
+    path: minio/manifests
     targetRevision: loki
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: loki
+    namespace: minio
   syncPolicy:
     automated:
       prune: true
