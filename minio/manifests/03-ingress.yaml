@@ -2,13 +2,33 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: minioconsole
+  name: miniobroeser
   namespace: minio
   annotations:
     kubernetes.io/ingress.class: "system-ingress"
 spec:
   rules:
     - host: "minio.kryukov.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mi
+                port:
+                  name: minio
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minioconsole
+  namespace: minio
+  annotations:
+    kubernetes.io/ingress.class: "system-ingress"
+spec:
+  rules:
+    - host: "minioc.kryukov.local"
       http:
         paths:
           - path: /
