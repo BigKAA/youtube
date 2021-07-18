@@ -20,8 +20,8 @@ metadata:
     app.kubernetes.io/instance: mi
 type: Opaque
 data:
-  access-key: "MTIzYXNkNDU2"
-  secret-key: "YXNkMTIzcXdl"
+  access-key: "YWRtaW4="
+  secret-key: "cGFzc3dvcmQ="
   key.json: ""
 ---
 apiVersion: v1
@@ -54,6 +54,7 @@ metadata:
     app.kubernetes.io/instance: mi
 spec:
   type: ClusterIP
+  
   ports:
     - name: minio
       port: 9000
@@ -80,19 +81,21 @@ spec:
   replicas: 2
   podManagementPolicy: Parallel
   updateStrategy:
-    type: RollingUpdate
+    type: Recreate
+    rollingUpdate: null
   template:
     metadata:
       labels:
         app.kubernetes.io/name: mi
         app.kubernetes.io/instance: mi
       annotations:
-        checksum/credentials-secret: 2f64023dfa98924e341af77f2d347befc5c5c4946fa68c9117ac6580d7b7fa45
+        checksum/credentials-secret: 7905e04fc109c7cb41482db0981594ae58efac357ec91b185e6f39c9676abec3
     spec:
-
+      
       serviceAccountName: mi
       affinity:
         podAffinity:
+          
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
             - podAffinityTerm:
@@ -101,7 +104,7 @@ spec:
                     app.kubernetes.io/name: mi
                     app.kubernetes.io/instance: mi
                 namespaces:
-                  - "loki"
+                  - "minio"
                 topologyKey: kubernetes.io/hostname
               weight: 1
         nodeAffinity:
@@ -127,7 +130,7 @@ spec:
             - name: MINIO_DISTRIBUTED_MODE_ENABLED
               value: "yes"
             - name: MINIO_DISTRIBUTED_NODES
-              value: "mi-{0...1}.mi-headless.loki.svc.cluster.local/data-{0...1}"
+              value: "mi-{0...1}.mi-headless.minio.svc.cluster.local/data_pv-{0...1}"
             - name: MINIO_SCHEME
               value: "http"
             - name: MINIO_FORCE_NEW_KEYS
@@ -175,10 +178,8 @@ spec:
             limits: {}
             requests: {}
           volumeMounts:
-            - name: data-0
-              mountPath: /data-0
-            - name: data-1
-              mountPath: /data-1
+            - name: data
+              mountPath: /data_pv
             - mountPath: /data-0
               name: data-0
             - mountPath: /data-1
@@ -192,27 +193,5 @@ spec:
             path: /var/minio-data-1
             type: DirectoryOrCreate
           name: data-1
-  volumeClaimTemplates:
-    - metadata:
-        name: data-0
-        labels:
-          app.kubernetes.io/name: mi
-          app.kubernetes.io/instance: mi
-      spec:
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "8Gi"
-
-    - metadata:
-        name: data-1
-        labels:
-          app.kubernetes.io/name: mi
-          app.kubernetes.io/instance: mi
-      spec:
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "8Gi"
+        - name: data
+          emptyDir: {}
