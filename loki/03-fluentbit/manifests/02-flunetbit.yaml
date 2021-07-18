@@ -69,11 +69,6 @@ spec:
             requests:
               cpu: 100m
               memory: 100Mi
-          env:
-            - name: NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
           volumeMounts:
             - name: varlog
               mountPath: /var/log

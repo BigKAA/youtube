@@ -96,7 +96,7 @@ data:
         match sysapp.gen.log.*
         host loki-loki-distributed-gateway
         port 80
-        labels  job=fluent-bit-systemlogs,fluentbit-pod-name=${NAME}
+        labels  job=fluent-bit-systemlogs,$app,$file
   parsers.conf: |
     [PARSER]
         Name   nginx
