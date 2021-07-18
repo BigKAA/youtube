@@ -70,10 +70,10 @@ spec:
               cpu: 100m
               memory: 100Mi
           env:
-            - name: NODE
+            - name: NAME
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.node
+                  fieldPath: metadata.name
           volumeMounts:
             - name: varlog
               mountPath: /var/log
