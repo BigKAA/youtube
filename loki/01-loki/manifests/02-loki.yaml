@@ -463,11 +463,6 @@ spec:
                 secretKeyRef:
                   key: MINIO_PASSWORD
                   name: s3-credentials
-#            - name: MINIO_PORT
-#              valueFrom:
-#                secretKeyRef:
-#                  key: MINIO_PORT
-#                  name: s3-credentials
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -676,11 +671,6 @@ spec:
                 secretKeyRef:
                   key: MINIO_PASSWORD
                   name: s3-credentials
-#            - name: MINIO_PORT
-#              valueFrom:
-#                secretKeyRef:
-#                  key: MINIO_PORT
-#                  name: s3-credentials
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -796,11 +786,6 @@ spec:
                 secretKeyRef:
                   key: MINIO_PASSWORD
                   name: s3-credentials
-#            - name: MINIO_PORT
-#              valueFrom:
-#                secretKeyRef:
-#                  key: MINIO_PORT
-#                  name: s3-credentials
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -926,11 +911,6 @@ spec:
                 secretKeyRef:
                   key: MINIO_PASSWORD
                   name: s3-credentials
-#            - name: MINIO_PORT
-#              valueFrom:
-#                secretKeyRef:
-#                  key: MINIO_PORT
-#                  name: s3-credentials
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

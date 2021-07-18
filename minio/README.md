@@ -1,6 +1,8 @@
 # Minio
 
-Основано на [Bitnami Object Storage Helm Chart based on MinIO](https://github.com/bitnami/charts/tree/master/bitnami/minio/#installing-the-chart)
+_Основано на [Bitnami Object Storage Helm Chart based on MinIO](https://github.com/bitnami/charts/tree/master/bitnami/minio/#installing-the-chart)_
+
+![](images/sh1.jpg)
 
 В качестве хранилища будет использоваться диски сервера. Поэтому необходимо жестко привязать
 поды minio к соответствующим нодам кластера. Пометим две worker node при помощи label.

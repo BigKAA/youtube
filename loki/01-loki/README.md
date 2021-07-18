@@ -2,6 +2,12 @@
 
 За основу берем официальный [helm chart](https://github.com/grafana/helm-charts/tree/main/charts/loki-distributed)
 
+Будем ставить версию loki-distributed - на каждую функцию отдельный микросервис.
+
+![](images/sh_1.jpg)
+
+Если не ожидается большой нагрузки на loki, можно ставить простой вариант, 
+"[всё в одном](https://github.com/grafana/helm-charts/tree/main/charts/loki)"
 
     helm repo add grafana https://grafana.github.io/helm-charts
     helm repo update
