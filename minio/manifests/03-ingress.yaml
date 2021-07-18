@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: miniobroeser
+  name: miniobrowser
   namespace: minio
   annotations:
     kubernetes.io/ingress.class: "system-ingress"
