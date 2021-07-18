@@ -86,11 +86,17 @@ data:
   output.conf: |
     [OUTPUT]
         name loki
-        match *
+        match kube.kubesystem.*
         host loki-loki-distributed-gateway
         port 80
-        labels  job=fluent-bit,$kubernetes['pod_name'],$kubernetes['namespace_name'],$kubernetes['host'],$kubernetes['container_name']
-        auto_kubernetes_labels on
+        labels  job=fluent-bit-k8s,$kubernetes['k8s-app'],$kubernetes['pod_name'],$kubernetes['namespace_name'],$kubernetes['host'],$kubernetes['container_name'],
+        # auto_kubernetes_labels on
+    [OUTPUT]
+        name loki
+        match sysapp.gen.log..*
+        host loki-loki-distributed-gateway
+        port 80
+        labels  job=fluent-bit-systemlogs
   parsers.conf: |
     [PARSER]
         Name   nginx
