@@ -89,6 +89,7 @@ data:
         match *
         host loki-loki-distributed-gateway
         port 80
+        labels  job=fluent-bit
         auto_kubernetes_labels on
   parsers.conf: |
     [PARSER]
