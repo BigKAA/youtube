@@ -61,7 +61,7 @@ spec:
               service:
                 name: console
                 port:
-                  name: console
+                  name: http
 
 
 
