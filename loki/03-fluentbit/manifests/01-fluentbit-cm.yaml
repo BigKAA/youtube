@@ -93,7 +93,7 @@ data:
         # auto_kubernetes_labels on
     [OUTPUT]
         name loki
-        match sysapp.gen.log..*
+        match sysapp.gen.log.*
         host loki-loki-distributed-gateway
         port 80
         labels  job=fluent-bit-systemlogs
