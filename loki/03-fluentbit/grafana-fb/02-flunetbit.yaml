@@ -58,8 +58,8 @@ spec:
       priorityClassName: low-priority
       containers:
         - name: fluent-bit
-          image: docker.io/fluent/fluent-bit:1.8.1
-          # image: grafana/fluent-bit-plugin-loki:2.2.1-amd64
+          # image: docker.io/fluent/fluent-bit:1.8.1
+          image: grafana/fluent-bit-plugin-loki:2.2.1-amd64
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 2020
