@@ -89,7 +89,7 @@ data:
         match *
         host loki-loki-distributed-gateway
         port 80
-        labels  job=fluent-bit, $kubernetes['pod_name','namespace_name','host','container_name']
+        labels  job=fluent-bit,$kubernetes['pod_name'],$kubernetes['namespace_name'],$kubernetes['host'],$kubernetes['container_name']
         auto_kubernetes_labels on
   parsers.conf: |
     [PARSER]
