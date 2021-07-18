@@ -109,6 +109,7 @@ loki:
         access_key_id: ${MINIO_USERNAME}
         secret_access_key: ${MINIO_PASSWORD}
         insecure: true
+        region: ${MINIO_PORT}
         s3forcepathstyle: true
       boltdb_shipper:
         shared_store: s3
