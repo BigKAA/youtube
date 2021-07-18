@@ -58,9 +58,9 @@ spec:
       port: 9000
       targetPort: minio
     # Встречаются приложения, где 80-й порт прибит гвоздями.
-    - name: http
-      port: 80
-      targetPort: minio
+    #- name: http
+    #  port: 80
+    #  targetPort: minio
   selector:
     app.kubernetes.io/name: mi
     app.kubernetes.io/instance: mi

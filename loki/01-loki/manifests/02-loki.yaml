@@ -67,7 +67,6 @@ data:
         endpoint: ${MINIO_HOST}
         access_key_id: ${MINIO_USERNAME}
         secret_access_key: ${MINIO_PASSWORD}
-        region: ${MINIO_PORT}
         insecure: true
         s3forcepathstyle: true
       boltdb_shipper:
