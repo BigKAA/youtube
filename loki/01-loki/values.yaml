@@ -264,11 +264,11 @@ ingester:
         secretKeyRef:
           name: s3-credentials
           key: MINIO_PASSWORD
-    - name: MINIO_PORT
-      valueFrom:
-        secretKeyRef:
-          name: s3-credentials
-          key: MINIO_PORT
+#    - name: MINIO_PORT
+#      valueFrom:
+#        secretKeyRef:
+#          name: s3-credentials
+#          key: MINIO_PORT
   # -- Environment variables from secrets or configmaps to add to the ingester pods
   extraEnvFrom: []
   # -- Volume mounts to add to the ingester pods
@@ -356,11 +356,11 @@ distributor:
         secretKeyRef:
           name: s3-credentials
           key: MINIO_PASSWORD
-    - name: MINIO_PORT
-      valueFrom:
-        secretKeyRef:
-          name: s3-credentials
-          key: MINIO_PORT
+#    - name: MINIO_PORT
+#      valueFrom:
+#        secretKeyRef:
+#          name: s3-credentials
+#          key: MINIO_PORT
   # -- Environment variables from secrets or configmaps to add to the distributor pods
   extraEnvFrom: []
   # -- Volume mounts to add to the distributor pods
@@ -435,11 +435,11 @@ querier:
         secretKeyRef:
           name: s3-credentials
           key: MINIO_PASSWORD
-    - name: MINIO_PORT
-      valueFrom:
-        secretKeyRef:
-          name: s3-credentials
-          key: MINIO_PORT
+#    - name: MINIO_PORT
+#      valueFrom:
+#        secretKeyRef:
+#          name: s3-credentials
+#          key: MINIO_PORT
   # -- Environment variables from secrets or configmaps to add to the querier pods
   extraEnvFrom: []
   # -- Volume mounts to add to the querier pods
@@ -525,11 +525,11 @@ queryFrontend:
         secretKeyRef:
           name: s3-credentials
           key: MINIO_PASSWORD
-    - name: MINIO_PORT
-      valueFrom:
-        secretKeyRef:
-          name: s3-credentials
-          key: MINIO_PORT
+#    - name: MINIO_PORT
+#      valueFrom:
+#        secretKeyRef:
+#          name: s3-credentials
+#          key: MINIO_PORT
   # -- Environment variables from secrets or configmaps to add to the query-frontend pods
   extraEnvFrom: []
   # -- Volume mounts to add to the query-frontend pods
@@ -564,7 +564,7 @@ queryFrontend:
 # Configuration for the table-manager
 tableManager:
   # -- Specifies whether the table-manager should be enabled
-  enabled: false
+  enabled: true
   image:
     # -- The Docker registry for the table-manager image. Overrides `loki.image.registry`
     registry: null
@@ -579,9 +579,30 @@ tableManager:
   # -- Labels for table-manager service
   serviceLabels: {}
   # -- Additional CLI args for the table-manager
-  extraArgs: []
+  extraArgs:
+    - -config.expand-env=true
   # -- Environment variables to add to the table-manager pods
-  extraEnv: []
+  extraEnv:
+    - name: MINIO_PROTO
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_PROTO
+    - name: MINIO_HOST
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_HOST
+    - name: MINIO_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_USERNAME
+    - name: MINIO_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: MINIO_PASSWORD
   # -- Environment variables from secrets or configmaps to add to the table-manager pods
   extraEnvFrom: []
   # -- Volume mounts to add to the table-manager pods
