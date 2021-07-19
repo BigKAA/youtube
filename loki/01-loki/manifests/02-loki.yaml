@@ -22,7 +22,7 @@ data:
     
     server:
       http_listen_port: 3100
-    
+      
     distributor:
       ring:
         kvstore:
@@ -384,6 +384,31 @@ spec:
     app.kubernetes.io/instance: loki
     app.kubernetes.io/part-of: memberlist
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-loki-distributed-table-manager
+  labels:
+    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "2.2.1"
+    app.kubernetes.io/component: table-manager
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3100
+      targetPort: http
+      protocol: TCP
+    - name: grpc
+      port: 9095
+      targetPort: grpc
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/component: table-manager
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -701,6 +726,115 @@ spec:
                     app.kubernetes.io/component: query-frontend
                 topologyKey: failure-domain.beta.kubernetes.io/zone
         
+      volumes:
+        - name: config
+          configMap:
+            name: loki-loki-distributed
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-loki-distributed-table-manager
+  labels:
+    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "2.2.1"
+    app.kubernetes.io/component: table-manager
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: loki-distributed
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/component: table-manager
+  template:
+    metadata:
+      annotations:
+        checksum/config: 1cfe7aacd6108fd07a2d5e53dc3f297f622ef5c12a96105f65fbb92ff241858f
+      labels:
+        app.kubernetes.io/name: loki-distributed
+        app.kubernetes.io/instance: loki
+        app.kubernetes.io/component: table-manager
+    spec:
+      serviceAccountName: loki-loki-distributed
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: loki
+          image: docker.io/grafana/loki:2.2.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - -config.file=/etc/loki/config/config.yaml
+            - -target=table-manager
+            - -config.expand-env=true
+          ports:
+            - name: http
+              containerPort: 3100
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+          env:
+            - name: MINIO_PROTO
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_PROTO
+                  name: s3-credentials
+            - name: MINIO_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_HOST
+                  name: s3-credentials
+            - name: MINIO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_USERNAME
+                  name: s3-credentials
+            - name: MINIO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_PASSWORD
+                  name: s3-credentials
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+          volumeMounts:
+            - name: config
+              mountPath: /etc/loki/config
+          resources:
+            {}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: loki-distributed
+                  app.kubernetes.io/instance: loki
+                  app.kubernetes.io/component: table-manager
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: loki-distributed
+                    app.kubernetes.io/instance: loki
+                    app.kubernetes.io/component: table-manager
+                topologyKey: failure-domain.beta.kubernetes.io/zone
       volumes:
         - name: config
           configMap:
