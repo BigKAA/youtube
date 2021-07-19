@@ -116,6 +116,7 @@ spec:
       initContainers:
         - name: init-configs
           image: busybox:1.33.0
+          imagePullPolicy: "IfNotPresent"
           command:
             - sh
             - -c
