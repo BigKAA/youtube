@@ -171,7 +171,7 @@ deployment:
   ##    maxUnavailable: 25%
   ##
   updateStrategy:
-    type: Recreate
+    type: RollingUpdate
 
 ## MinIO(R) statefulset parameters
 ## Only when mode is 'distributed'
@@ -338,11 +338,11 @@ customStartupProbe: {}
 extraVolumes: ## <--- change by Artur
   - name: data-0
     hostPath:
-      path: /var/minio-data-0
+      path: /var/data-0
       type: DirectoryOrCreate
   - name: data-1
     hostPath:
-      path: /var/minio-data-1
+      path: /var/data-1
       type: DirectoryOrCreate
 
 # Add additional volumes mounts, e. g. for custom themes

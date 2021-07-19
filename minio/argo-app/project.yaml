@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  description: Keycloak cluster installation
+  description: Minio cluster installation
   sourceRepos:
   - 'https://github.com/BigKAA/youtube'
   destinations:
