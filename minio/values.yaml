@@ -1,0 +1,522 @@
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+##
+global:
+  ## Global imageRegistry
+  ##
+  # imageRegistry: myRegistryName
+  ## Global imagePullSecrets
+  ##
+  imagePullSecrets: []
+  ## Global storageClass
+  ##
+  # storageClass: myStorageClass
+  ## Global MinIO(R) credentials
+  ## e.g:
+  ## minio:
+  ##   existingSecret: ""
+  ##   accessKey: ""
+  ##   secretKey: ""
+  ##
+  minio: {}
+
+## Bitnami MinIO(R) image version
+## ref: https://hub.docker.com/r/bitnami/minio/tags/
+##
+image:
+  registry: quay.io
+  repository: bitnami/minio
+  tag: 2021.6.17-debian-10-r14
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+  debug: false
+
+## Bitnami MinIO(R) Client image version
+## ref: https://hub.docker.com/r/bitnami/minio-client/tags/
+##
+clientImage:
+  registry: quay.io
+  repository: bitnami/minio-client
+  tag: 2021.6.13-debian-10-r22
+
+## String to partially override common.names.fullname template (will maintain the release name)
+##
+nameOverride: "mi"
+
+## String to fully override common.names.fullname template
+##
+fullnameOverride: "mi"
+
+## Add labels to all the deployed resources
+##
+commonLabels: {}
+
+## Add annotations to all the deployed resources
+##
+commonAnnotations: {}
+
+## Force target Kubernetes version (using Helm capabilites if not set)
+##
+kubeVersion:
+
+## Cluster domain
+##
+clusterDomain: cluster.local
+
+## Extra objects to deploy (value evaluated as a template)
+##
+extraDeploy: []
+
+## MinIO(R) server mode. Allowed values: standalone or distributed.
+## ref: https://docs.minio.io/docs/distributed-minio-quickstart-guide
+##
+mode: distributed  ## <--- change by Artur
+
+## MinIO(R) credentials
+##
+accessKey:
+  ## MinIO(R) Access Key
+  ## ref: https://github.com/bitnami/bitnami-docker-minio/#setting-up-minio-in-distributed-mode
+  ##
+  password: admin  ## <--- change by Artur
+  ## Option to force users to specify a password. That is required for 'helm upgrade' to work properly.
+  ## If it is not force, a random password will be generated.
+  ##
+  forcePassword: false
+secretKey:
+  ## MinIO(R) Secret Key
+  ## ref: https://github.com/bitnami/bitnami-docker-minio/#setting-up-minio-in-distributed-mode
+  ##
+  password: password ## <--- change by Artur
+  ## Option to force users to specify a password. That is required for 'helm upgrade' to work properly.
+  ## If it is not force, a random password will be generated.
+  ##
+  forcePassword: false
+
+## Use existing secret (ignores accessKey, and secretKey passwords)
+##
+# existingSecret:
+
+## Mount MinIO(R) secret as a file instead of passing environment variable
+##
+useCredentialsFile: false
+
+## Force reconfiguring new keys whenever the credentials change
+##
+forceNewKeys: false
+
+## Comma, semi-colon or space separated list of buckets to create at initialization
+##
+# defaultBuckets: "my-bucket, my-second-bucket"
+
+## Disable MinIO(R) Web UI
+## ref: https://github.com/minio/minio/tree/master/docs/config/#browser
+##
+disableWebUI: false
+
+## Enable tls in front of MinIO(R) containers.
+##
+tls:
+  ## If true, mount an existing secret to the container
+  ##
+  enabled: false
+  ## Name of an existing secret holding the certificate information
+  ##
+  existingSecret:
+  ## DEPRECATED. Use `tls.existingSecret` instead.
+  ## Name of an existing secret holding the certificate information
+  ##
+  secretName: ""
+  ## The mounted path where the secret will be located
+  ##  Custom mount path where the certificates will be located, if empty will default to /certs
+  mountPath: ""
+
+## An array to add extra env vars
+## e.g:
+## extraEnv:
+##   - name: FOO
+##     value: "bar"
+##
+extraEnv: {}
+
+## ConfigMap with extra environment variables
+##
+extraEnvVarsCM: ""
+
+## Secret with extra environment variables
+##
+extraEnvVarsSecret: ""
+
+## Command and args for running the MinIO(R) container (set to default if not set). Use array form
+##
+command: []
+args: []
+
+## Scheduler name
+## https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+##
+# schedulerName: stork
+
+## MinIO(R) deployment parameters
+## Only when 'mode' is 'standalone' or 'gateway.enabled' is 'true'
+##
+deployment:
+  ## Set to Recreate if you use persistent volume that cannot be mounted by more than one pods to make sure the pods is destroyed first.
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## e.g:
+  ## updateStrategy:
+  ##  type: RollingUpdate
+  ##  rollingUpdate:
+  ##    maxSurge: 25%
+  ##    maxUnavailable: 25%
+  ##
+  updateStrategy:
+    type: Recreate
+
+## MinIO(R) statefulset parameters
+## Only when mode is 'distributed'
+##
+statefulset:
+  ## Update strategy, can be set to RollingUpdate or OnDelete by default.
+  ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#updating-statefulsets
+  ##
+  updateStrategy: RollingUpdate
+
+  ## StatefulSet controller supports relax its ordering guarantees while preserving its uniqueness and identity guarantees. There are two valid pod management policies: OrderedReady and Parallel
+  ## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#pod-management-policy
+  ##
+  podManagementPolicy: Parallel
+
+  ## Number of replicas, it must even and greater than 4
+  ##
+  replicaCount: 2
+
+  ## Number of expanded MinIO(R) clusters
+  ##
+  zones: 1
+
+  ## Number of drives (PVC) attached to every node
+  ##
+  drivesPerNode: 2
+
+## MinIO(R) pod host aliases
+## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+##
+hostAliases: []
+
+## MinIO(R) container ports to open
+##
+containerPort: 9000
+
+## MinIO(R) pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+##
+podSecurityContext:
+  enabled: true
+  fsGroup: 1001
+
+## MinIO(R) container Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+##
+containerSecurityContext:
+  enabled: true
+  runAsUser: 1001
+  runAsNonRoot: true
+
+## Pod labels
+## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+##
+podLabels: {}
+
+## Pod annotations
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/minio/v2/metrics/cluster"
+  prometheus.io/port: "9000"
+
+## Pod affinity preset
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+## Allowed values: soft, hard
+##
+podAffinityPreset: ""
+
+## Pod anti-affinity preset
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+## Allowed values: soft, hard
+##
+podAntiAffinityPreset: soft
+
+## Node affinity preset
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+## Allowed values: soft, hard
+##
+nodeAffinityPreset:
+  ## Node affinity type
+  ## Allowed values: soft, hard
+  ##
+  type: "hard" ## <--- change by Artur
+  ## Node label key to match
+  ## E.g.
+  ## key: "kubernetes.io/e2e-az-name"
+  ##
+  key: "minio" ## <--- change by Artur
+  ## Node label values to match
+  ## E.g.
+  ## values:
+  ##   - e2e-az1
+  ##   - e2e-az2
+  ##
+  values:
+    - "yes" ## <--- change by Artur
+
+## Affinity for pod assignment. Evaluated as a template.
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+## Note: podAffinityPreset, podAntiAffinityPreset, and nodeAffinityPreset will be ignored when it's set
+##
+affinity: {}
+
+## Node labels for pod assignment. Evaluated as a template.
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment. Evaluated as a template.
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+## MinIO(R) containers' resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits: {}
+  #   cpu: 250m
+  #   memory: 256Mi
+  requests: {}
+  #   cpu: 250m
+  #   memory: 256Mi
+
+## Configure extra options for liveness, readiness and startup probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+##
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 5
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 60
+
+## Custom Liveness, Readiness, and Startup probes for MinIO(R)
+##
+customLivenessProbe: {}
+customReadinessProbe: {}
+customStartupProbe: {}
+
+
+# Add additional volumes, e. g. for custom themes
+extraVolumes: ## <--- change by Artur
+  - name: data-0
+    hostPath:
+      path: /var/minio-data-0
+      type: DirectoryOrCreate
+  - name: data-1
+    hostPath:
+      path: /var/minio-data-1
+      type: DirectoryOrCreate
+
+# Add additional volumes mounts, e. g. for custom themes
+extraVolumeMounts: ## <--- change by Artur
+  - name: data-0
+    mountPath: /data-0
+  - name: data-1
+    mountPath: /data-1
+
+## Extra volumes to add to the MinIO(R) statefulset
+##
+#extraVolumes: []
+
+## Extra volume mounts to add to MinIO(R) containers
+##
+#extraVolumeMounts: []
+
+## Add init containers to the MinIO(R) pods.
+## e.g:
+## initContainers:
+##   - name: your-image-name
+##     image: your-image
+##     imagePullPolicy: Always
+##     ports:
+##       - name: portname
+##         containerPort: 1234
+##
+initContainers: {}
+
+## Add sidecars to the MinIO(R) pods.
+## e.g:
+## sidecars:
+##   - name: your-image-name
+##     image: your-image
+##     imagePullPolicy: Always
+##     ports:
+##       - name: portname
+##         containerPort: 1234
+##
+sidecars: {}
+
+## MinIO(R) Service properties
+##
+service:
+  type: ClusterIP
+  port: 9000
+  annotations: {}
+
+## Configure the ingress resource that allows you to access the
+## MinIO(R) installation. Set up the URL
+## ref: http://kubernetes.io/docs/user-guide/ingress/
+##
+ingress:
+  ## Set to true to enable ingress record generation
+  ##
+  enabled: false
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  ## If true, use a Persistent Volume Claim, If false, use emptyDir
+  ##
+  enabled: false ## <--- change by Artur
+  ## Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  ## Data volume mount path
+  ##
+  mountPath: /data_pv ## <--- change by Artur
+  ## Persistent Volume Access Mode
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## Persistent Volume size
+  ##
+  size: 8Gi
+  ## Persistent Volume Claim annotations
+  ##
+  annotations: {}
+  ## Enable persistence using an existing PVC (only in standalone mode)
+  ##
+  # existingClaim:
+
+## Init containers parameters:
+## volumePermissions: Change the owner and group of the persistent volume mountpoint to runAsUser:fsGroup values from the securityContext section.
+##
+volumePermissions:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: bitnami/bitnami-shell
+    tag: 10-debian-10-r109
+    pullPolicy: Always
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+  ## Init container' resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    ## We usually recommend not to specify default resources and to leave this as a conscious
+    ## choice for the user. This also increases chances charts run on environments with little
+    ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+    ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    ## e.g:
+    ## limits:
+    ##   cpu: 500m
+    ##   memory: 1Gi
+    ##
+    limits: {}
+    requests: {}
+  ## Init container' Security Context
+  ## Note: the chown of the data folder is done to containerSecurityContext.runAsUser
+  ## and not the below volumePermissions.containerSecurityContext.runAsUser
+  ##
+  containerSecurityContext:
+    runAsUser: 0
+
+## Specifies whether a ServiceAccount should be created
+##
+serviceAccount:
+  create: true
+  ## The name of the ServiceAccount to use.
+  ## If not set and create is true, a name is generated using the common.names.fullname template
+  ##
+  name: ""
+
+## Metrics configuration
+##
+metrics:
+  ## MinIO(R) supports two authentication modes for Prometheus either jwt or public, by default MinIO(R) runs in jwt mode.
+  ## To allow public access without authentication for prometheus metrics set environment as follows.
+  ##
+  prometheusAuthType: public
+
+  ## Prometheus Operator ServiceMonitor configuration
+  ##
+  serviceMonitor:
+    ## If the operator is installed in your cluster, set to true to create a Service Monitor Entry
+    ##
+    enabled: false
+    ## Specify the namespace in which the serviceMonitor resource will be created
+    ##
+    # namespace: ""
+    ## HTTP path to scrape for metrics
+    ##
+    path: /minio/v2/metrics/cluster
+    ## Specify the interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## Specify the timeout after which the scrape is ended
+    ##
+    # scrapeTimeout: 30s
+    ## Specify Metric Relabellings to add to the scrape endpoint
+    ##
+    # relabellings:
+    ## Specify honorLabels parameter to add the scrape endpoint
+    ##
+    honorLabels: false
+    ## Specify the release for ServiceMonitor. Sometimes it should be custom for prometheus operator to work
+    ##
+    # release: ""
+    ## Used to pass Labels that are used by the Prometheus installed in your cluster to select Service Monitors to work with
+    ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#prometheusspec
+    ##
+    additionalLabels: {}

@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: loki
+  source:
+    repoURL: 'https://github.com/BigKAA/youtube'
+    path: loki/01-loki/manifests
+    targetRevision: master
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: loki
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
