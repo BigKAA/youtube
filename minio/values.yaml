@@ -112,7 +112,7 @@ forceNewKeys: false
 ## Disable MinIO(R) Web UI
 ## ref: https://github.com/minio/minio/tree/master/docs/config/#browser
 ##
-disableWebUI: false
+disableWebUI: true
 
 ## Enable tls in front of MinIO(R) containers.
 ##
@@ -475,7 +475,7 @@ volumePermissions:
 ## Specifies whether a ServiceAccount should be created
 ##
 serviceAccount:
-  create: true
+  create: false
   ## The name of the ServiceAccount to use.
   ## If not set and create is true, a name is generated using the common.names.fullname template
   ##
