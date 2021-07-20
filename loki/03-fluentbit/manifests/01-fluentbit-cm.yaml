@@ -89,7 +89,7 @@ data:
         match kube.kubesystem.*
         host loki-loki-distributed-gateway
         port 80
-        labels  job=fluent-bit-k8s,$kubernetes['pod_name'],$kubernetes['namespace_name'],$kubernetes['host'],$kubernetes['container_name'],
+        labels  job=fluent-bit-k8s,$kubernetes['pod_name'],$kubernetes['namespace_name'],$kubernetes['host'],$kubernetes['container_name']
         # auto_kubernetes_labels on
     [OUTPUT]
         name loki
