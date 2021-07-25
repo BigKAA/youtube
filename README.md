@@ -33,3 +33,7 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **[ArgoCD](argocd/README.md)** - приложение для CD в k8s.
 * **[Harbor](harbor/README.md)** - хранилище образов контейнеров и много 
 дополнительных плюшек.
+  
+* **[Keycloak](keycloak/README.md)** - кластер Keycloak.
+* **[Loki](loki/README.md)** - первая попытка поставить Loki в k8s.
+* **[Mino](minio/README.md)** - установка minio в k8s. Версия под мой [миникластер](k8s-step-by-step/00-planning/README.md).
