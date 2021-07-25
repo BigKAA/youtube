@@ -48,3 +48,7 @@ _Основано на [Bitnami Object Storage Helm Chart based on MinIO](https:
 Поскольку был установлен ingress, доступ к WEB интерфейсу:
 
 http://minio.kryukov.local
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/0MYrwR7EFBM/maxresdefault.jpg" width="50%">](https://youtu.be/0MYrwR7EFBM)

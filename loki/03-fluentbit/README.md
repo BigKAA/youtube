@@ -12,3 +12,7 @@
 * [Классический fluentbit](manifests)
 * [Вариант от Grafana](grafana-fb)
 
+## Видео
+
+[<img src="https://img.youtube.com/vi/cAiBsaAO_IM/maxresdefault.jpg" width="50%">](https://youtu.be/cAiBsaAO_IM)
+

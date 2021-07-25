@@ -27,3 +27,7 @@
 ## Fluentbit
 
 [Установка Fluentbit](03-fluentbit)
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/xjb5WLNPg-0/maxresdefault.jpg" width="50%">](https://youtu.be/xjb5WLNPg-0)

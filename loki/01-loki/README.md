@@ -27,3 +27,7 @@
 Установка как приложение ArgoCD:
 
     kubectl -n loki apply -f argo-app/argo-app.yaml
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/Ohta2szC4RM/maxresdefault.jpg" width="50%">](https://youtu.be/Ohta2szC4RM)
