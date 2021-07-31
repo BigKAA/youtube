@@ -59,11 +59,11 @@
 
 Добавляем PV
 
-    kubectl apply -f 00-pv-pvc.yaml
+    kubectl apply -f 01-pv-pvc.yaml
 
 Создаём кластер
 
-    kubectl apply -f 01-cluster.yaml
+    kubectl apply -f 02-cluster.yaml
 
 Смотрим пароль пользователя.
 

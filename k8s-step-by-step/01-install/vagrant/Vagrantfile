@@ -1,0 +1,96 @@
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+ENV['VAGRANT_EXPERIMENTAL'] = "disks"
+
+$path_to_clone_directory = "C:/Users/artur/VirtualDisks/VG"
+
+Vagrant.configure("2") do |config|
+
+  config.vm.provision "shell", path: "bootstrap.sh"
+
+  config.vm.define "control" do |control|
+    control.vm.box               ="almalinux/8"
+    control.vm.box_check_update  = false
+    control.vm.hostname          = "control.kryukov.local"
+    control.vm.network "public_network", ip: "192.168.218.190", hostname: true
+    control.vm.provider "vmware_desktop" do |v|
+      v.gui = true
+      v.memory = 4096
+      v.allowlist_verified = true
+#       v.vmx["ethernet0.pcislotnumber"] = "32"
+#       v.vmx["ethernet1.pcislotnumber"] = "33"
+      v.vmx["ethernet1.vnet"] = "vmnet1"
+      v.vmx["ethernet1.connectionType"] = "custom"
+      v.vmx["ethernet1.virtualdev"] = "e1000"
+      v.cpus = 4
+      v.clone_directory = "#$path_to_clone_directory"
+    end
+    control.vm.provision "shell", run: "always",
+    inline: "sed '/^nameserver/d' /etc/resolv.conf | sed '$ a nameserver 192.168.218.195' > /etc/resolv1.conf && mv -f /etc/resolv1.conf /etc/resolv.conf"
+  end
+
+  (1..3).each do |i|
+    config.vm.define "node#{i}" do |node|
+      node.vm.box               ="almalinux/8"
+      node.vm.box_check_update  = false
+      node.vm.hostname          = "node#{i}.kryukov.local"
+      node.vm.network "public_network", ip: "192.168.218.19#{i}", hostname: true
+      node.vm.provider "vmware_desktop" do |v|
+        v.gui = true
+        v.memory = 8192
+        v.allowlist_verified = true
+#         v.vmx["ethernet0.pcislotnumber"] = "32"
+#         v.vmx["ethernet1.pcislotnumber"] = "33"
+        v.vmx["ethernet1.vnet"] = "vmnet1"
+        v.vmx["ethernet1.connectionType"] = "custom"
+        v.vmx["ethernet1.virtualdev"] = "e1000"
+        v.cpus = 6
+        v.clone_directory = "#$path_to_clone_directory"
+      end
+      node.vm.provision "shell", run: "always",
+      inline: "sed '/^nameserver/d' /etc/resolv.conf | sed '$ a nameserver 192.168.218.195' > /etc/resolv1.conf && mv -f /etc/resolv1.conf /etc/resolv.conf"
+    end
+  end
+
+  config.vm.define "db" do |db|
+    db.vm.box               ="almalinux/8"
+    db.vm.box_check_update  = false
+    db.vm.hostname          = "db.kryukov.local"
+    db.vm.network "public_network", ip: "192.168.218.194", hostname: true
+    db.vm.provider "vmware_desktop" do |v|
+      v.gui = true
+      v.memory = 4096
+      v.allowlist_verified = true
+#       v.vmx["ethernet0.pcislotnumber"] = "32"
+#       v.vmx["ethernet1.pcislotnumber"] = "33"
+      v.vmx["ethernet1.vnet"] = "vmnet1"
+      v.vmx["ethernet1.connectionType"] = "custom"
+      v.vmx["ethernet1.virtualdev"] = "e1000"
+      v.cpus = 4
+      v.clone_directory = "#$path_to_clone_directory"
+    end
+    db.vm.provision "shell", run: "always",
+    inline: "sed '/^nameserver/d' /etc/resolv.conf | sed '$ a nameserver 192.168.218.195' > /etc/resolv1.conf && mv -f /etc/resolv1.conf /etc/resolv.conf"
+  end
+
+  config.vm.define "master" do |master|
+    master.vm.box               ="almalinux/8"
+    master.vm.box_check_update  = false
+    master.vm.hostname          = "master.kryukov.local"
+    master.vm.network "public_network", ip: "192.168.218.195", hostname: true
+    master.vm.provider "vmware_desktop" do |v|
+      v.gui = true
+      v.memory = 2048
+      v.allowlist_verified = true
+#       v.vmx["ethernet0.pcislotnumber"] = "32"
+#       v.vmx["ethernet1.pcislotnumber"] = "33"
+      v.vmx["ethernet1.vnet"] = "vmnet1"
+      v.vmx["ethernet1.connectionType"] = "custom"
+      v.vmx["ethernet1.virtualdev"] = "e1000"
+      v.cpus = 4
+      v.clone_directory = "#$path_to_clone_directory"
+    end
+    master.vm.provision "shell", path: "master_bootstrap.sh"
+    master.vm.provision "shell", run: "always",
+    inline: "sed '/^nameserver/d' /etc/resolv.conf | sed '$ a nameserver 192.168.218.195' > /etc/resolv1.conf && mv -f /etc/resolv1.conf /etc/resolv.conf"
+  end
+end
