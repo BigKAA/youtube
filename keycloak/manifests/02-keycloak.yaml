@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
-    app.kubernetes.io/version: "13.0.1"
+    app.kubernetes.io/version: "15.0.2"
 data:
   keycloak.cli: |
     embed-server --server-config=standalone-ha.xml --std-out=echo
@@ -34,7 +34,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
-    app.kubernetes.io/version: "13.0.1"
+    app.kubernetes.io/version: "15.0.2"
     app.kubernetes.io/component: headless
 spec:
   type: ClusterIP
@@ -55,7 +55,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
-    app.kubernetes.io/version: "13.0.1"
+    app.kubernetes.io/version: "15.0.2"
     app.kubernetes.io/component: http
 spec:
   type: ClusterIP
@@ -83,7 +83,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kk
     app.kubernetes.io/instance: kk
-    app.kubernetes.io/version: "13.0.1"
+    app.kubernetes.io/version: "15.0.2"
 spec:
   selector:
     matchLabels:
@@ -108,7 +108,7 @@ spec:
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
-          image: "quay.io/keycloak/keycloak:13.0.1"
+          image: "quay.io/keycloak/keycloak:15.0.2"
           imagePullPolicy: IfNotPresent
           command:
             []
