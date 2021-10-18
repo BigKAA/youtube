@@ -90,6 +90,10 @@ spec:
       app.kubernetes.io/name: kk
       app.kubernetes.io/instance: kk
   replicas: 2
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
   template:
     metadata:
       annotations:
@@ -152,8 +156,6 @@ spec:
               value: "2"
             - name: PROXY_ADDRESS_FORWARDING
               value: "true"
-            
-          envFrom:
           ports:
             - name: http
               containerPort: 8080
@@ -170,14 +172,12 @@ spec:
               port: http
             initialDelaySeconds: 0
             timeoutSeconds: 5
-            
           readinessProbe:
             httpGet:
               path: /iam/auth/realms/master
               port: http
             initialDelaySeconds: 30
             timeoutSeconds: 1
-            
           startupProbe:
             httpGet:
               path: /iam/auth/
@@ -186,7 +186,6 @@ spec:
             timeoutSeconds: 5
             failureThreshold: 60
             periodSeconds: 5
-            
           resources:
             limits:
               cpu: "1"
@@ -202,7 +201,6 @@ spec:
             - name: creds
               mountPath: /secrets/creds
               readOnly: true
-            
       serviceAccountName: default
       securityContext:
         fsGroup: 1000
@@ -218,7 +216,6 @@ spec:
                     values:
                       - kk
               topologyKey: "kubernetes.io/hostname"
-        
       priorityClassName: high-priority
       terminationGracePeriodSeconds: 60
       volumes:
