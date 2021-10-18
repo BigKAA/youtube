@@ -1,0 +1,234 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kk-startup
+  labels:
+    app.kubernetes.io/name: kk
+    app.kubernetes.io/instance: kk
+    app.kubernetes.io/version: "15.0.2"
+data:
+  keycloak.cli: |
+    embed-server --server-config=standalone-ha.xml --std-out=echo
+    batch
+    echo Configuring node identifier
+    /subsystem=keycloak-server/:write-attribute(name=web-context,value=iam/auth)
+    # Allow log level to be configured via environment variable
+    /subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=${env.WILDFLY_LOGLEVEL:INFO})
+    /subsystem=logging/root-logger=ROOT:write-attribute(name=level, value=${env.WILDFLY_LOGLEVEL:INFO})
+    # Configure datasource to connection before use
+    /subsystem=datasources/data-source=KeycloakDS/:write-attribute(name=validate-on-match,value=${env.DB_VALIDATE_ON_MATCH:true})
+    # Configure datasource to try all other connections before failing
+    /subsystem=datasources/data-source=KeycloakDS/:write-attribute(name=use-fast-fail,value=${env.DB_USE_CAST_FAIL:false})
+    # Json log format
+    /subsystem=logging/json-formatter=json:add(exception-output-type=formatted, pretty-print=false, meta-data={label=value})
+    /subsystem=logging/console-handler=CONSOLE:write-attribute(name=named-formatter, value=json)
+    echo Finished configuring node identifier
+    run-batch
+    stop-embedded-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kk-headless
+  labels:
+    app.kubernetes.io/name: kk
+    app.kubernetes.io/instance: kk
+    app.kubernetes.io/version: "15.0.2"
+    app.kubernetes.io/component: headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: kk
+    app.kubernetes.io/instance: kk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kk-http
+  labels:
+    app.kubernetes.io/name: kk
+    app.kubernetes.io/instance: kk
+    app.kubernetes.io/version: "15.0.2"
+    app.kubernetes.io/component: http
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: https
+      port: 8443
+      targetPort: https
+      protocol: TCP
+    - name: http-management
+      port: 9990
+      targetPort: http-management
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: kk
+    app.kubernetes.io/instance: kk
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kk
+  labels:
+    app.kubernetes.io/name: kk
+    app.kubernetes.io/instance: kk
+    app.kubernetes.io/version: "15.0.2"
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kk
+      app.kubernetes.io/instance: kk
+  replicas: 2
+  podManagementPolicy: Parallel
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+  serviceName: kk-headless
+  template:
+    metadata:
+      annotations:
+        checksum/config-startup: 8b422677456a1f03322e6897e44c93c1b112fa9d3783ef11c7167091048931a3
+        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+      labels:
+        app.kubernetes.io/name: kk
+        app.kubernetes.io/instance: kk
+    spec:
+      containers:
+        - name: keycloak
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+          image: "quay.io/keycloak/keycloak:15.0.2"
+          imagePullPolicy: IfNotPresent
+          command:
+            []
+          args:
+            []
+          env:
+            - name: JAVA_OPTS
+              value: >-
+                -server
+                -Xms1024m
+                -Xmx2048m
+                -XX:MetaspaceSize=192M
+                -XX:MaxMetaspaceSize=512m
+                -Djava.net.preferIPv4Stack=true
+                -Djboss.modules.system.pkgs=org.jboss.byteman
+                -Djava.awt.headless=true
+            - name: DB_VENDOR
+              value: postgres
+            - name: DB_ADDR
+              value: base-pgbouncer.pgo.svc
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE
+              value: keycloak
+            - name: DB_USER_FILE
+              value: /secrets/creds/db-user
+            - name: DB_PASSWORD_FILE
+              value: /secrets/creds/db-password
+            - name: KEYCLOAK_USER_FILE
+              value: /secrets/creds/admin-user
+            - name: KEYCLOAK_PASSWORD_FILE
+              value: /secrets/creds/admin-password
+            - name: JGROUPS_DISCOVERY_PROTOCOL
+              value: dns.DNS_PING
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: JGROUPS_DISCOVERY_PROPERTIES
+              value: 'dns_query=kk-headless'
+            - name: CACHE_OWNERS_COUNT
+              value: "2"
+            - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
+              value: "2"
+            - name: PROXY_ADDRESS_FORWARDING
+              value: "true"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+            - name: http-management
+              containerPort: 9990
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /iam/auth/
+              port: http
+            initialDelaySeconds: 0
+            timeoutSeconds: 5
+            
+          readinessProbe:
+            httpGet:
+              path: /iam/auth/realms/master
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            
+          startupProbe:
+            httpGet:
+              path: /iam/auth/
+              port: http
+            initialDelaySeconds: 45
+            timeoutSeconds: 5
+            failureThreshold: 60
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: "1"
+              memory: 3072Mi
+            requests:
+              cpu: 100m
+              memory: 1024Mi
+          volumeMounts:
+            - name: startup
+              mountPath: "/opt/jboss/startup-scripts/keycloak.cli"
+              subPath: "keycloak.cli"
+              readOnly: true
+            - name: creds
+              mountPath: /secrets/creds
+              readOnly: true
+      serviceAccountName: default
+      securityContext:
+        fsGroup: 1000
+      enableServiceLinks: true
+      restartPolicy: Always
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                      - kk
+              topologyKey: "kubernetes.io/hostname"
+      priorityClassName: high-priority
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: startup
+          configMap:
+            name: kk-startup
+            defaultMode: 0555
+            items:
+              - key: keycloak.cli
+                path: keycloak.cli
+        - name: creds
+          secret:
+            secretName: keycloak-credentials
