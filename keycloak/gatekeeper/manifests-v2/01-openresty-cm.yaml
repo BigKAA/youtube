@@ -36,7 +36,7 @@ data:
       <h3>Первая группа</h3>
     </p>
     <p>
-      <a href=/oauth/logout?redir=https://application.kryukov.local/index.html>Logout</a>
+      <a href=/oauth/logout?redir=/index.html>Logout</a>
     </p>
     </body>
     </html>
@@ -53,7 +53,7 @@ data:
       <h3>Первая группа</h3>
     </p>
     <p>
-      <a href=/oauth/logout?redir=https://application.kryukov.local/index.html>Logout</a>
+      <a href=/oauth/logout?redir=/index.html>Logout</a>
     </p>
     </body>
     </html>
