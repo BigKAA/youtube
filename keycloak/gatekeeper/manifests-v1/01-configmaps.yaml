@@ -57,7 +57,7 @@ metadata:
   name: gatekeeper-config
 data:
   config.yaml: |
-    client-id: dashboard
+    client-id: myapp
     client-secret: fe50afd7-b170-4f21-8db8-51ea3b244c07
     discovery-url: http://keycloak.kryukov.local/iam/auth/realms/app
     enable-metrics: true
