@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  description: Minio cluster installation
+  description: My app
   sourceRepos:
   - 'https://github.com/BigKAA/youtube'
   destinations:
