@@ -21,4 +21,4 @@ spec:
               service:
                 name: application
                 port:
-                  number: 443
+                  number: 80

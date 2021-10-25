@@ -5,7 +5,7 @@ metadata:
   name: application
 spec:
   ports:
-    - port: 443
+    - port: 80
       targetPort: 3000
   selector:
     k8s-app: application
