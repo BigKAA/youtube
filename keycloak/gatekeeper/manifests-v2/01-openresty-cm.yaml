@@ -1,0 +1,59 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: openresty
+data:
+  index.html: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+    <h1>Тестовая страница</h1>
+    <p>
+      Проверяем доступы через gatekeeper.
+    </p>
+    <p>
+      <a href=g1.html>Группа 1</a>
+    </p>
+    <p>
+      <a href=g1.html>Группа 2</a>
+    </p>
+    </body>
+    </html>
+  g1.html: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+    <h1>Первая группа</h1>
+    <p>
+      Проверяем доступы через gatekeeper.</br>
+      <h3>Первая группа</h3>
+    </p>
+    <p>
+      <a href=/oauth/logout?redir=https://application.kryukov.local/index.html>Logout</a>
+    </p>
+    </body>
+    </html>
+  g2.html: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+    <h1>Первая группа</h1>
+    <p>
+      Проверяем доступы через gatekeeper.</br>
+      <h3>Первая группа</h3>
+    </p>
+    <p>
+      <a href=/oauth/logout?redir=https://application.kryukov.local/index.html>Logout</a>
+    </p>
+    </body>
+    </html>
