@@ -19,6 +19,6 @@ spec:
             path: /
             backend:
               service:
-                name: application
+                name: gatekeeper
                 port:
-                  number: 443
+                  number: 80
