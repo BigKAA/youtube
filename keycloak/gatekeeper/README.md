@@ -41,6 +41,12 @@
         Token Claim Name -> groups
         Full group path -> OFF
         Save
+        Mappers -> Create
+        Name -> myapp-audience
+        Mapper Type -> Audience
+        Included Client Audience -> myapp
+        Add to access token -> On
+        Save
 
 Проверяем.
 
