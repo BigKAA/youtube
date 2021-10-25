@@ -6,8 +6,8 @@ metadata:
 data:
   config.yaml: |
     client-id: dashboard
-    client-secret: e358af32-e82e-4e2a-a23a-162557f1c74c
-    discovery-url: http://keycloak.kryukov.local/iam/auth/realms/k8s
+    client-secret: fe50afd7-b170-4f21-8db8-51ea3b244c07
+    discovery-url: http://keycloak.kryukov.local/iam/auth/realms/app
     enable-metrics: true
     enable-refresh-tokens: true
     encryption-key: AgXa7xRcoClKEU0AHSH4X0XhL5Qy2Z2j
