@@ -15,10 +15,10 @@ data:
     listen: :3000
     listen-admin: :4000
     redirection-url: https://application.kryukov.local
-    # enable-logout-redirect: true
+    enable-logout-redirect: true
     enable-encrypted-token: true
     resources:
-    - uri: /index.html
+    - uri: /
       white-listed: true
     - uri: /g1.html
       groups:
