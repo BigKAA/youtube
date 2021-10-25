@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: application
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Minio cluster installation
+  sourceRepos:
+  - 'https://github.com/BigKAA/youtube'
+  destinations:
+  - server: https://kubernetes.default.svc
+    namespace: 'app'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

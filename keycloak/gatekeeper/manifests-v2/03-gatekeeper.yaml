@@ -1,0 +1,155 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: openresty
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: openresty
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: openresty
+  name: openresty
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      k8s-app: openresty
+  template:
+    metadata:
+      labels:
+        k8s-app: openresty
+    spec:
+      containers:
+        - name: openresty
+          image: openresty/openresty:centos-rpm
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: "300Mi"
+            requests:
+              cpu: "0.1"
+              memory: "100Mi"
+          volumeMounts:
+            - name: html
+              mountPath: /usr/local/openresty/nginx/html/
+      volumes:
+        - name: html
+          configMap:
+            name: openresty
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: gatekeeper
+spec:
+  ports:
+    - port: 443
+      targetPort: 3000
+  selector:
+    k8s-app: gatekeeper
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: gatekeeper
+  name: gatekeeper
+  annotations:
+    reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: "gatekeeper-config"
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      k8s-app: gatekeeper
+  template:
+    metadata:
+      labels:
+        k8s-app: gatekeeper
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/oauth/metrics"
+        prometheus.io/port: "4000"
+    spec:
+      containers:
+        - name: gatekeeper
+          image: 'quay.io/gogatekeeper/gatekeeper:1.3.5'
+          imagePullPolicy: IfNotPresent
+          args:
+            - '--config'
+            - /etc/gatekeeper/config.yaml
+          ports:
+            - name: proxy
+              containerPort: 3000
+              protocol: TCP
+            - name: admin
+              containerPort: 4000
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+          - name: config
+            mountPath: /etc/gatekeeper/config.yaml
+            subPath: config.yaml
+          livenessProbe:
+            httpGet:
+              path: /oauth/health
+              port: admin
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /oauth/health
+              port: admin
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: config
+          configMap:
+            name: gatekeeper-config

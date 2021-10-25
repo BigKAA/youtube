@@ -1,0 +1,83 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: openresty
+data:
+  index.html: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+    <h1>Тестовая страница</h1>
+    <p>
+      Проверяем доступы через gatekeeper.
+    </p>
+    </body>
+    </html>
+  g1.html: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+    <h1>Первая группа</h1>
+    <p>
+      Проверяем доступы через gatekeeper.</br>
+      <h3>Первая группа</h3>
+    </p>
+    </body>
+    </html>
+  g2.html: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+    <h1>Первая группа</h1>
+    <p>
+      Проверяем доступы через gatekeeper.</br>
+      <h3>Первая группа</h3>
+    </p>
+    </body>
+    </html>
+
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: gatekeeper-config
+data:
+  config.yaml: |
+    client-id: dashboard
+    client-secret: e358af32-e82e-4e2a-a23a-162557f1c74c
+    discovery-url: http://keycloak.kryukov.local/iam/auth/realms/k8s
+    enable-metrics: true
+    enable-refresh-tokens: true
+    encryption-key: AgXa7xRcoClKEU0AHSH4X0XhL5Qy2Z2j
+    skip-openid-provider-tls-verify: true
+    listen: :3000
+    listen-admin: :4000
+    redirection-url: https://application.kryukov.local
+    resources:
+    - uri: /index.html
+      white-listed: true
+    - uri: /g1.html
+      groups:
+      - g1
+    - uri: /g2.html
+      groups:
+      - g2
+    - uri: /favicon
+      white-listed: true
+    - uri: /css/*
+      white-listed: true
+    headers:
+      BiTest: allowed
+
+    upstream-url: http://127.0.0.1:80

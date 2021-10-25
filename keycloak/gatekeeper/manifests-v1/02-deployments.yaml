@@ -1,0 +1,115 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: application
+spec:
+  ports:
+    - port: 443
+      targetPort: 3000
+  selector:
+    k8s-app: application
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: application
+  name: application
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      k8s-app: application
+  template:
+    metadata:
+      labels:
+        k8s-app: application
+    spec:
+      containers:
+        - name: gatekeeper
+          image: 'quay.io/gogatekeeper/gatekeeper:1.3.5'
+          imagePullPolicy: IfNotPresent
+          args:
+            - '--config'
+            - /etc/gatekeeper/config.yaml
+          ports:
+            - name: proxy
+              containerPort: 3000
+              protocol: TCP
+            - name: admin
+              containerPort: 4000
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+          - name: config
+            mountPath: /etc/gatekeeper/config.yaml
+            subPath: config.yaml
+          livenessProbe:
+            httpGet:
+              path: /oauth/health
+              port: admin
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /oauth/health
+              port: admin
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+        - name: openresty
+          image: openresty/openresty:centos-rpm
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: "300Mi"
+            requests:
+              cpu: "0.1"
+              memory: "100Mi"
+          volumeMounts:
+            - name: html
+              mountPath: /usr/local/openresty/nginx/html/
+      volumes:
+        - name: config
+          configMap:
+            name: gatekeeper-config
+        - name: html
+          configMap:
+            name: openresty
