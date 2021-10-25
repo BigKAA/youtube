@@ -13,8 +13,11 @@ data:
     <body>
     <h1>Тестовая страница</h1>
     <p>
-      Проверяем доступы через gatekeeper.
-    </p>
+          <a href=g1.html>Группа 1</a>
+        </p>
+        <p>
+          <a href=g1.html>Группа 2</a>
+        </p>
     </body>
     </html>
   g1.html: |
