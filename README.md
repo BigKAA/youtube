@@ -35,5 +35,6 @@ Nexus внутри kubernetes, делаем свой docker registry.
 дополнительных плюшек.
   
 * **[Keycloak](keycloak/README.md)** - кластер Keycloak.
+  * **[Gatekeeper](keycloak/gatekeeper/README.md)**
 * **[Loki](loki/README.md)** - первая попытка поставить Loki в k8s.
 * **[Mino](minio/README.md)** - установка minio в k8s. Версия под мой [миникластер](k8s-step-by-step/00-planning/README.md).
