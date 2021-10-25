@@ -56,7 +56,7 @@
 
 Посмотрим содержимое токена.
 
-    curl --user "user1:$CLIENT-SECRET" \
+    curl --user "myapp:$CLIENT-SECRET" \
     -d "token=$ACCESS-TOKEN" \
     http://keycloak.kryukov.local/iam/auth/realms/app/protocol/openid-connect/token/introspect
 
