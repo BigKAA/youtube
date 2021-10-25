@@ -16,6 +16,9 @@ apiVersion: apps/v1
 metadata:
   labels:
     k8s-app: openresty
+  annotations:
+    reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: "openresty"
   name: openresty
 spec:
   replicas: 2
