@@ -17,6 +17,7 @@ data:
     redirection-url: https://application.kryukov.local
     enable-logout-redirect: true
     enable-encrypted-token: true
+    enable-json-logging: true
     resources:
     - uri: /
       white-listed: true
