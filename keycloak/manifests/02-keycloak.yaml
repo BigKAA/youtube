@@ -85,7 +85,7 @@ metadata:
     app.kubernetes.io/instance: kk
     app.kubernetes.io/version: "15.0.2"
   annotations:
-    check_notification: "v1"
+    check_notification: "v2"
 spec:
   selector:
     matchLabels:
