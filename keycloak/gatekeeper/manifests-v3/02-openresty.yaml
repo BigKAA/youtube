@@ -1,0 +1,67 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: openresty
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: openresty
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: openresty
+  labels:
+    k8s-app: openresty
+  annotations:
+    reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: "openresty"
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      k8s-app: openresty
+  template:
+    metadata:
+      labels:
+        k8s-app: openresty
+    spec:
+      containers:
+        - name: openresty
+          image: openresty/openresty:centos-rpm
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: "400Mi"
+            requests:
+              cpu: "0.1"
+              memory: "200Mi"
+          volumeMounts:
+            - name: html
+              mountPath: /usr/local/openresty/nginx/html/
+      volumes:
+        - name: html
+          configMap:
+            name: openresty

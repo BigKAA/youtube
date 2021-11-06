@@ -1,0 +1,24 @@
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: application
+  annotations:
+    kubernetes.io/ingress.class: "system-ingress"
+    certmanager.k8s.io/cluster-issuer: monitoring-issuer
+spec:
+  tls:
+    - hosts:
+        - application.kryukov.local
+      secretName: app-tls
+  rules:
+    - host: "application.kryukov.local"
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: gatekeeper
+                port:
+                  number: 80

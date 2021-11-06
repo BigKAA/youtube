@@ -1,0 +1,36 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: gatekeeper-config
+data:
+  config.yaml: |
+    client-id: $CLIENT_ID
+    client-secret: $CLIENT_SECRET
+    discovery-url: http://keycloak.kryukov.local/iam/auth/realms/app
+    enable-metrics: true
+    enable-refresh-tokens: true
+    encryption-key: $ENCRYPTION_KEY
+    skip-openid-provider-tls-verify: true
+    listen: :3000
+    listen-admin: :4000
+    redirection-url: https://application.kryukov.local
+    enable-logout-redirect: true
+    enable-encrypted-token: true
+    enable-json-logging: true
+    resources:
+    - uri: /
+      white-listed: true
+    - uri: /g1.html
+      groups:
+      - g1
+    - uri: /g2.html
+      groups:
+      - g2
+    - uri: /favicon
+      white-listed: true
+    - uri: /css/*
+      white-listed: true
+    headers:
+      BiTest: allowed
+    upstream-url: http://openresty:80
