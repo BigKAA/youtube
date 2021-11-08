@@ -1,16 +1,16 @@
 # Notification
 
-https://argocd-notifications.readthedocs.io/en/stable/)
+https://argocd-notifications.readthedocs.io/en/stable/
+
+Учитываем неточности в документации на сайте :)
 
 ## Telegram chat
     
 В телеграмме ищем бот BotFather.
 
-    /newbot
+Создаём своего бота (/newbot). Получаем token. Сохраняем его в secret.
 
-Создаём своего бота. Получаем token. Сохраняем его в secret.
-
-Создаём группу. Добавляем в нее бота.
+В телеграмм создаём группу и добавляем в нее бота.
 
 От своего пользователя пишем в группу тестовое сообщение.
 
@@ -42,8 +42,8 @@ stringData:
 
 Деплоим приложение notification.
 
-Или в командной строке:
+* Или в командной строке:
 
     kubectl -n argocd apply -f 00-rbac.yaml -f 01-configs.yaml -f 02-deployment.yaml
 
-или в ArgoCD 00-notification.yaml
+* или в ArgoCD 00-notification.yaml
