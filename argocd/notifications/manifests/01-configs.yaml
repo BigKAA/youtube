@@ -516,7 +516,7 @@ data:
       send:
       - app-sync-succeeded
       when: app.status.operationState.phase in ['Succeeded']
-  service.telegram: |
+  service.telegram.kryukovbiz: |
     token: $telegram-token
 #  service.email.my_server: |
 #    username: $email-username

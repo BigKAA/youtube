@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: notifications
+  name: application
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-    notifications.argoproj.io/subscribe.on-sync-succeeded.telegram: "-1001716159312"
+    notifications.argoproj.io/subscribe.on-sync-succeeded.kryukovbiz: "-1001716159312"
 spec:
   project: application
   source:
