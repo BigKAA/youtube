@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: notifications
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.telegram: "-1001716159312"
+spec:
+  project: application
+  source:
+    repoURL: 'https://github.com/BigKAA/youtube'
+    path: argocd/notifications/manifests/app
+    targetRevision: master
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
