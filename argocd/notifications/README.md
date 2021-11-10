@@ -47,3 +47,7 @@ stringData:
     kubectl -n argocd apply -f 00-rbac.yaml -f 01-configs.yaml -f 02-deployment.yaml
 
 * или в ArgoCD 00-notification.yaml
+
+## Ссылка на видео.
+
+[<img src="https://img.youtube.com/vi/ayHXgjc0guM/maxresdefault.jpg" width="50%">](https://youtu.be/ayHXgjc0guM)
