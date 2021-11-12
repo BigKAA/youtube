@@ -87,6 +87,10 @@ CREATE TABLE vault_ha_locks (
 Получили ключ для unseal.
 
     cat cluster-keys.json | jq -r ".unseal_keys_b64[]"
+
+Ключ сохраняем где-то в сейфе. Потому как он будет необходим при каждом запуске
+пода vault.
+
     VAULT_UNSEAL_KEY=$(cat cluster-keys.json | jq -r ".unseal_keys_b64[]")
     kubectl -n vault exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
     kubectl -n vault exec vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY
