@@ -5,9 +5,15 @@ metadata:
 spec:
   provider: vault
   parameters:
-    vaultAddress: "http://vault.vault:8200"
+    vaultAddress: "http://vault.vault.svc:8200"
     roleName: "application"
     objects: |
       - objectName: "application"
+        secretPath: "secret/data/application"
+        secretKey: "application"
+      - objectName: "user"
+        secretPath: "secret/data/application"
+        secretKey: "user"
+      - objectName: "password"
         secretPath: "secret/data/application"
         secretKey: "password"

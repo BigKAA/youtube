@@ -40,23 +40,16 @@ spec:
       serviceAccountName: application-sa
       initContainers:
         - name: prepare
-          # image: busybox:1.34.1
-          image: bigkaa/m_busybox:3.14.2
+          image: busybox:1.34.1
           imagePullPolicy: "IfNotPresent"
-          envFrom:
-            - secretRef:
-                name: gatekeeper
           command:
             - sh
             - -c
             - |
-              #sed -e "s/\$CLIENT_ID/$(echo $CLIENT_ID)/" \
-              #    -e "s/\$CLIENT_SECRET/$(echo $CLIENT_SECRET)/" \
-              #    -e "s/\$ENCRYPTION_KEY/$(echo $ENCRYPTION_KEY)/" \
-              #    /mnt-template/config.yaml > /mnt/config.yaml
-              # envsubst < /mnt-template/config.yaml > /mnt/config.yaml
-              # cat /mnt/config.yaml
-              cat /mnt/secrets-store/db-password
+              sed -e "s/\$APPLICATION_FROM_VAULT/$(cat /mnt/secrets-store/application)/" \
+                  -e "s/\$USER_FROM_VAULT/$(cat /mnt/secrets-store/user)/" \
+                  -e "s/\$PASSWORD_FROM_VAULT/$(cat /mnt/secrets-store/password)/" \
+                  /mnt-template/index.html > /mnt/index.html
               echo "Done"
           volumeMounts:
             - name: secrets-store-inline
@@ -94,7 +87,7 @@ spec:
               cpu: "0.1"
               memory: "200Mi"
           volumeMounts:
-            - name: config-template
+            - name: config
               mountPath: /usr/local/openresty/nginx/html/
       volumes:
         - name: config-template
