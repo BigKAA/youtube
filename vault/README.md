@@ -60,10 +60,19 @@ CREATE TABLE vault_ha_locks (
 #### Командная строка
 
     kubectl create ns vault
-    kubectl -n vault apply -f manifests/00-vault.yaml
+    kubectl -n vault apply -f manifests/00-vault.yaml -f manifests/01-mwc.yaml 
 
 #### ArgoCD
 
+В ArgoCD один ресурс приходится исключать из синхронизации.
+
+```yaml
+    annotations:
+        ## Отключаем синхронизацию в ArgoCD
+        argocd.argoproj.io/hook: Skip
+```
+
+    kubectl -n vault apply -f manifests/01-mwc.yaml
     kubectl apply -f argo-app/vault-app.yaml
 
 ## Первичная настройка
