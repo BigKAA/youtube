@@ -546,7 +546,7 @@ metadata:
     app.kubernetes.io/name: vault-agent-injector
     app.kubernetes.io/instance: vault
   annotations:
-    argocd.argoproj.io/hook: Skip
+    argocd.argoproj.io/hook: PreSync
 webhooks:
   - name: vault.hashicorp.com
     sideEffects: None
