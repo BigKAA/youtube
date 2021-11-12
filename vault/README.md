@@ -45,35 +45,14 @@ CREATE TABLE vault_ha_locks (
 Подготавливаем файл [values.yaml](values.yaml) с учетом того, что vault будет работать в режиме HA и в качестве
 хранилища используется PostgreSQL, установленный в нашем же кластере.
 
-### Установка при помощи helm
+### helm install
 
     helm repo add hashicorp https://helm.releases.hashicorp.com
     helm repo update
     helm install --namespace vault --create-namespace vault hashicorp/vault -f values.yaml 
     
-### Тем, кто не любит helm
+### ArgoCD install
 
-Получаем шаблон и рихтуем его. 
-
-    helm template vault hashicorp/vault --namespace vault -f values.yaml | \
-    sed -e '/managed-by/d' -e '/helm.sh/d' > manifests/00-vault.yaml
-    
-#### Командная строка
-
-    kubectl create ns vault
-    kubectl -n vault apply -f manifests/00-vault.yaml -f manifests/01-mwc.yaml 
-
-#### ArgoCD
-
-В ArgoCD один ресурс приходится исключать из синхронизации.
-
-```yaml
-    annotations:
-        ## Отключаем синхронизацию в ArgoCD
-        argocd.argoproj.io/hook: Skip
-```
-
-    kubectl -n vault apply -f manifests/01-mwc.yaml
     kubectl apply -f argo-app/vault-app.yaml
 
 ## Secrets store CSI driver

@@ -1,5 +1,5 @@
 injector:
-  enable: false
+  enabled: false
 
 server:
   image:
@@ -49,7 +49,7 @@ server:
       service_registration "kubernetes" {}
 
 csi:
-  enable: true
+  enabled: true
   resources:
     requests:
       cpu: 50m

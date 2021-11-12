@@ -4,16 +4,78 @@ metadata:
   name: vault
   namespace: argocd
   finalizers:
-  - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io
 spec:
-  project: system-utils
-  source:
-    repoURL: 'https://github.com/BigKAA/youtube'
-    path: vault/manifests
-    targetRevision: master
   destination:
-    server: 'https://kubernetes.default.svc'
     namespace: vault
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: ''
+    repoURL: 'https://helm.releases.hashicorp.com'
+    targetRevision: 0.17.1
+    chart: vault
+    helm:
+      values: |
+        injector:
+          enabled: false
+        csi:
+          enabled: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 50m
+              memory: 128Mi
+        server:
+          image:
+            repository: "hashicorp/vault"
+            tag: "1.8.4"
+            pullPolicy: IfNotPresent
+          logLevel: "info"
+          logFormat: "json"
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 256Mi
+              cpu: 250m
+          priorityClassName: "medium-priority" # если они определены в кластере
+          #extraEnvironmentVars:
+          #  AWS_S3_ENDPOINT: "minio.minio.svc:9100"
+
+          dataStorage:
+            enabled: false
+          dev:
+            enabled: false
+          standalone:
+            enabled: false
+          ha:
+            enabled: true
+            replicas: 2
+
+            # Set the api_addr configuration for Vault HA
+            # See https://www.vaultproject.io/docs/configuration#api_addr
+            # If set to null, this will be set to the Pod IP Address
+            apiAddr: null
+
+            config: |
+              ui = true
+
+              listener "tcp" {
+                tls_disable = 1
+                address = "[::]:8200"
+                cluster_address = "[::]:8201"
+              }
+
+              storage "postgresql" {
+                connection_url = "postgres://vault:password@base-pgbouncer.pgo.svc:5432/vault?sslmode=disable"
+                ha_enabled = true
+              }
+
+              service_registration "kubernetes" {}
+  project: system-utils
   syncPolicy:
     automated:
       prune: true
