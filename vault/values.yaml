@@ -1,15 +1,5 @@
 injector:
-  metrics:
-    enabled: true
-  logFormat: "json"
-  resources:
-    requests:
-      memory: 256Mi
-      cpu: 250m
-    limits:
-      memory: 256Mi
-      cpu: 250m
-  priorityClassName: "medium-priority" # если они определены в кластере
+  enable: false
 
 server:
   image:
@@ -57,3 +47,13 @@ server:
       }
 
       service_registration "kubernetes" {}
+
+csi:
+  enable: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 50m
+      memory: 128Mi

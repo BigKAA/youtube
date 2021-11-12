@@ -55,7 +55,8 @@ CREATE TABLE vault_ha_locks (
 
 Получаем шаблон и рихтуем его. 
 
-    helm template vault hashicorp/vault --namespace vault -f values.yaml > manifests/00-vault.yaml
+    helm template vault hashicorp/vault --namespace vault -f values.yaml | \
+    sed -e '/managed-by/d' -e '/helm.sh/d' > manifests/00-vault.yaml
     
 #### Командная строка
 
@@ -74,6 +75,20 @@ CREATE TABLE vault_ha_locks (
 
     kubectl -n vault apply -f manifests/01-mwc.yaml
     kubectl apply -f argo-app/vault-app.yaml
+
+## Secrets store CSI driver
+
+Потребуется для подключения сикретов из vault в init контейнеры.
+
+### helm install
+
+    helm repo add secrets-store-csi-driver https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts
+    helm repo update
+    helm install --namespace vault csi secrets-store-csi-driver/secrets-store-csi-driver 
+
+### ArgoCD install
+
+    kubectl apply -f argo-app/csi-app.yaml
 
 ## Первичная настройка
 
@@ -100,3 +115,44 @@ CREATE TABLE vault_ha_locks (
     kubectl -n vault get pods
 
 Кластер vault собран и готов к работе.
+
+## Использование vault в приложении.
+
+     cat cluster-keys.json | jq -r ".root_token"
+
+Запоминаем токен
+
+    kubectl -n vault exec -it vault-0 -- /bin/sh
+    vault login
+
+Подставляем токен.
+
+    vault auth list
+    vault secrets enable -path=secret kv-v2
+    vault auth enable kubernetes
+    vault auth list
+
+    vault write auth/kubernetes/config \
+        kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" \
+        token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+        kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+        issuer="https://kubernetes.default.svc.cluster.local"
+
+Добавляем секрет
+
+    vault kv put secret/application password="HelloPassword"
+    vault kv get secret/application
+
+    vault policy write internal-app - <<EOF
+    path "secret/data/application" {
+      capabilities = ["read"]
+    }
+    EOF
+    vault policy read internal-app
+
+    vault write auth/kubernetes/role/application \
+    bound_service_account_names=application-sa \
+    bound_service_account_namespaces=default \
+    policies=internal-app \
+    ttl=20m
+

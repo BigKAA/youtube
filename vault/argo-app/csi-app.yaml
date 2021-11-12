@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: csi-driver
+spec:
+  destination:
+    namespace: vault
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: ''
+    repoURL: >-
+      https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts
+    targetRevision: 0.2.0
+    chart: secrets-store-csi-driver
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
