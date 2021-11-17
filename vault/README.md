@@ -4,6 +4,7 @@
 * https://www.hashicorp.com/products/vault
 * https://github.com/hashicorp/vault-helm
 * https://www.vaultproject.io/docs/configuration/storage/postgresql
+* https://github.com/kubernetes-sigs/secrets-store-csi-driver/
 
 ## Установка
 
@@ -106,7 +107,6 @@ CREATE TABLE vault_ha_locks (
 
 Подставляем токен.
 
-    vault auth list
     vault secrets enable -path=secret kv-v2
     vault auth enable kubernetes
     vault auth list
@@ -116,8 +116,6 @@ CREATE TABLE vault_ha_locks (
         token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
         kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
         issuer="https://kubernetes.default.svc.cluster.local"
-
-    https://kubernetes.default.svc.cluster.local
 
 Добавляем секрет
 

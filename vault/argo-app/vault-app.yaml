@@ -42,8 +42,6 @@ spec:
               memory: 256Mi
               cpu: 250m
           priorityClassName: "medium-priority" # если они определены в кластере
-          #extraEnvironmentVars:
-          #  AWS_S3_ENDPOINT: "minio.minio.svc:9100"
 
           dataStorage:
             enabled: false
@@ -55,9 +53,6 @@ spec:
             enabled: true
             replicas: 2
 
-            # Set the api_addr configuration for Vault HA
-            # See https://www.vaultproject.io/docs/configuration#api_addr
-            # If set to null, this will be set to the Pod IP Address
             apiAddr: null
 
             config: |
