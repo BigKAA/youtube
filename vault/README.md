@@ -135,3 +135,6 @@ CREATE TABLE vault_ha_locks (
     policies=internal-app \
     ttl=20m
 
+## Видео
+
+[<img src="https://img.youtube.com/vi/3zqjAqWH6Sw/maxresdefault.jpg" width="50%">](https://youtu.be/3zqjAqWH6Sw)
