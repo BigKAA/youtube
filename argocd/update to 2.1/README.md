@@ -7,7 +7,7 @@
 Мы должны сохранить предыдущие конфигурационные параметры, поэтому из файла удаляем:
 
 * Secret argocd-secret
-* ConfigMap argocd-rbac-cm
+* ConfigMap argocd-rbac-cm и argocd-cm
 
 Иначе при применении обновления, старые конфиги обнулятся.
 
