@@ -39,3 +39,7 @@ data:
 
 В ConfigMap argocd-cm исправляем url на https. Если вы используете keycloak, в keycloak в приложении argo 
 соответственно изменяем все на https.
+
+## Ссылка на видео.
+
+[<img src="https://img.youtube.com/vi/TQjLq6wac3Y/maxresdefault.jpg" width="50%">](https://youtu.be/TQjLq6wac3Y)

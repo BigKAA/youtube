@@ -32,6 +32,7 @@ Nexus внутри kubernetes, делаем свой docker registry.
   
 * **[ArgoCD](argocd/README.md)** - приложение для CD в k8s.
   * [ArgoCD Notifications](argocd/notifications) - уведомления ArgoCD.
+  * [ArgoCD upgrade from 2.0 to 2.1](argocd/update%20to%202.1) - процедура апгрейда с версии 2.0 на версию 2.1.
 * **[Harbor](harbor/README.md)** - хранилище образов контейнеров и много 
 дополнительных плюшек.
   
