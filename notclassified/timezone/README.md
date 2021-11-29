@@ -58,3 +58,6 @@ spec:
             path: /usr/share/zoneinfo/Europe/Moscow
 ```
 
+## Видео
+
+[<img src="https://img.youtube.com/vi/TwPqUEbJrhs/maxresdefault.jpg" width="50%">](https://youtu.be/TwPqUEbJrhs)
