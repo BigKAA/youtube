@@ -60,4 +60,4 @@ spec:
 
 ## Видео
 
-[<img src="https://img.youtube.com/vi/TwPqUEbJrhs/maxresdefault.jpg" width="50%">](https://youtu.be/TwPqUEbJrhs)
+[<img src="https://img.youtube.com/vi/2N_4jcG9dMA/maxresdefault.jpg" width="50%">](https://youtu.be/2N_4jcG9dMA)
