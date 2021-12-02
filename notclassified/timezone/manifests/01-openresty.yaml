@@ -50,6 +50,9 @@ spec:
         - name: openresty
           image: openresty/openresty:centos-rpm
           imagePullPolicy: IfNotPresent
+#          env:
+#            - name: "TZ"
+#              value: "Europe/Moscow"
           ports:
             - containerPort: 80
               name: http
