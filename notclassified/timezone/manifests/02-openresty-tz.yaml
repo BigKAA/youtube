@@ -50,6 +50,9 @@ spec:
         - name: openresty
           image: openresty/openresty:centos-rpm
           imagePullPolicy: IfNotPresent
+          env:
+            - name: "TZ"
+              value: "Europe/Moscow"
           ports:
             - containerPort: 80
               name: http
@@ -76,12 +79,7 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /usr/local/openresty/nginx/html/
-            - name: tz
-              mountPath: /etc/localtime
       volumes:
         - name: config
           configMap:
             name: openresty
-        - name:  tz
-          hostPath:
-            path: /usr/share/zoneinfo/Europe/Moscow

@@ -26,11 +26,11 @@
     Time_Offset +0300
 ```
 
-2. Подставить файл необходимой timezone.
+2. ~~Подставить файл необходимой timezone~~.
 
-Во втором случае придется немного повозиться. В большинстве контейнеров просто нет необходимого набора файлов
+~~Во втором случае придется немного повозиться. В большинстве контейнеров просто нет необходимого набора файлов
 timezone. Поэтому в качестве решения, можно подмонтировать файл timezone хостовой машины. Этот вариант демонстрируется 
-в файле [02-openresty-tz.yaml](manifests/02-openresty-tz.yaml). Ниже приведен усечённый вариант файла.
+в файле [02-openresty-tz.yaml](manifests/02-openresty-tz.yaml). Ниже приведен усечённый вариант файла.~~
 
 ```yaml
 kind: Deployment
@@ -56,6 +56,54 @@ spec:
         - name:  tz
           hostPath:
             path: /usr/share/zoneinfo/Europe/Moscow
+```
+
+2. Изменить timezone в контейнере.
+
+Для этого, в самом контейнере должен быть установлен пакет tzdata. Если его нет, то см. пункт 1 - "Забить".
+
+Если всё же хочется изменить timezone, тогда придется добавить в контейнер необходимый пакет. Лучше всего это сделать
+на стадии создания образа, чем добавлять команду установки пакета в init контейнере пода.
+
+Например, образ alpine идет без установленного пакета tzdata
+
+```
+docker run -it --name alpine alpine
+/ # date
+Mon Dec  6 07:25:57 UTC 2021
+/ # ls /etc/localtime
+ls: /etc/localtime: No such file or directory
+/ #
+```
+
+Пример добавления пакета.
+
+```dockerfile
+FROM alpine:latest
+RUN apk update && \
+    apk add --no-cache tzdata
+```
+
+После того как контейнер добавлен, для смены timezone ему достаточно передать переменную среды окружения
+TZ.
+
+```
+docker run -d --name opr -e "TZ=Europe/Moscow" openresty/openresty:centos-rpm
+$ docker exec -it opr sh
+sh-4.4# date
+Mon Dec  6 10:33:25 MSK 2021
+sh-4.4# ls -l /etc/localtime
+lrwxrwxrwx 1 root root 25 Sep 15 17:17 /etc/localtime -> ../usr/share/zoneinfo/UTC
+sh-4.4#
+```
+
+Если в контейнере не установен пакет tzdata, то определение переменной среды окружения не поможет.
+
+```
+docker run -it --name alpine -e "TZ=Europe/Moscow" alpine
+/ # date
+Mon Dec  6 07:36:09 UTC 2021
+/ #
 ```
 
 ## Видео
