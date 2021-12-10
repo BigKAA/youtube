@@ -1,31 +1,4 @@
 ---
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: openresty
-data:
-  index.html: |
-    <html>
-    <head>
-        <title>Тестовая страница</title>
-        <meta charset="UTF-8">
-    </head>
-    <body>
-      <h1>Тестовая страница</h1>
-    </body>
-    </html>
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: openresty
-spec:
-  ports:
-    - port: 80
-      targetPort: 80
-  selector:
-    k8s-app: openresty
----
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -36,7 +9,7 @@ metadata:
     reloader.stakater.com/auto: "true"
     configmap.reloader.stakater.com/reload: "openresty"
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -50,9 +23,6 @@ spec:
         - name: openresty
           image: openresty/openresty:centos-rpm
           imagePullPolicy: IfNotPresent
-#          env:
-#            - name: "TZ"
-#              value: "Europe/Moscow"
           ports:
             - containerPort: 80
               name: http
@@ -77,9 +47,14 @@ spec:
               cpu: "0.1"
               memory: "200Mi"
           volumeMounts:
-            - name: config
+            - name: html
               mountPath: /usr/local/openresty/nginx/html/
+            - name: config
+              mountPath: /etc/nginx/conf.d/
       volumes:
+        - name: html
+          configMap:
+            name: openresty-html
         - name: config
           configMap:
-            name: openresty
+            name: openresty-conf

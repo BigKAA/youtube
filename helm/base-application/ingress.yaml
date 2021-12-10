@@ -1,0 +1,20 @@
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: application
+  annotations:
+    kubernetes.io/ingress.class: "system-ingress"
+    certmanager.k8s.io/cluster-issuer: monitoring-issuer
+spec:
+  rules:
+    - host: "application.kryukov.local"
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: openresty
+                port:
+                  number: 80
