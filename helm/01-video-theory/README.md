@@ -69,4 +69,6 @@ Helm не может управлять приложениями, установ
 У нас не стоит задачи сделать супер chart с возможностью кастомизации всего и вся. Только базовый функционал,
 на котором можно понять как работает "кухня" helm charts.
 
+## Видео
 
+[<img src="https://img.youtube.com/vi/vv8SSYITzPE/maxresdefault.jpg" width="50%">](https://youtu.be/vv8SSYITzPE)
