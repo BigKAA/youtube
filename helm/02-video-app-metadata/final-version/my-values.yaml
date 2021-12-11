@@ -1,0 +1,4 @@
+fullnameOverride: "art"
+
+application:
+  reloader: true
