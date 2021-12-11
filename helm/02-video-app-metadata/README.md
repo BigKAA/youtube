@@ -364,3 +364,7 @@ helm template app ./openresty-art -f my-values.yaml > app.yaml
 Удалим приложение.
 
     helm uninstall app --namespace app
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/HgI_5kMhbhY/maxresdefault.jpg" width="50%">](https://youtu.be/HgI_5kMhbhY)
