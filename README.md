@@ -20,3 +20,4 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **[Подстановка данных из Secret](keycloak/gatekeeper/manifests-v3)** - подстановка данных из Secret в 
 конфигурационный файл приложения.
 * **[Всякое разное](notclassified)** - разные полезные мелочи.
+* **[Helm](helm)** - всякое про Helm
