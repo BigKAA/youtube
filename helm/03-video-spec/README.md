@@ -302,3 +302,7 @@ application:
 Проверим, что ресурсы корректно подставляются.
 
 На этом подготовка шаблона deployment.yaml завершена.
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/OWJYAhMuyJg/maxresdefault.jpg" width="50%">](https://youtu.be/OWJYAhMuyJg)
