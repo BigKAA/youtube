@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: openresty
+  name: {{ include "openresty-art.fullname" . }}-srv
 spec:
   ports:
     - port: 80

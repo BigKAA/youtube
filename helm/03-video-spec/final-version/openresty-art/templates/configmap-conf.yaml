@@ -2,7 +2,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: openresty-conf
+  name: {{ include "openresty-art.fullname" . }}y-conf
 data:
   default.conf: |
     server {
