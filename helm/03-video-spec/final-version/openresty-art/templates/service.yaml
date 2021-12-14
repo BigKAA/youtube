@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: openresty
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: openresty

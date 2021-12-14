@@ -1,0 +1,25 @@
+fullnameOverride: "art"
+
+application:
+  reloader: true
+  probes:
+    readinessProbe:
+      httpGet:
+        path: /index.html
+        port: http
+      initialDelaySeconds: 5
+      periodSeconds: 15
+    livenessProbe:
+      httpGet:
+        path: /index.html
+        port: http
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      timeoutSeconds: 5
+  resources:
+    limits:
+      cpu: "0.2"
+      memory: "400Mi"
+    requests:
+      cpu: "0.1"
+      memory: "200Mi"

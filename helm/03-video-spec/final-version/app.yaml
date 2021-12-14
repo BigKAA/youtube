@@ -1,0 +1,161 @@
+---
+# Source: openresty-art/templates/configmap-conf.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: openresty-conf
+data:
+  default.conf: |
+    server {
+        listen       80;
+        server_name  localhost;
+
+        location / {
+            root   /usr/local/openresty/nginx/html;
+            index  index.html index.htm;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/local/openresty/nginx/html;
+        }
+    }
+---
+# Source: openresty-art/templates/configmap-html.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: openresty-html
+data:
+  index.html: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+      <h1>Тестовая страница</h1>
+
+    </body>
+    </html>
+  50x.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title>Error</title>
+    <style>
+        body {
+            width: 35em;
+            margin: 0 auto;
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+        }
+    </style>
+    </head>
+    <body>
+    <h1>An error occurred.</h1>
+    <p>Sorry, the page you are looking for is currently unavailable.<br/>
+    Please try again later.</p>
+    </body>
+    </html>
+---
+# Source: openresty-art/templates/service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: openresty
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: openresty
+---
+# Source: openresty-art/templates/deployment.yaml
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: art
+  labels:
+    helm.sh/chart: openresty-art-0.1.0
+    app.kubernetes.io/name: openresty-art
+    app.kubernetes.io/instance: app
+    app.kubernetes.io/version: "1.19.9.1-centos-rpm"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: art-conf,art-html
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: openresty-art
+      app.kubernetes.io/instance: app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: openresty-art
+        app.kubernetes.io/instance: app
+    spec:
+      containers:
+        - name: art
+          image: "openresty/openresty:centos-rpm"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: 400Mi
+            requests:
+              cpu: "0.1"
+              memory: 200Mi
+          volumeMounts:
+            - name: html
+              mountPath: /usr/local/openresty/nginx/html/
+            - name: config
+              mountPath: /etc/nginx/conf.d/
+      volumes:
+        - name: html
+          configMap:
+            name: art-html
+        - name: config
+          configMap:
+            name: art-conf
+---
+# Source: openresty-art/templates/ingress.yaml
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: application
+  annotations:
+    kubernetes.io/ingress.class: "system-ingress"
+    certmanager.k8s.io/cluster-issuer: monitoring-issuer
+spec:
+  rules:
+    - host: "application.kryukov.local"
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: openresty
+                port:
+                  number: 80
