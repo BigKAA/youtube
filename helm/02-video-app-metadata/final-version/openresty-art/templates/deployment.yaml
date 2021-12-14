@@ -8,7 +8,7 @@ metadata:
   {{- if .Values.application.reloader }}
   annotations:
     reloader.stakater.com/auto: "true"
-    configmap.reloader.stakater.com/reload: {{ include "penresty-art.fullname" . }}-conf,{{ include "penresty-art.fullname" . }}-html
+    configmap.reloader.stakater.com/reload: {{ include "openresty-art.fullname" . }}-conf,{{ include "openresty-art.fullname" . }}-html
   {{- end }}
 spec:
   replicas: 2
@@ -56,7 +56,7 @@ spec:
       volumes:
         - name: html
           configMap:
-            name: openresty-html
+            name: {{ include "openresty-art.fullname" . }}-html
         - name: config
           configMap:
-            name: openresty-conf
+            name: {{ include "openresty-art.fullname" . }}-conf
