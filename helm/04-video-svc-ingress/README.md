@@ -122,3 +122,6 @@ ingress:
 Содержимое файла NOTE.txt выводится на стандартный вывод после установки 
 или обновления чарта (helm install или helm upgrade).
 
+## Видео
+
+[<img src="https://img.youtube.com/vi/dwS21jD7fq0/maxresdefault.jpg" width="50%">](https://youtu.be/dwS21jD7fq0)
