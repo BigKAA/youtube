@@ -1,0 +1,57 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ include "openresty-art.fullname" . }}
+  labels:
+    {{- include "openresty-art.labels" . | nindent 4 }}
+  {{- if .Values.application.reloader }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: {{ include "openresty-art.fullname" . }}-conf,{{ include "openresty-art.fullname" . }}-html
+  {{- end }}
+spec:
+  replicas: {{ .Values.application.replicaCount }}
+  revisionHistoryLimit: {{ .Values.application.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "openresty-art.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "openresty-art.selectorLabels" . | nindent 8 }}
+      {{- with .Values.application.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.application.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "openresty-art.fullname" . }}
+          image: "{{ .Values.application.image.repository }}:{{ .Values.application.image.tag | default "centos-rpm" }}"
+          imagePullPolicy: {{ .Values.application.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+              name: http
+          {{- with .Values.application.probes }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .Values.application.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: html
+              mountPath: /usr/local/openresty/nginx/html/
+            - name: config
+              mountPath: /etc/nginx/conf.d/
+      volumes:
+        - name: html
+          configMap:
+            name: {{ include "openresty-art.fullname" . }}-html
+        - name: config
+          configMap:
+            name: {{ include "openresty-art.fullname" . }}-conf
