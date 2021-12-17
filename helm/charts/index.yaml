@@ -1,0 +1,20 @@
+apiVersion: v1
+entries:
+  openresty-art:
+  - apiVersion: v2
+    appVersion: 1.19.9.1-centos-rpm
+    created: "2021-12-17T16:25:40.844176641+03:00"
+    description: My vision of openresty application
+    digest: d747bd4fad707b16dbcd051026e2cf0ac16ec9189ba27d372f4edaebdecce281
+    home: https://github.com/BigKAA/youtube/tree/master/helm
+    kubeVersion: '>= 1.19.0'
+    maintainers:
+    - email: artur@kryukov.biz
+      name: Artur Kryukov
+      url: https://www.kryukov.biz
+    name: openresty-art
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/BigKAA/youtube/master/helm/charts/openresty-art-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-12-17T16:25:40.840582435+03:00"
