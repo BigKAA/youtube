@@ -13,7 +13,7 @@ openresty-art - тестовый helm chart, пример для демонст�
 | application.replicaCount         |           1           | Количество реплик                                                                          |
 | application.revisionHistoryLimit |           3           | Ограничение revisionHistoryLimit                                                           |
 | application.podAnnotations       |          {}           | Аннотации, добавляемые в под                                                               |
-| application.imagePullSecrets     |          []           | Secret для доступа к containers repositiry                                                 |
+| application.imagePullSecrets     |          []           | Secret для доступа к containers repository                                                 |
 | application.image.repository     |  openresty/openresty  | Путь к образу контейнера в репозитории                                                     |
 | application.image.tag            |          ""           | Container tag                                                                              |
 | application.image.pullPolicy     |     IfNotPresent      | Политика                                                                                   |

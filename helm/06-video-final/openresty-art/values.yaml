@@ -17,7 +17,7 @@ application:
   #  prometheus.io/path: "/metrics"
   #  prometheus.io/port: "80"
 
-  # Secret для доступа к containers repositiry
+  # Secret для доступа к containers repository
   imagePullSecrets: []
   #  - name: MySecret
 
