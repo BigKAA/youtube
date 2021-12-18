@@ -1,0 +1,128 @@
+# Строка для частичного переопределения шаблона openresty-art.fullname (сохранит имя релиза)
+nameOverride: ""
+# Строка для частичного переопределения шаблона openresty-art.fullname
+fullnameOverride: ""
+
+# Параметры deployment
+application:
+  # Включение аннотации stakater reloader
+  reloader: false
+  # Количество реплик
+  replicaCount: 1
+  # Ограничение revisionHistoryLimit
+  revisionHistoryLimit: 3
+  # Аннотации, добавляемые в под
+  podAnnotations: {}
+  #  prometheus.io/scrape: "true"
+  #  prometheus.io/path: "/metrics"
+  #  prometheus.io/port: "80"
+
+  # Secret для доступа к containers repositiry
+  imagePullSecrets: []
+  #  - name: MySecret
+
+  # Параметры образа контейнера
+  image:
+    repository: openresty/openresty
+    tag: ""
+    pullPolicy: IfNotPresent
+  # Настройки проб
+  probes:
+    livenessProbe:
+      httpGet:
+        path: /
+        port: http
+    readinessProbe:
+      httpGet:
+        path: /
+        port: http
+  # Определение ресурсов.
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+# Настройки сервиса
+service:
+  # Services type может быть только ClusterIp или NodePort
+  type: ClusterIP
+  port: 80
+  name: ""
+  nodePort: ""
+
+# Настройки ingress
+ingress:
+  # По умолчанию ingress отключён
+  enabled: false
+  # Если необходимо, определите ingress class.
+  className: ""
+  # Аннотации.
+  # Аннотацию kubernetes.io/ingress.class в этом месте определять
+  # не надо. Используйте className выше.
+  annotations: {}
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# Основной конфигурационный файл.
+conf:
+  default: |
+    server {
+            listen       80;
+            server_name  localhost;
+
+            location / {
+                root   /usr/local/openresty/nginx/html;
+                index  index.html index.htm;
+            }
+
+            error_page   500 502 503 504  /50x.html;
+            location = /50x.html {
+                root   /usr/local/openresty/nginx/html;
+            }
+    }
+
+# Список html файлов.
+html:
+  index: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+    <h1>Тестовая страница</h1>
+
+    </body>
+    </html>
+  50x: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">
+        <title>Error</title>
+        <style>
+            body {
+                width: 35em;
+                margin: 0 auto;
+                font-family: Tahoma, Verdana, Arial, sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+    <h1>An error occurred.</h1>
+    <p>Sorry, the page you are looking for is currently unavailable.<br/>
+        Please try again later.</p>
+    </body>
+    </html>
