@@ -57,7 +57,7 @@ data:
 
     kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 
-usfpsGjWsI5c-L6K
+Получим что то типа: usfpsGjWsI5c-L6K
 
 Скачаем утилиту
 
