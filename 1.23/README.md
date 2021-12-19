@@ -5,6 +5,16 @@
 Кластер кубера установлен при помощи kubeadm. Придется поставить много чего руками. В 
 этот раз поставил сетевой драйвер [Cilium](https://docs.cilium.io/en/stable/).
 
+```
+kubectl get nodes
+NAME                     STATUS   ROLES                  AGE   VERSION
+control1.kryukov.local   Ready    control-plane,master   18h   v1.23.1
+db1.kryukov.local        Ready    <none>                 18h   v1.23.1
+worker1.kryukov.local    Ready    <none>                 18h   v1.23.1
+worker2.kryukov.local    Ready    <none>                 18h   v1.23.1
+worker3.kryukov.local    Ready    <none>                 18h   v1.23.1
+```
+
 _**Внимание!** У меня поднят DNS сервер, поддерживающий домен kryukov.local. Учтите это, когда будете читать данную ветку._
 
 _Эта ветка документации имеет справочный характер, видео по ней не будет._
