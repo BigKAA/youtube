@@ -47,11 +47,11 @@ data:
 
     kubectl -n argocd apply -f install.yaml
 
-## CLI
-
 Создадим сертификат и ingress:
 
     kubectl -n argocd apply -f 00-certs.yaml 01-ingress.yaml
+
+## CLI
 
 Получим пароль пользователя по умолчанию.
 
