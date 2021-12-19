@@ -59,7 +59,7 @@ data:
 
 Получим что то типа: usfpsGjWsI5c-L6K
 
-Скачаем утилиту
+Скачаем утилиту.
 
     curl -sSL -o /usr/local/bin/argocd  https://github.com/argoproj/argo-cd/releases/download/v2.2.1/argocd-linux-amd64
     chmod +x /usr/local/bin/argocd
@@ -79,9 +79,11 @@ data:
 
     kubectl -n argocd apply -f 02-argocd-cm.yaml -f 03-argocd-rbac-cm.yaml
 
-Затем в командной строке получаем список
+Затем в командной строке получаем список пользователей:
 
     argocd account list --grpc-web
+
+Меняем пароль у нового пользователя:
 
     argocd account update-password --account artur --grpc-web
     *** Enter current password:        <---- admin password
