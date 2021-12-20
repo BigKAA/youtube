@@ -56,3 +56,6 @@ namespace.
 
 ## Pgadmin
 
+Установка pgadmin простая как электровеник.
+
+Добавьте [project](../argo-sys-project.yaml) в ArgoCD. И запустите [argo приложение](pgadmin/argo/argo-app.yaml).
