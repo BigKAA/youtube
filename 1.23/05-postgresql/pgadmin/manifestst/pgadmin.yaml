@@ -15,13 +15,14 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: base-pgadmin-np
+  name: pgadmin-svc
   labels:
     name: postgres-operator
 spec:
   ports:
     - protocol: TCP
       port: 80
+      name: http
       targetPort: 80
       nodePort: 30861
   selector:
@@ -82,3 +83,23 @@ spec:
         - name: state
           persistentVolumeClaim:
             claimName: pgadmin-pvc
+---
+#pg.kryukov.local
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pgadmin
+  namespace: argocd
+spec:
+  ingressClassName: system-ingress
+  rules:
+    - host: pg.kryukov.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: pgadmin-svc
+                port:
+                  name: http
