@@ -6,6 +6,7 @@ metadata:
   annotations:
     volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
 spec:
+  storageClassName: "managed-nfs-storage"
   accessModes:
     - ReadWriteMany
   resources:
@@ -83,6 +84,8 @@ spec:
         - name: state
           persistentVolumeClaim:
             claimName: pgadmin-pvc
+
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
