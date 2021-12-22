@@ -23,7 +23,7 @@ _Эта ветка документации имеет справочный ха
 2. [Metallb](02-metallb) для сервисов типа LoadBalancer.
 3. [Ingress controller](03-ingress-controller).
 4. [ArgoCD](04-argocd).
+5. [PostgreSQL](05-postgresql).
 
 После установки ArgoCD всё остальное ПО буду устанавливать при помощи ArgoCD.
 
-5. [PostgreSQL](05-postgresql).
