@@ -1,0 +1,10 @@
+apiVersion: v2
+name: bigkaa-vmagent
+description: Victoriametrics agent
+type: application
+version: 0.7.36
+appVersion: 1.71.0
+dependencies:
+  - name: victoria-metrics-agent
+    version: 0.7.36
+    repository: https://victoriametrics.github.io/helm-charts/

@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vmagent
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: ''
+    namespace: monitoring
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: 1.23/charts/03-vmagent
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+        - my-values.yaml
+  project: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
