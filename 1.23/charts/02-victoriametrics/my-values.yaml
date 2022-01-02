@@ -1,9 +1,13 @@
 victoria-metrics-single:
+  rbac:
+    create: false
+    pspEnabled: false
+  serviceAccount:
+    create: false
   server:
     priorityClassName: "low-priority"
     retentionPeriod: 5h
     extraArgs:
-      VM_http.pathPrefix: "/vm"
       selfScrapeInterval: "15s"
       loggerLevel: "INFO"
     persistentVolume:
@@ -16,30 +20,22 @@ victoria-metrics-single:
       limits:
         cpu: "1"
         memory: 2Gi
-    readinessProbe:
-      httpGet:
-        path: /vm/health
-        port: http
-      initialDelaySeconds: 5
-      periodSeconds: 15
-      timeoutSeconds: 5
-      failureThreshold: 3
     ingress:
       enabled: true
       annotations:
-        ingress.kubernetes.io/rewrite-target: "/"
         certmanager.k8s.io/cluster-issuer: monitoring-issuer
       hosts:
-        - name: "mon.kryukov.local"
-          path: /vm
+        - name: "vm.kryukov.local"
+          path: /
           port: 9090
       tls:
         - secretName: "mon-tls"
           hosts:
-            - mon.kryukov.local
+            - vm.kryukov.local
       ingressClassName: system-ingress
     statefulSet:
       enabled: true
       podManagementPolicy: Parallel
     scrape:
       enabled: false
+
