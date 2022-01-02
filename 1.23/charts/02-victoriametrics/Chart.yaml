@@ -1,0 +1,10 @@
+apiVersion: v2
+name: bigkaa-victoriametrics
+description: Victoriametrics single (one executables) installation
+type: application
+version: 0.8.14
+appVersion: 1.71.0
+dependencies:
+  - name: victoria-metrics-single
+    version: 0.8.14
+    repository: https://victoriametrics.github.io/helm-charts
