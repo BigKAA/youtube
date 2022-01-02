@@ -3,17 +3,18 @@ kind: Application
 metadata:
   name: ksm-and-node-exporter
 spec:
-  project: monitoring
+  destination:
+    name: ''
+    namespace: monitoring
+    server: 'https://kubernetes.default.svc'
   source:
+    path: 1.23/charts/01-ksm-and-node-exporter
     repoURL: 'https://github.com/BigKAA/youtube'
-    path: 1.23/charts/01-kube-state-metrics-and-node-exporter
     targetRevision: HEAD
     helm:
       valueFiles:
         - values.yaml
-  destination:
-    server: 'https://kubernetes.default.svc'
-    namespace: monitoring
+  project: monitoring
   syncPolicy:
     automated:
       prune: true
