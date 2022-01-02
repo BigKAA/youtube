@@ -24,13 +24,6 @@ victoria-metrics-single:
       periodSeconds: 15
       timeoutSeconds: 5
       failureThreshold: 3
-    livenessProbe:
-      httpGet:
-        path: /vm/metrics
-        port: victoria
-      initialDelaySeconds: 5
-      periodSeconds: 15
-      timeoutSeconds: 5
     ingress:
       enabled: true
       annotations:
