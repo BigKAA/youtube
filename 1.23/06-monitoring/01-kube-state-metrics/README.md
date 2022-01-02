@@ -13,3 +13,5 @@
 ### ArgoCD
 
 ArgoCD использует чарты из директории [charts](../../charts).
+
+Приложение для ArgoCD - [argoapp.yaml](argoapp.yaml)
