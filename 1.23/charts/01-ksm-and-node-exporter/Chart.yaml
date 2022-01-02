@@ -1,5 +1,5 @@
 apiVersion: v2
-name: bigkaa-kube-state-metrics
+name: bigkaa-ksm-and-node-exporter
 description: Install kube-state-metrics to generate and expose cluster-level metrics
 type: application
 version: 4.2.0
@@ -7,4 +7,7 @@ appVersion: 2.3.0
 dependencies:
   - name: kube-state-metrics
     version: 4.2.0
+    repository: https://prometheus-community.github.io/helm-charts
+  - name: prometheus-node-exporter
+    version: 2.4.1
     repository: https://prometheus-community.github.io/helm-charts

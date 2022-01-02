@@ -6,7 +6,7 @@ spec:
   project: monitoring
   source:
     repoURL: 'https://github.com/BigKAA/youtube'
-    path: 1.23/charts/01-kube-state-metrics
+    path: 1.23/charts/01-kube-state-metrics-and-node-exporter
     targetRevision: HEAD
     helm:
       valueFiles:
