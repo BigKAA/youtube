@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ksm-and-node-exporter
+  name: victoriametrics
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -11,16 +11,14 @@ spec:
     namespace: monitoring
     server: 'https://kubernetes.default.svc'
   source:
-    path: 1.23/charts/01-ksm-and-node-exporter
+    path: 1.23/charts/02-victoriametrics
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: HEAD
     helm:
       valueFiles:
-        - values.yaml
+        - my-values.yaml
   project: monitoring
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
