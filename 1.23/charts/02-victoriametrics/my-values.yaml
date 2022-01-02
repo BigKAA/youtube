@@ -3,7 +3,7 @@ victoria-metrics-single:
     priorityClassName: "low-priority"
     retentionPeriod: 5h
     extraArgs:
-      http.pathPrefix: "/vm"
+      VM_http.pathPrefix: "/vm"
       selfScrapeInterval: "15s"
       loggerLevel: "INFO"
     persistentVolume:
