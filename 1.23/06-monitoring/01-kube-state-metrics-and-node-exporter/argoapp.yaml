@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: pgadmin
+  name: ksm-and-node-exporter
 spec:
   project: monitoring
   source:
