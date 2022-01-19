@@ -35,7 +35,7 @@
 подключаются и какие имена имеют.
 
     helm repo add hazelcast https://hazelcast-charts.s3.amazonaws.com/
-    helm repo aupdate
+    helm repo update
     helm search repo hazelcast
     helm template hazelcast hazelcast/hazelcast > hazelcast-app.yaml
 
