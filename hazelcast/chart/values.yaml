@@ -43,9 +43,9 @@ hazelcast:
         appender.file.strategy.type=DefaultRolloverStrategy
         appender.file.strategy.max=3
       fluent-bit.conf: |+
-        @SET infsystem=oasi
+        @SET infsystem=var
         @SET env=stage
-        @SET suffix=ugd
+        @SET suffix=port
 
         [SERVICE]
             Flush             1
