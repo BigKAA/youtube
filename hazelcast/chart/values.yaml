@@ -1,0 +1,178 @@
+hazelcast:
+  enabled: true
+  image:
+    repository: "hazelcast/hazelcast"
+    tag: "5.0"
+    pullPolicy: IfNotPresent
+  cluster:
+    memberCount: 2
+    # Жаль, но это в официальном чарте не предусмотрено.
+    # podManagementPolicy: Parallel
+
+  # Hazelcast properties
+  hazelcast:
+    # javaOpts are additional JAVA_OPTS properties for Hazelcast member
+    javaOpts: "-Dlog4j.configurationFile=/data/hazelcast/log4j2.properties"
+    # loggingLevel is the level of Hazelcast logs (OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL)
+    loggingLevel: INFO
+    # configurationFiles are any additional Hazelcast configuration files
+    configurationFiles:
+      log4j2.properties: |+
+        appenders = console, file
+        rootLogger.level=${env:LOGGING_LEVEL}
+        rootLogger.appenderRefs= STDOUT, RollingFile 
+        rootLogger.appenderRef.stdout.ref=STDOUT
+        rootLogger.appenderRef.file.ref=RollingFile
+        appender.console.type=Console
+        appender.console.name=STDOUT
+        appender.console.layout.type=PatternLayout
+        appender.console.layout.pattern=${env:LOGGING_PATTERN}
+        appender.file.type=RollingFile
+        appender.file.name=RollingFile
+        appender.file.fileName=${env:LOG_FILE_PATH}/${env:LOG_FILE}.log
+        appender.file.filePattern=${env:LOG_FILE_PATH}/${env:LOG_FILE}-%d{yyyy-MM-dd}-%i.log.gz
+        appender.file.layout.type=JsonLayout
+        appender.file.layout.compact=true
+        appender.file.layout.eventEol=true
+        appender.file.policies.type=Policies
+        appender.file.policies.time.type=TimeBasedTriggeringPolicy
+        appender.file.policies.time.interval=1
+        appender.file.policies.time.modulate=true
+        appender.file.policies.size.type=SizeBasedTriggeringPolicy
+        appender.file.policies.size.size=50MB
+        appender.file.strategy.type=DefaultRolloverStrategy
+        appender.file.strategy.max=3
+      fluent-bit.conf: |+
+        @SET infsystem=oasi
+        @SET env=stage
+        @SET suffix=ugd
+
+        [SERVICE]
+            Flush             1
+            Daemon            Off
+            Log_Level         info
+            Parsers_File      parsers.conf
+            HTTP_Server       On
+            HTTP_Listen       0.0.0.0
+            HTTP_Port         2020
+
+        @INCLUDE input-kubernetes.conf
+        @INCLUDE filter-kubernetes.conf
+        @INCLUDE output-elasticsearch.conf
+      parsers.conf: |+
+        [PARSER]
+            Name              podapp
+            Format            json
+            Time_Key          instant.nanoOfSecond
+            Time_Format       %s
+            Time_Keep         On
+            # Command      |  Decoder | Field | Optional Action
+            # =============|==================|=================
+            Decode_Field_As   escaped_utf8    log    do_next
+            Decode_Field_As   json       log
+      input-kubernetes.conf: |+
+        [INPUT]
+            Name              tail
+            Tag               ${infsystem}-${env}-${suffix}-${APP_NAME}.*
+            Parser            podapp
+            Path              ${LOG_FILE_PATH}/${LOG_FILE}.log
+            DB                ${LOG_FILE_PATH}/${LOG_FILE}.log.db
+            Mem_Buf_Limit     50MB
+            Refresh_Interval  10
+            Skip_Long_Lines   On
+      filter-kubernetes.conf: |+
+        [FILTER]
+            Name              modify
+            Match             ${infsystem}-${env}-${suffix}-${APP_NAME}.*
+            set app           ${APP_NAME}
+            set mamespace     ${APP_NAMESPACE}
+            set host          ${APP_NODENAME}
+            set pod           ${APP_POD}
+      output-elasticsearch.conf: |+
+        [OUTPUT]
+            Name              stdout
+            Match             *
+            # Name              forward
+            # Match             *
+            # Host              ${FLUENT_ELASTICSEARCH_HOST}
+            # Port              ${FLUENT_ELASTICSEARCH_PORT}
+
+  # affinity specifies the affinity/anti-affinity of different pods. The commented out
+  # example below shows how you could ensure your hazelcast pods are scheduled on
+  # different Kubernetes nodes
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - hazelcast
+          - key: role
+            operator: In
+            values:
+            - hazelcast
+        topologyKey: kubernetes.io/hostname
+
+  priorityClassName: "medium-priority"
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 1024Mi
+      cpu: 200m
+
+  # externalVolume is the configuration for any volume mounted as '/data/external/'
+  externalVolume:
+    emptyDir: {}
+
+  # Sidecar containers to add to the Hazelcast statefulset's pod spec.
+  sidecarContainers: 
+    - name: fluent-bit
+      image: fluent/fluent-bit:1.8
+      env:
+        - name: LOG_FILE
+          value: hazelcast
+        - name: LOG_FILE_PATH
+          value: /data/external
+        - name: APP_NAME
+          value: hazelcast
+        - name: APP_POD
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: APP_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: APP_NODENAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      imagePullPolicy: IfNotPresent
+      ports:
+        # Порты для сборщика метрик. На всякий случай.
+        - name: fluentbit-http
+          containerPort: 2020
+          protocol: TCP
+      volumeMounts:
+        - name: hazelcast-storage
+          mountPath: /fluent-bit/etc/
+        # Диск с логами из хэлм чарта приложения
+        - name: hazelcast-external
+          mountPath: /data/external
+
+  # Additional Environment variables
+  env:
+    - name: LOG_FILE
+      value: hazelcast
+    - name: LOG_FILE_PATH
+      value: /data/external
+
+  # Hazelcast Management Center application properties
+  mancenter:
+    # enabled is a flag to enable Management Center application
+    enabled: false

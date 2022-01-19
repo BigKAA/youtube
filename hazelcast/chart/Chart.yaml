@@ -1,0 +1,9 @@
+apiVersion: v2
+name: hazelcast-light
+description: Hazelcast light chart
+version: "0.0.1"
+dependencies:
+  - name: hazelcast
+    repository: https://hazelcast-charts.s3.amazonaws.com/
+    version: "5.3.2"
+    condition: hazelcast.enabled
