@@ -5,3 +5,4 @@
 * [Третье видео. завершаем шаблон Deployment.](03-video-spec)
 * [Четвёртое видео. Service, Ingress, NOTES.txt.](04-video-svc-ingress)
 * [Видео пять. ConfigMap.](05-video-cm)
+* [Видео шесть. Финальное](06-video-final)

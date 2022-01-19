@@ -227,7 +227,6 @@ hazelcast:
     helm install hazelcast hazelcast/hazelcast -f my-values.yaml
     helm list
 
-### ArgoCD
+## Видео
 
-Для argo можно использовать стандартный метод, когда в файл приложения ArgoCD добавляется содержимое файла values.
-Но я пойду другим путём - создам свой чарт.
+[<img src="https://img.youtube.com/vi/XWTYGHGHIbY/maxresdefault.jpg" width="50%">](https://youtu.be/XWTYGHGHIbY)
