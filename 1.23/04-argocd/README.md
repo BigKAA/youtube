@@ -7,10 +7,10 @@
 
     # kubectl create namespace argocd
     # kubectl -n argocd create secret tls kube-ca-secret \
-    --cert=/etc/kubernetes/ssl/ca.crt \
-    --key=/etc/kubernetes/ssl/ca.key
+    --cert=/etc/kubernetes/pki/ca.crt \
+    --key=/etc/kubernetes/pki/ca.key
 
-    # kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.yaml
+    # kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.6.1/cert-manager.yaml
 
 Namespace cert-manager создаётся автоматически.
 
@@ -18,7 +18,7 @@ Namespace cert-manager создаётся автоматически.
 
 Скачайте манифест.
 
-    curl -o install.yaml https://raw.githubusercontent.com/argoproj/argo-cd/v2.2.1/manifests/install.yaml
+    curl -o install.yaml https://raw.githubusercontent.com/argoproj/argo-cd/v2.2.3/manifests/install.yaml
 
 Откройте его в редакторе и найдите:
 
@@ -49,7 +49,7 @@ data:
 
 Создадим сертификат и ingress:
 
-    kubectl -n argocd apply -f 00-certs.yaml 01-ingress.yaml
+    kubectl -n argocd apply -f 00-certs.yaml -f 01-ingress.yaml
 
 ## CLI
 
@@ -61,7 +61,7 @@ data:
 
 Скачаем утилиту.
 
-    curl -sSL -o /usr/local/bin/argocd  https://github.com/argoproj/argo-cd/releases/download/v2.2.1/argocd-linux-amd64
+    curl -sSL -o /usr/local/bin/argocd  https://github.com/argoproj/argo-cd/releases/download/v2.2.3/argocd-linux-amd64
     chmod +x /usr/local/bin/argocd
     argocd version
 
