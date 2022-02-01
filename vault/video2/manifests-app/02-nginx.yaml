@@ -82,19 +82,6 @@ spec:
           ports:
             - containerPort: 80
               name: http
-          readinessProbe:
-            httpGet:
-              path: /index.html
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-          livenessProbe:
-            httpGet:
-              path: /index.html
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-            timeoutSeconds: 5
           resources:
             limits:
               cpu: "0.2"
