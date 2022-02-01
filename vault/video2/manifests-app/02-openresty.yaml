@@ -106,7 +106,8 @@ spec:
             - name: config
               mountPath: /usr/local/openresty/nginx/html/
             - name: server-conf
-              mountPath: /etc/nginx/conf.d/
+              mountPath: /usr/local/openresty/nginx/conf/nginx.conf
+              subPath: nginx.conf
         - name: vault-agent-rerender
           image: vault:1.9.3
           imagePullPolicy: IfNotPresent
