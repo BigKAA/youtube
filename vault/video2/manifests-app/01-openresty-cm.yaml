@@ -5,7 +5,7 @@ metadata:
   name: config
 data:
   default.conf: |
-    user 10001;
+    user nobody;
     server {
             listen       8080;
             server_name  localhost;
