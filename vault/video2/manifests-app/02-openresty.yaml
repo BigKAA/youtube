@@ -64,7 +64,7 @@ spec:
               value: 'true'
           volumeMounts:
           - mountPath: /etc/vault/config
-            name: vault-agent-config
+            name: vault-agent-configs
           - mountPath: /etc/vault/config/template/
             name: config-template
           - mountPath: /etc/vault/config/render/
@@ -121,7 +121,7 @@ spec:
               value: 'true'
           volumeMounts:
           - mountPath: /etc/vault/config
-            name: vault-agent-config
+            name: vault-agent-configs
           - mountPath: /etc/vault/config/template/
             name: config-template
           - mountPath: /etc/vault/config/render/
