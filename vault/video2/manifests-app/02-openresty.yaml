@@ -11,7 +11,7 @@ metadata:
 spec:
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: 8080
   selector:
     k8s-app: openresty
 
@@ -46,6 +46,9 @@ spec:
         - name: config
           emptyDir:
             medium: Memory
+        - name: server-conf
+          configMap:
+            name: config
       initContainers:
         - name: init-config
           image: vault:1.9.3
@@ -77,7 +80,7 @@ spec:
             runAsUser: 10001
             runAsNonRoot: true
           ports:
-            - containerPort: 80
+            - containerPort: 8080
               name: http
           readinessProbe:
             httpGet:
@@ -102,6 +105,8 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /usr/local/openresty/nginx/html/
+            - name: server-conf
+              mountPath: /etc/nginx/conf.d/
         - name: vault-agent-rerender
           image: vault:1.9.3
           imagePullPolicy: IfNotPresent
