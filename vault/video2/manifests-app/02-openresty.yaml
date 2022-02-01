@@ -77,7 +77,7 @@ spec:
             name: config
       containers:
         - name: openresty
-          image: openresty/openresty:centos-rpm
+          image: openresty/openresty:1.19.9.1-5-alpine
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsUser: 65534
