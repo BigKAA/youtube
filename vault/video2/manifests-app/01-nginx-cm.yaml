@@ -2,45 +2,11 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: nginx-config
-data:
-  nginx.conf: |
-    user  nobody;
-      events {
-      worker_connections  1024;
-    }
-    
-      
-      http {
-      include       mime.types;
-      default_type  application/octet-stream;
-      
-      client_body_temp_path /var/run/openresty/nginx-client-body;
-      proxy_temp_path       /var/run/openresty/nginx-proxy;
-      fastcgi_temp_path     /var/run/openresty/nginx-fastcgi;
-      uwsgi_temp_path       /var/run/openresty/nginx-uwsgi;
-      scgi_temp_path        /var/run/openresty/nginx-scgi;
-      
-      sendfile        on;
-      #tcp_nopush     on;
-      
-      #keepalive_timeout  0;
-      keepalive_timeout  65;
-      
-      #gzip  on;
-      
-      include /etc/nginx/conf.d/*.conf;
-    }
-
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
   name: default-config
 data:
   default.conf: |
     server {
-            listen       8080;
+            listen       80;
             server_name  localhost;
 
             location / {

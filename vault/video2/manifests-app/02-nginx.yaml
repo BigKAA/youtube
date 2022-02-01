@@ -46,9 +46,6 @@ spec:
         - name: config
           emptyDir:
             medium: Memory
-        #- name: nginx-config
-        #  configMap:
-        #    name: nginx-config
         - name: default-config
           configMap:
             name: default-config
@@ -92,9 +89,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /usr/share/nginx/html
-            #- name: nginx-config
-            #  mountPath: /etc/nginx/nginx.conf
-            #  subPath: nginx.conf
             - name: default-config
               mountPath: /etc/nginx/conf.d/
         - name: vault-agent-rerender
