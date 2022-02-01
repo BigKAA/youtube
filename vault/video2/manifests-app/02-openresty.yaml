@@ -46,9 +46,12 @@ spec:
         - name: config
           emptyDir:
             medium: Memory
-        - name: server-conf
+        - name: nginx-config
           configMap:
-            name: config
+            name: nginx-config
+        - name: default-config
+          configMap:
+            name: default-config
       initContainers:
         - name: init-config
           image: vault:1.9.3
@@ -105,9 +108,11 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /usr/local/openresty/nginx/html/
-            - name: server-conf
+            - name: nginx-config
               mountPath: /usr/local/openresty/nginx/conf/nginx.conf
               subPath: nginx.conf
+            - name: default-config
+              mountPath: /etc/nginx/conf.d/
         - name: vault-agent-rerender
           image: vault:1.9.3
           imagePullPolicy: IfNotPresent

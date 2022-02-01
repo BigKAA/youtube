@@ -2,7 +2,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: config
+  name: nginx-config
 data:
   nginx.conf: |
     user  nobody;
@@ -30,6 +30,28 @@ data:
       #gzip  on;
       
       include /etc/nginx/conf.d/*.conf;
+    }
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: default-config
+data:
+  default.conf: |
+    server {
+            listen       8080;
+            server_name  localhost;
+
+            location / {
+                root   /usr/local/openresty/nginx/html;
+                index  index.html index.htm;
+            }
+
+            error_page   500 502 503 504  /50x.html;
+            location = /50x.html {
+                root   /usr/local/openresty/nginx/html;
+            }
     }
 
 ---
