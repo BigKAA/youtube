@@ -15,6 +15,6 @@ spec:
             path: /
             backend:
               service:
-                name: openresty
+                name: nginx
                 port:
                   number: 8080

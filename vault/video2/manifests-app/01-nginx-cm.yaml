@@ -44,13 +44,13 @@ data:
             server_name  localhost;
 
             location / {
-                root   /usr/local/openresty/nginx/html;
+                root   /usr/share/nginx/html;
                 index  index.html index.htm;
             }
 
             error_page   500 502 503 504  /50x.html;
             location = /50x.html {
-                root   /usr/local/openresty/nginx/html;
+                root   /usr/share/nginx/html;
             }
     }
 
@@ -58,7 +58,7 @@ data:
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: openresty
+  name: nginx
 data:
   index.html.template: |
     <html>

@@ -7,31 +7,31 @@ metadata:
 kind: Service
 apiVersion: v1
 metadata:
-  name: openresty
+  name: nginx
 spec:
   ports:
     - port: 80
       targetPort: 8080
   selector:
-    k8s-app: openresty
+    k8s-app: nginx
 
 ---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: openresty
+  name: nginx
   labels:
-    k8s-app: openresty
+    k8s-app: nginx
 spec:
   replicas: 2
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      k8s-app: openresty
+      k8s-app: nginx
   template:
     metadata:
       labels:
-        k8s-app: openresty
+        k8s-app: nginx
     spec:
       #### Добавлен для работы vault
       serviceAccountName: application-sa
@@ -39,16 +39,16 @@ spec:
       volumes:
         - name: config-template
           configMap:
-            name: openresty
+            name: nginx
         - name: vault-agent-configs
           configMap:
             name: vault-agent-configs
         - name: config
           emptyDir:
             medium: Memory
-        - name: nginx-config
-          configMap:
-            name: nginx-config
+        #- name: nginx-config
+        #  configMap:
+        #    name: nginx-config
         - name: default-config
           configMap:
             name: default-config
@@ -57,7 +57,7 @@ spec:
           image: vault:1.9.3
           imagePullPolicy: IfNotPresent
           securityContext:
-            runAsUser: 65534
+            runAsUser: 10001
             runAsNonRoot: true
             capabilities:
               add:
@@ -76,11 +76,11 @@ spec:
           - mountPath: /etc/vault/config/render/
             name: config
       containers:
-        - name: openresty
-          image: openresty/openresty:1.19.9.1-5-alpine
+        - name: nginx
+          image: nginx:1.21.6-alpine
           imagePullPolicy: IfNotPresent
           securityContext:
-            runAsUser: 65534
+            runAsUser: 10001
             runAsNonRoot: true
           ports:
             - containerPort: 8080
@@ -107,17 +107,17 @@ spec:
               memory: "200Mi"
           volumeMounts:
             - name: config
-              mountPath: /usr/local/openresty/nginx/html/
-            - name: nginx-config
-              mountPath: /usr/local/openresty/nginx/conf/nginx.conf
-              subPath: nginx.conf
+              mountPath: /usr/share/nginx/html
+            #- name: nginx-config
+            #  mountPath: /etc/nginx/nginx.conf
+            #  subPath: nginx.conf
             - name: default-config
               mountPath: /etc/nginx/conf.d/
         - name: vault-agent-rerender
           image: vault:1.9.3
           imagePullPolicy: IfNotPresent
           securityContext:
-            runAsUser: 65534
+            runAsUser: 10001
             runAsNonRoot: true
             allowPrivilegeEscalation: false
             capabilities:
