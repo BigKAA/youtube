@@ -1,0 +1,128 @@
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: application-sa
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: openresty
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: openresty
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: openresty
+  labels:
+    k8s-app: openresty
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      k8s-app: openresty
+  template:
+    metadata:
+      labels:
+        k8s-app: openresty
+    spec:
+      #### Добавлен для работы vault
+      serviceAccountName: application-sa
+      shareProcessNamespace: true
+      volumes:
+        - name: config-template
+          configMap:
+            name: openresty
+        - name: vault-agent-configs
+          configMap:
+            name: vault-agent-configs
+        - name: config
+          emptyDir:
+            medium: Memory
+      initContainers:
+        - name: init-config
+          image: vault:1.9.3
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 10001
+            runAsNonRoot: true
+            capabilities:
+              add:
+                - IPC_LOCK
+          args:
+            - "agent"
+            - "-config=/etc/vault/config/vault-agent-init.hcl"
+          env:
+            - name: SKIP_SETCAP
+              value: 'true'
+          volumeMounts:
+          - mountPath: /etc/vault/config
+            name: vault-agent-config
+          - mountPath: /etc/vault/config/template/
+            name: config-template
+          - mountPath: /etc/vault/config/render/
+            name: config
+      containers:
+        - name: openresty
+          image: openresty/openresty:centos-rpm
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 10001
+            runAsNonRoot: true
+          ports:
+            - containerPort: 80
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: "400Mi"
+            requests:
+              cpu: "0.1"
+              memory: "200Mi"
+          volumeMounts:
+            - name: config
+              mountPath: /usr/local/openresty/nginx/html/
+        - name: vault-agent-rerender
+          image: vault:1.9.3
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 10001
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - IPC_LOCK
+                - SYS_PTRACE
+          args:
+            - "agent"
+            - "-config=/etc/vault/config/vault-agent-reload.hcl"
+          env:
+            - name: SKIP_SETCAP
+              value: 'true'
+          volumeMounts:
+          - mountPath: /etc/vault/config
+            name: vault-agent-config
+          - mountPath: /etc/vault/config/template/
+            name: config-template
+          - mountPath: /etc/vault/config/render/
+            name: config

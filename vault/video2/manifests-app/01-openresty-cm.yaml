@@ -1,0 +1,72 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: openresty
+data:
+  index.html.template: |
+    <html>
+    <head>
+        <title>Тестовая страница</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+      <h1>Тестовая страница</h1>
+
+      <p>Вот тут мы подставляем данные из hashicorp vault:</p>
+      <p>Приложение: <b>{{ with secret "secret/application" }}{{ .Data.data.application }}{{ end }}</b></p>
+      <p>Пользователь: <b>{{ with secret "secret/application" }}{{ .Data.data.user }}{{ end }}</b></p>
+      <p>Пароль: <b>{{ with secret "secret/application" }}{{ .Data.data.password }}{{ end }}</b></p>
+
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-agent-configs
+data:
+  vault-agent-init.hcl: |
+    pid_file = "/tmp/.pidfile"
+
+    auto_auth {
+      mount_path = "auth/approle"
+      method "kubernetes" {
+        config = {
+          role = "application"
+        }
+      }
+    }
+    template {
+      source      = "/etc/vault/config/template/index.html.template"
+      destination = "/etc/vault/config/render/index.html"
+    }
+
+    vault {
+      address = "http://vault.vault.svc:8200"
+    }
+    exit_after_auth = true
+  vault-agent-reload.hcl: |
+    pid_file = "/tmp/.pidfile"
+
+    auto_auth {
+      mount_path = "auth/approle"
+      method "kubernetes" {
+        config = {
+          role = "application"
+        }
+      }
+    }
+
+    template {
+      source      = "/etc/vault/config/template/index.html.template"
+      destination = "/etc/vault/config/render/index.html"
+      command = "ps ax | grep 'nginx: maste[r]' | awk '{print $1}' | xargs kill -s HUP"
+    }
+    template_config {
+          static_secret_render_interval = "1m"
+    }
+
+    vault {
+      address = "http://vault.vault.svc:8200"
+    }
