@@ -11,7 +11,7 @@ metadata:
 spec:
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 80
   selector:
     k8s-app: nginx
 
@@ -57,7 +57,7 @@ spec:
           image: vault:1.9.3
           imagePullPolicy: IfNotPresent
           securityContext:
-            runAsUser: 10001
+            runAsUser: 101
             runAsNonRoot: true
             capabilities:
               add:
@@ -79,11 +79,8 @@ spec:
         - name: nginx
           image: nginx:1.21.6-alpine
           imagePullPolicy: IfNotPresent
-          securityContext:
-            runAsUser: 10001
-            runAsNonRoot: true
           ports:
-            - containerPort: 8080
+            - containerPort: 80
               name: http
           readinessProbe:
             httpGet:
@@ -117,7 +114,7 @@ spec:
           image: vault:1.9.3
           imagePullPolicy: IfNotPresent
           securityContext:
-            runAsUser: 10001
+            runAsUser: 101
             runAsNonRoot: true
             allowPrivilegeEscalation: false
             capabilities:
