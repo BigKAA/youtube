@@ -5,10 +5,10 @@ metadata:
   name: config
 data:
   default.conf: |
+    user 10001;
     server {
             listen       8080;
             server_name  localhost;
-            user 10001;
 
             location / {
                 root   /usr/local/openresty/nginx/html;
