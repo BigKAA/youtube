@@ -29,7 +29,6 @@ data:
   vault-agent-init.hcl: |
     pid_file = "/tmp/.pidfile"
     auto_auth {
-      #ount_path = "auth/approle"
       method "kubernetes" {
         config = {
           role = "application"
@@ -47,7 +46,6 @@ data:
   vault-agent-reload.hcl: |
     pid_file = "/tmp/.pidfile"
     auto_auth {
-      #mount_path = "auth/approle"
       method "kubernetes" {
         config = {
           role = "application"
