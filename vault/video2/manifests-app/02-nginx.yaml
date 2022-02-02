@@ -46,9 +46,6 @@ spec:
         - name: config
           emptyDir:
             medium: Memory
-        - name: default-config
-          configMap:
-            name: default-config
       initContainers:
         - name: init-config
           image: vault:1.9.3
@@ -89,8 +86,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /usr/share/nginx/html
-            - name: default-config
-              mountPath: /etc/nginx/conf.d/
         - name: vault-agent-rerender
           image: vault:1.9.3
           imagePullPolicy: IfNotPresent

@@ -2,28 +2,6 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: default-config
-data:
-  default.conf: |
-    server {
-            listen       80;
-            server_name  localhost;
-
-            location / {
-                root   /usr/share/nginx/html;
-                index  index.html index.htm;
-            }
-
-            error_page   500 502 503 504  /50x.html;
-            location = /50x.html {
-                root   /usr/share/nginx/html;
-            }
-    }
-
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
   name: nginx
 data:
   index.html.template: |
@@ -50,9 +28,8 @@ metadata:
 data:
   vault-agent-init.hcl: |
     pid_file = "/tmp/.pidfile"
-
     auto_auth {
-      mount_path = "auth/approle"
+      # ount_path = "auth/approle"
       method "kubernetes" {
         config = {
           role = "application"
@@ -63,23 +40,20 @@ data:
       source      = "/etc/vault/config/template/index.html.template"
       destination = "/etc/vault/config/render/index.html"
     }
-
     vault {
       address = "http://vault.vault.svc:8200"
     }
     exit_after_auth = true
   vault-agent-reload.hcl: |
     pid_file = "/tmp/.pidfile"
-
     auto_auth {
-      mount_path = "auth/approle"
+      # mount_path = "auth/approle"
       method "kubernetes" {
         config = {
           role = "application"
         }
       }
     }
-
     template {
       source      = "/etc/vault/config/template/index.html.template"
       destination = "/etc/vault/config/render/index.html"
@@ -88,7 +62,6 @@ data:
     template_config {
           static_secret_render_interval = "1m"
     }
-
     vault {
       address = "http://vault.vault.svc:8200"
     }
