@@ -21,3 +21,4 @@ Nexus внутри kubernetes, делаем свой docker registry.
 конфигурационный файл приложения.
 * **[Всякое разное](notclassified)** - разные полезные мелочи.
 * **[Helm](helm)** - всякое про Helm
+* **[Hashicorp vault](vault)**

@@ -1,0 +1,64 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: vault
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: ''
+    repoURL: 'https://helm.releases.hashicorp.com'
+    targetRevision: 0.17.1
+    chart: vault
+    helm:
+      values: |
+        injector:
+          enabled: false
+
+        server:
+          image:
+            repository: "hashicorp/vault"
+            tag: "1.8.4"
+            pullPolicy: IfNotPresent
+          logLevel: "info"
+          logFormat: "json"
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 256Mi
+              cpu: 250m
+          priorityClassName: "medium-priority" # если они определены в кластере
+
+          dataStorage:
+            enabled: false
+          dev:
+            enabled: true
+          standalone:
+            enabled: false
+          ha:
+            enabled: false
+            apiAddr: null
+            config: |
+              ui = true
+
+              listener "tcp" {
+                tls_disable = 1
+                address = "[::]:8200"
+                cluster_address = "[::]:8201"
+              }
+              service_registration "kubernetes" {}
+        csi:
+          enabled: false
+  project: system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

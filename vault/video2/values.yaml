@@ -1,0 +1,46 @@
+injector:
+  enabled: false
+
+server:
+  image:
+    repository: "hashicorp/vault"
+    tag: "1.8.4"
+    pullPolicy: IfNotPresent
+  logLevel: "info"
+  logFormat: "json"
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 256Mi
+      cpu: 250m
+  priorityClassName: "medium-priority" # если они определены в кластере
+
+  dataStorage:
+    enabled: false
+  dev:
+    enabled: true
+  standalone:
+    enabled: false
+  ha:
+    enabled: false
+
+    # Set the api_addr configuration for Vault HA
+    # See https://www.vaultproject.io/docs/configuration#api_addr
+    # If set to null, this will be set to the Pod IP Address
+    apiAddr: null
+
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+
+      service_registration "kubernetes" {}
+
+csi:
+  enabled: false
