@@ -11,10 +11,10 @@ alertmanager:
         paths:
           - path: /
             pathType: Prefix
-      tls:
-        - hosts:
-            - am.kryukov.local
-          secretName: am-tls
+    tls:
+      - hosts:
+          - am.kryukov.local
+        secretName: am-tls
   resources:
     limits:
       cpu: 100m
