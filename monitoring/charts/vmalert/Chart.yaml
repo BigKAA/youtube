@@ -1,0 +1,10 @@
+apiVersion: v2
+name: vmalert
+description: Victoriametrics vmalert
+type: application
+version: 0.4.17
+appVersion: v1.72.0
+dependencies:
+  - name: victoria-metrics-alert
+    version: 0.4.17
+    repository: https://victoriametrics.github.io/helm-charts/
