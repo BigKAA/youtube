@@ -1,0 +1,10 @@
+apiVersion: v2
+name: vmagent
+description: Victoriametrics agent
+type: application
+version: 0.7.37
+appVersion: 1.72.0
+dependencies:
+  - name: victoria-metrics-agent
+    version: 0.7.37
+    repository: https://victoriametrics.github.io/helm-charts/
