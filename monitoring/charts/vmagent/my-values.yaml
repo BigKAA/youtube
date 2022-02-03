@@ -5,8 +5,8 @@ victoria-metrics-agent:
     tag: "v1.72.0"
     pullPolicy: IfNotPresent
 
-  nameOverride: "vmagent"
-  fullnameOverride: "vmagent"
+  nameOverride: "vmagent-sys"
+  fullnameOverride: "vmagent-sys"
 
   # Это параметр зависит от установки victoriametrics
   remoteWriteUrls:
