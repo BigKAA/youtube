@@ -37,14 +37,11 @@ victoria-metrics-alert:
         groups:
           - name: resources-cpu
               rules:
-                #
-                # Metric: CPU node-exporter
-                #
                 - alert: NodeCpuUsage
-                expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle",project!="egip"}[5m])) without (cpu) * 100 > 85
-                for: 5m
-                labels:
-                  severity: warning
-                annotations:
-                  description: "Средняя загрузка процессора по ядрам на (instance {{ $labels.lhostname }}) превышает допустимые значения. \n\n Текущее значение: {{ humanize $value }}%."
-                  summary: "Дополнительная информация: \n "
+                  expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle",project!="egip"}[5m])) without (cpu) * 100 > 85
+                  for: 5m
+                  labels:
+                    severity: warning
+                  annotations:
+                    description: "Средняя загрузка процессора по ядрам на (instance {{ $labels.lhostname }}) превышает допустимые значения. \n\n Текущее значение: {{ humanize $value }}%."
+                    summary: "Дополнительная информация: \n "
