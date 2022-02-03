@@ -46,7 +46,6 @@ karma:
              - description
          filters:
            default: []
-             # - "@receiver=by-cluster-service"
          labels:
            color:
              static:
