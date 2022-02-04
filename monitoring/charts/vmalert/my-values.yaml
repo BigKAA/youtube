@@ -38,7 +38,7 @@ victoria-metrics-alert:
           - name: resources-cpu
             rules:
               - alert: NodeCpuUsage
-                expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle",project!="egip"}[5m])) without (cpu) * 100 > 85
+                expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) without (cpu) * 100 > 85
                 for: 5m
                 labels:
                   severity: warning
