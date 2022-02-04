@@ -1,0 +1,87 @@
+---
+# Source: vmalert/charts/victoria-metrics-alert/templates/server-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vmalert
+  labels:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+    helm.sh/chart: victoria-metrics-alert-0.4.17
+    app.kubernetes.io/managed-by: Helm
+spec:
+  minReadySeconds: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+      app.kubernetes.io/name: victoria-metrics-alert
+      app.kubernetes.io/instance: vmalert
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/name: victoria-metrics-alert
+        app.kubernetes.io/instance: vmalert
+        helm.sh/chart: victoria-metrics-alert-0.4.17
+        app.kubernetes.io/managed-by: Helm
+      annotations:
+        checksum/config: 74ac1080e5658b68c8379c4db55b6d3f4f9aed07ba4c090e6bfbf9bdee42c23c
+    spec:
+      serviceAccountName: vmalert-victoria-metrics-alert
+      securityContext:
+        {}
+      automountServiceAccountToken: true
+      containers:
+        - name: victoria-metrics-alert-server
+          securityContext:
+            {}
+          image: "victoriametrics/vmalert:v1.72.0"
+          args:
+            - '-rule=/config-cpu/alert-rules-cpu.yaml'
+            - -datasource.url=http://victoriametrics-victoria-metrics-single-server:8428
+            - -datasource.basicAuth.password=
+            - -datasource.basicAuth.username=
+            - -notifier.url=http://alertmanager:9093
+            - -remoteRead.url=
+            - -remoteWrite.url=
+            - -envflag.enable=true
+            - -envflag.prefix=VM_
+            - -loggerFormat=json
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8880
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: alerts-config-cpu
+              mountPath: /config-cpu
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+      priorityClassName: "low-priority"
+      volumes:
+        - name: alerts-config-cpu
+          configMap:
+            name: vmalert-alert-rules-config-cpu
