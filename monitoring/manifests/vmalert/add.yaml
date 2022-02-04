@@ -62,6 +62,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: vmalert-victoria-metrics-alert
+    namespace: monitoring
 roleRef:
   kind: ClusterRole
   name: vmalert-clusterrole
