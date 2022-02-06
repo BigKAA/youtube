@@ -10,13 +10,10 @@ spec:
     namespace: monitoring
     server: 'https://kubernetes.default.svc'
   source:
-    path: monitoring/charts/vmalert
+    path: monitoring/manifests/vmalert
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: monitoring
-    helm:
-      valueFiles:
-        - my-values.yaml
-  project: system
+  project:  monitoring
   syncPolicy:
     automated:
       prune: true

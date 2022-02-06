@@ -16,7 +16,7 @@ spec:
     helm:
       valueFiles:
         - my-values.yaml
-  project: system
+  project:  monitoring
   syncPolicy:
     automated:
       prune: true
