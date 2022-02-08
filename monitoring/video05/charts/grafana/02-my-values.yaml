@@ -45,7 +45,7 @@ grafana:
           orgId: 1
           folder: ''
           type: file
-          disableDeletion: true
+          disableDeletion: false
           editable: false
           options:
             path: /var/lib/grafana/dashboards/default
