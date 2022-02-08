@@ -48,7 +48,7 @@ grafana:
         disableDeletion: true
         editable: false
         options:
-          path: /etc/grafana/provisioning/dashboards/dashboards
+          path: /var/lib/grafana/dashboards/default
   dashboards:
     default:
       node-exporter:
