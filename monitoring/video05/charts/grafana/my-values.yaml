@@ -48,7 +48,7 @@ grafana:
         disableDeletion: true
         editable: false
         options:
-          path: /var/lib/grafana/dashboards/default
+          path: /etc/grafana/provisioning/dashboards/dashboards
     dashboards:
       default:
         local-dashboard:
