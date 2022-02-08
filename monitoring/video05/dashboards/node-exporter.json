@@ -12,6 +12,10 @@
       }
     ]
   },
+  "timezone": "browser",
+  "title": "Node Exporter Full",
+  "uid": "art-node-exporter",
+  "version": 67,
   "editable": false,
   "graphTooltip": 0,
   "gnetId": null,
@@ -14058,9 +14062,5 @@
       "7d",
       "30d"
     ]
-  },
-  "timezone": "browser",
-  "title": "Node Exporter Full",
-  "uid": "rYdddlPWk",
-  "version": 67
+  }
 }
