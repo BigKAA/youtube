@@ -37,6 +37,22 @@ grafana:
     server:
       domain: grafana.kryukov.local
       root_url: https://grafana.kryukov.local
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: true
+        editable: false
+        options:
+          path: /var/lib/grafana/dashboards/default
+    dashboards:
+      default:
+        local-dashboard:
+          url: https://raw.githubusercontent.com/BigKAA/youtube/monitoring/monitoring/video05/dashboards/node-exporter-full.json
   datasources:
     datasources.yaml:
       apiVersion: 1
