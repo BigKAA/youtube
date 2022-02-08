@@ -53,7 +53,6 @@ grafana:
     default:
       node-exporter:
         url: 'https://raw.githubusercontent.com/BigKAA/youtube/monitoring/monitoring/video05/dashboards/node-exporter.json'
-        b64content: true
   datasources:
     datasources.yaml:
       apiVersion: 1
