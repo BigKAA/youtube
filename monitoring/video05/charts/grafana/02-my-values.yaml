@@ -49,10 +49,10 @@ grafana:
           editable: false
           options:
             path: /var/lib/grafana/dashboards/default
-  dashboards:
-    default:
-      node-exporter:
-        url: 'https://raw.githubusercontent.com/BigKAA/youtube/monitoring/monitoring/video05/dashboards/node-exporter.json'
+  dashboards: {}
+    #default:
+    #  node-exporter:
+    #    url: 'https://raw.githubusercontent.com/BigKAA/youtube/monitoring/monitoring/video05/dashboards/node-exporter.json'
   datasources:
     datasources.yaml:
       apiVersion: 1
