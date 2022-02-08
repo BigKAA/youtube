@@ -51,8 +51,10 @@ grafana:
           path: /etc/grafana/provisioning/dashboards/dashboards
     dashboards:
       default:
-        local-dashboard:
-          url: https://raw.githubusercontent.com/BigKAA/youtube/monitoring/monitoring/video05/dashboards/node-exporter-full.json
+        node-exporter:
+          gnetId: 1860
+          revision: 25
+          datasource: Victoria
   datasources:
     datasources.yaml:
       apiVersion: 1
