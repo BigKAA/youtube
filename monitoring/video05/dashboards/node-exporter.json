@@ -1,40 +1,7 @@
 {
-  "__requires": [
-    {
-      "type": "panel",
-      "id": "gauge",
-      "name": "Gauge",
-      "version": ""
-    },
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "7.3.7"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "singlestat",
-      "name": "Singlestat",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
-        "$$hashKey": "object:1058",
         "builtIn": 1,
         "datasource": "Victoria",
         "enable": true,
@@ -46,24 +13,17 @@
     ]
   },
   "editable": false,
-  "gnetId": 1860,
   "graphTooltip": 0,
-  "id": "art-node-exporter",
+  "gnetId": null,
+  "id": null,
   "iteration": 1641803921158,
   "links": [
     {
       "icon": "external link",
       "tags": [],
-      "title": "GitHub",
+      "title": "Artur Kryukov",
       "type": "link",
-      "url": "https://github.com/rfrail3/grafana-dashboards"
-    },
-    {
-      "icon": "external link",
-      "tags": [],
-      "title": "Grafana",
-      "type": "link",
-      "url": "https://grafana.com/grafana/dashboards/1860"
+      "url": "https://www.kryukov.biz"
     }
   ],
   "panels": [
