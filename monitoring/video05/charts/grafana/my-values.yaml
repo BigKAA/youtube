@@ -49,12 +49,12 @@ grafana:
         editable: false
         options:
           path: /etc/grafana/provisioning/dashboards/dashboards
-    dashboards:
-      default:
-        node-exporter:
-          gnetId: 1860
-          revision: 25
-          datasource: Victoria
+  dashboards:
+    default:
+      node-exporter:
+        gnetId: 1860
+        revision: 25
+        datasource: Victoria
   datasources:
     datasources.yaml:
       apiVersion: 1
