@@ -52,7 +52,7 @@ grafana:
   dashboards:
     default:
       node-exporter:
-        url: https://example.com/repository/test-b64.json
+        url: https://raw.githubusercontent.com/BigKAA/youtube/monitoring/monitoring/video05/dashboards/node-exporter.json
         b64content: true
   datasources:
     datasources.yaml:
