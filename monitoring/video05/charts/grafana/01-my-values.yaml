@@ -33,6 +33,28 @@ grafana:
     accessModes:
       - ReadWriteOnce
     size: 2Gi
+  grafana.ini:
+    server:
+      domain: grafana.kryukov.local
+      root_url: https://grafana.kryukov.local
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: true
+        editable: false
+        options:
+          path: /var/lib/grafana/dashboards/default
+  dashboards:
+    default:
+      node-exporter:
+        gnetId: 1860
+        revision: 25
+        datasource: Victoria
   datasources:
     datasources.yaml:
       apiVersion: 1
