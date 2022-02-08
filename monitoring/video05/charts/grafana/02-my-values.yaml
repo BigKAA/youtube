@@ -38,17 +38,17 @@ grafana:
       domain: grafana.kryukov.local
       root_url: https://grafana.kryukov.local
   dashboardProviders:
-    dashboardproviders.yaml:
-      apiVersion: 1
-      providers:
-        - name: 'default'
-          orgId: 1
-          folder: ''
-          type: file
-          disableDeletion: false
-          editable: false
-          options:
-            path: /var/lib/grafana/dashboards/default
+    #dashboardproviders.yaml:
+    #  apiVersion: 1
+    #  providers:
+    #    - name: 'default'
+    #      orgId: 1
+    #      folder: ''
+    #      type: file
+    #      disableDeletion: false
+    #      editable: false
+    #      options:
+    #        path: /var/lib/grafana/dashboards/default
   dashboards: {}
     #default:
     #  node-exporter:
