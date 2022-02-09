@@ -46,6 +46,7 @@ grafana:
           folder: ''
           type: file
           disableDeletion: true
+          updateIntervalSeconds: 30
           editable: false
           options:
             path: /var/lib/grafana/dashboards/default
