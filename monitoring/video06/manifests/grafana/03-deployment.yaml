@@ -73,7 +73,7 @@ spec:
         runAsUser: 472
       initContainers:
         - name: init-chown-data
-          image: "busybox:1.31.1"
+          image: "busybox:1.35.0"
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsNonRoot: false
@@ -88,28 +88,35 @@ spec:
               echo "Convert from $FILE to ${FILE%.b64}" 
               base64 -d < $FILE > ${FILE%.b64}
             done
+            ls -l
+            for FILE in /tmp/*.zip
+            do
+              echo "Unzip $FILE"
+              unzip $FILE
+            done
+            ls -l
 
           volumeMounts:
           - name: storage
             mountPath: "/var/lib/grafana"
           - name: dashboard-daemonset
-            mountPath: "/tmp/daemonset.json.b64"
-            subPath: "daemonset.json.b64"
+            mountPath: "/tmp/daemonset.json.zip.b64"
+            subPath: "daemonset.json.b64.zip"
           - name: dashboard-deployment
-            mountPath: "/tmp/deployment.json.b64"
-            subPath: "deployment.json.b64"
+            mountPath: "/tmp/deployment.json.zip.b64"
+            subPath: "deployment.json.zip.b64"
           - name: dashboard-sts
-            mountPath: "/tmp/sts.json.b64"
-            subPath: "sts.json.b64"
+            mountPath: "/tmp/sts.json.zip.b64"
+            subPath: "sts.json.zip.b64"
           - name: dashboard-k8s
-            mountPath: "/tmp/k8s.json.b64"
-            subPath: "k8s.json.b64"
+            mountPath: "/tmp/k8s.json.zip.b64"
+            subPath: "k8s.json.zip.b64"
           - name: dashboard-main
-            mountPath: "/tmp/main.json.b64"
-            subPath: "main.json.b64"
+            mountPath: "/tmp/main.json.zip.b64"
+            subPath: "main.json.zip.b64"
           - name: dashboard-node-exporter
-            mountPath: "/tmp/node-exporter.json.b64"
-            subPath: "node-exporter.json.b64"
+            mountPath: "/tmp/node-exporter.json.zip.b64"
+            subPath: "node-exporter.json.zip.b64"
       enableServiceLinks: true
       containers:
         - name: grafana
