@@ -80,7 +80,7 @@ spec:
             runAsUser: 0
           command:
           - sh
-          - c
+          - -c
           - |
             mkdir -p /tmp2/grafana/dashboards/default 
             chown -R 472:472 /tmp2/grafana 
