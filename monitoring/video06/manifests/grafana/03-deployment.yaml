@@ -113,7 +113,7 @@ spec:
             mountPath: "/tmp/daemonset.json.gz.b64"
             subPath: "daemonset.json.gz.b64"
           - name: dashboard-deployment
-            mountPath: "/tmp/deployment.json.zip.b64"
+            mountPath: "/tmp/deployment.json.gz.b64"
             subPath: "deployment.json.gz.b64"
           - name: dashboard-sts
             mountPath: "/tmp/sts.json.gz.b64"
