@@ -104,7 +104,7 @@ spec:
             mountPath: "/tmp2/grafana"
           - name: dashboard-daemonset
             mountPath: "/tmp/daemonset.json.zip.b64"
-            subPath: "daemonset.json.b64.zip"
+            subPath: "daemonset.json.zip.b64"
           - name: dashboard-deployment
             mountPath: "/tmp/deployment.json.zip.b64"
             subPath: "deployment.json.zip.b64"
