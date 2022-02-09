@@ -95,9 +95,15 @@ spec:
             for FILE in /tmp/*.zip
             do
               echo "Unzip $FILE"
-              unzip $FILE -d /tmp2/grafana/dashboards/default
+              unzip $FILE 
+            done
+            ls -l /tmp/
+            for FILE in /tmp/*.json
+            do
+              mv -f $FILE . 
             done
             ls -l .
+            
 
           volumeMounts:
           - name: storage
