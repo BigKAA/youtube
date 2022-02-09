@@ -79,9 +79,8 @@ spec:
             runAsNonRoot: false
             runAsUser: 0
           command:
-          - | 
-            chown -R 472:472 /var/lib/grafana
-
+            - | 
+              chown -R 472:472 /var/lib/grafana
           volumeMounts:
           - name: storage
             mountPath: "/var/lib/grafana"
