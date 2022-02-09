@@ -176,6 +176,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: grafana
+  namespace: monitoring
   annotations:
     certmanager.k8s.io/cluster-issuer: monitoring-issuer
 spec:
