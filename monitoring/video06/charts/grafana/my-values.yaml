@@ -54,14 +54,7 @@ grafana:
     default:
       node-exporter:
         file: dashboards/node-exporter.json'
-      daemonset:
-        file: dashboards/daemonset.json'
-      sts:
-        file: dashboards/sts.json'
-      deployment:
-        file: dashboards/deployment.json'
-      k8s:
-        file: dashboards/k8s.json'
+
   datasources:
     datasources.yaml:
       apiVersion: 1
