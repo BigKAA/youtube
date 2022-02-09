@@ -91,7 +91,7 @@ spec:
               base64 -d < $FILE > ${FILE%.b64}
             done
             ls -l .
-            for FILE in /tmp/*.zip
+            for FILE in *.zip
             do
               echo "Unzip $FILE"
               unzip $FILE
