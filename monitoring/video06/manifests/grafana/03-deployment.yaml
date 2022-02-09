@@ -85,6 +85,7 @@ spec:
             mkdir -p /tmp2/grafana/dashboards/default 
             chown -R 472:472 /tmp2/grafana 
             cd /tmp2/grafana/dashboards/default
+            ls -l /tmp/
             for FILE in /tmp/*.b64
             do
               echo "Convert from $FILE to ${FILE%.b64}" 
@@ -94,8 +95,7 @@ spec:
             for FILE in /tmp/*.zip
             do
               echo "Unzip $FILE"
-              unzip $FILE
-              ls -l /tmp/
+              unzip $FILE -d /tmp2/grafana/dashboards/default
             done
             ls -l .
 
