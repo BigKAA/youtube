@@ -79,6 +79,8 @@ spec:
             runAsNonRoot: false
             runAsUser: 0
           command:
+            - sh
+            - c
             - | 
               chown -R 472:472 /tmp2/grafana
           volumeMounts:
