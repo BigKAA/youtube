@@ -90,11 +90,12 @@ spec:
               echo "Convert from $FILE to ${FILE%.b64}" 
               base64 -d < $FILE > ${FILE%.b64}
             done
-            ls -l .
-            for FILE in *.zip
+            ls -l /tmp/
+            for FILE in /tmp/*.zip
             do
               echo "Unzip $FILE"
               unzip $FILE
+              ls -l /tmp/
             done
             ls -l .
 
