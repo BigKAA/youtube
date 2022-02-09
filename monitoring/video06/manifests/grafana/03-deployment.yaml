@@ -88,13 +88,13 @@ spec:
               echo "Convert from $FILE to ${FILE%.b64}" 
               base64 -d < $FILE > ${FILE%.b64}
             done
-            ls -l
+            ls -l .
             for FILE in /tmp/*.zip
             do
               echo "Unzip $FILE"
               unzip $FILE
             done
-            ls -l
+            ls -l .
 
           volumeMounts:
           - name: storage
