@@ -183,6 +183,9 @@ spec:
           - name: config
             mountPath: "/etc/grafana/provisioning/dashboards/dashboardproviders.yaml"
             subPath: "dashboardproviders.yaml"
+          - name: config
+            mountPath: "/etc/grafana/provisioning/datasources/datasources.yaml"
+            subPath: "datasources.yaml"
           - name: storage
             mountPath: "/var/lib/grafana"
       volumes:
