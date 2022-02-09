@@ -15,6 +15,31 @@ spec:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/instance: grafana
 ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: monitoring
+  annotations:
+    certmanager.k8s.io/cluster-issuer: monitoring-issuer
+spec:
+  ingressClassName: system-ingress
+  tls:
+    - hosts:
+        - "grafana.kryukov.local"
+      secretName: grafana-tls
+  rules:
+    - host: "grafana.kryukov.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 80
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -171,28 +196,3 @@ spec:
         - name: dashboard-node-exporter
           configMap:
             name: dashboard-node-exporter
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: grafana
-  namespace: monitoring
-  annotations:
-    certmanager.k8s.io/cluster-issuer: monitoring-issuer
-spec:
-  ingressClassName: system-ingress
-  tls:
-    - hosts:
-        - "grafana.kryukov.local"
-      secretName: grafana-tls
-  rules:
-    - host: "grafana.kryukov.local"
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: grafana
-                port:
-                  number: 80
