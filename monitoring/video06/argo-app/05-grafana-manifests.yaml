@@ -10,7 +10,7 @@ spec:
     namespace: monitoring
     server: 'https://kubernetes.default.svc'
   source:
-    path: monitoring/video06/charts/grafana
+    path: monitoring/video06/manifests/grafana
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: monitoring
   project:  monitoring
