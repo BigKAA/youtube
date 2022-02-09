@@ -80,7 +80,7 @@ spec:
             runAsUser: 0
           command:
           - |
-            mkdir -p /var/lib/grafana/dashboards/default 
+            #mkdir -p /var/lib/grafana/dashboards/default 
             chown -R 472:472 /var/lib/grafana 
             #cd /var/lib/grafana/dashboards/default
             #for FILE in /tmp/*.b64
