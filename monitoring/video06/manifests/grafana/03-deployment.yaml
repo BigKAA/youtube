@@ -80,10 +80,10 @@ spec:
             runAsUser: 0
           command:
             - | 
-              chown -R 472:472 /var/lib/grafana
+              chown -R 472:472 /tmp2/grafana
           volumeMounts:
           - name: storage
-            mountPath: "/var/lib/grafana"
+            mountPath: "/tmp2/grafana"
           - name: dashboard-daemonset
             mountPath: "/tmp/daemonset.json.zip.b64"
             subPath: "daemonset.json.b64.zip"
