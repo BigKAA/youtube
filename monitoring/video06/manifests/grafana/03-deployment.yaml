@@ -79,22 +79,8 @@ spec:
             runAsNonRoot: false
             runAsUser: 0
           command:
-          - |
-            #mkdir -p /var/lib/grafana/dashboards/default 
-            chown -R 472:472 /var/lib/grafana 
-            #cd /var/lib/grafana/dashboards/default
-            #for FILE in /tmp/*.b64
-            #do
-            #  echo "Convert from $FILE to ${FILE%.b64}" 
-            #  base64 -d < $FILE > ${FILE%.b64}
-            #done
-            #ls -l .
-            #for FILE in /tmp/*.zip
-            #do
-            #  echo "Unzip $FILE"
-            #  unzip $FILE
-            #done
-            #ls -l .
+          - | 
+            chown -R 472:472 /var/lib/grafana
 
           volumeMounts:
           - name: storage
