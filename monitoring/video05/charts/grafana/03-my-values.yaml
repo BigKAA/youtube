@@ -52,7 +52,7 @@ grafana:
   dashboards:
     default:
       node-exporter:
-        file: dashboards/node-exporter.json'
+        file: dashboards/node-exporter.json
   datasources:
     datasources.yaml:
       apiVersion: 1
