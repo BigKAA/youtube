@@ -1,4 +1,4 @@
 prometheus-node-exporter:
 
-  extraArgs: [ ]
+  extraArgs:
     - --collector.systemd
