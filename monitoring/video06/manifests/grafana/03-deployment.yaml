@@ -135,6 +135,9 @@ spec:
           - name: dashboard-pods
             mountPath: "/tmp/pods.json.gz.b64"
             subPath: "pods.json.gz.b64"
+          - name: dashboard-victoria
+            mountPath: "/tmp/victoria.json.gz.b64"
+            subPath: "victoria.json.gz.b64"
       enableServiceLinks: true
       containers:
         - name: grafana
@@ -230,3 +233,6 @@ spec:
         - name: dashboard-pods
           configMap:
             name: dashboard-pods
+        - name: dashboard-victoria
+          configMap:
+            name: dashboard-victoria
