@@ -215,7 +215,7 @@ spec:
         - name: dashboard-k8s
           configMap:
             name: dashboard-k8s
-        - name: dashboard-home
+        - name: dashboard-main
           configMap:
             name: dashboard-main
         - name: dashboard-node-exporter
