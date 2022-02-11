@@ -21,7 +21,7 @@ data:
     domain = grafana.kryukov.local
     root_url = https://grafana.kryukov.local
     [dashboards]
-    default_home_dashboard_path = default/main.json
+    default_home_dashboard_path = /var/lib/grafana/dashboards/default/main.json
   datasources.yaml: |
     apiVersion: 1
     datasources:
