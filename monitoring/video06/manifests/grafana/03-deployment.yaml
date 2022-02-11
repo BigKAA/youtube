@@ -104,7 +104,6 @@ spec:
             done
             echo "============="
             ls -l .
-            
 
           volumeMounts:
           - name: storage
@@ -127,6 +126,15 @@ spec:
           - name: dashboard-node-exporter
             mountPath: "/tmp/node-exporter.json.gz.b64"
             subPath: "node-exporter.json.gz.b64"
+          - name: dashboard-nodes
+            mountPath: "/tmp/nodes.json.gz.b64"
+            subPath: "nodes.json.gz.b64"
+          - name: dashboard-pod
+            mountPath: "/tmp/pod.json.gz.b64"
+            subPath: "pod.json.gz.b64"
+          - name: dashboard-pods
+            mountPath: "/tmp/pods.json.gz.b64"
+            subPath: "pods.json.gz.b64"
       enableServiceLinks: true
       containers:
         - name: grafana
@@ -195,9 +203,6 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: grafana
-        - name: dashboards-default
-          configMap:
-            name: grafana-dashboards-default
         - name: dashboard-daemonset
           configMap:
             name: dashboard-daemonset
@@ -210,9 +215,18 @@ spec:
         - name: dashboard-k8s
           configMap:
             name: dashboard-k8s
-        - name: dashboard-main
+        - name: dashboard-home
           configMap:
             name: dashboard-main
         - name: dashboard-node-exporter
           configMap:
             name: dashboard-node-exporter
+        - name: dashboard-nodes
+          configMap:
+            name: dashboard-nodes
+        - name: dashboard-pod
+          configMap:
+            name: dashboard-pod
+        - name: dashboard-pods
+          configMap:
+            name: dashboard-pods
