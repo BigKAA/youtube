@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dashboard-home
+  name: dashboard-main
   namespace: monitoring
 data:
   home.json.gz.b64: |
