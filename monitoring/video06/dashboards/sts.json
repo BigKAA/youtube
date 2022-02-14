@@ -21,9 +21,22 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 7,
-  "iteration": 1644404432914,
-  "links": [],
+  "id": 9,
+  "iteration": 1644570509322,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Artur Kryukov",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://www.kryukov.biz"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
@@ -648,7 +661,8 @@
   "schemaVersion": 34,
   "style": "dark",
   "tags": [
-    "k8s"
+    "k8s",
+    "art-dashboards"
   ],
   "templating": {
     "list": [

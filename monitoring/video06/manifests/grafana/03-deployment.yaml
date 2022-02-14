@@ -206,33 +206,33 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: grafana
-        - name: dashboard-daemonset
+        - name: daemonset
           configMap:
             name: dashboard-daemonset
-        - name: dashboard-deployment
+        - name: deployment
           configMap:
             name: dashboard-deployment
-        - name: dashboard-sts
+        - name: sts
           configMap:
             name: dashboard-sts
         - name: dashboard-k8s
           configMap:
-            name: dashboard-k8s
+            name: k8s
         - name: dashboard-main
           configMap:
-            name: dashboard-main
+            name: main
         - name: dashboard-node-exporter
           configMap:
-            name: dashboard-node-exporter
+            name: node-exporter
         - name: dashboard-nodes
           configMap:
-            name: dashboard-nodes
+            name: nodes
         - name: dashboard-pod
           configMap:
-            name: dashboard-pod
+            name: pod
         - name: dashboard-pods
           configMap:
-            name: dashboard-pods
+            name: pods
         - name: dashboard-victoria
           configMap:
-            name: dashboard-victoria
+            name: victoria
