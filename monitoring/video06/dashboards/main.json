@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 10,
-  "iteration": 1644576516594,
+  "iteration": 1644825152930,
   "links": [
     {
       "asDropdown": false,
@@ -41,7 +41,7 @@
   "panels": [
     {
       "gridPos": {
-        "h": 7,
+        "h": 9,
         "w": 10,
         "x": 0,
         "y": 0
@@ -59,160 +59,6 @@
         }
       ],
       "type": "text"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${ds}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "displayMode": "auto",
-            "filterable": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Pod"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "",
-                    "url": "/d/art-k8s-pod-info/?var-pod=${__value.raw}&var-container${__data.fields.Container}"
-                  }
-                ]
-              },
-              {
-                "id": "custom.width",
-                "value": 219
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Container"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 209
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "namespace"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 128
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Restarts"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 68
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 10,
-        "x": 10,
-        "y": 0
-      },
-      "id": 20,
-      "options": {
-        "footer": {
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": []
-      },
-      "pluginVersion": "8.3.4",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PC7A11E9A55DE2B14"
-          },
-          "exemplar": false,
-          "expr": "(sum(delta(kube_pod_container_status_restarts_total[30m])) by (pod,container,namespace)) > 0",
-          "format": "table",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "Restart pods at last 30 min",
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "container": false,
-              "instance": true,
-              "job": true,
-              "namespace": false,
-              "uid": true
-            },
-            "indexByName": {
-              "Time": 0,
-              "Value": 4,
-              "container": 3,
-              "namespace": 1,
-              "pod": 2
-            },
-            "renameByName": {
-              "Value": "Restarts",
-              "container": "Container",
-              "pod": "Pod"
-            }
-          }
-        }
-      ],
-      "type": "table"
     },
     {
       "datasource": {
@@ -256,7 +102,7 @@
         "h": 3,
         "w": 5,
         "x": 10,
-        "y": 4
+        "y": 0
       },
       "id": 16,
       "links": [],
@@ -337,7 +183,7 @@
         "h": 3,
         "w": 5,
         "x": 15,
-        "y": 4
+        "y": 0
       },
       "id": 18,
       "links": [],
@@ -364,14 +210,91 @@
             "type": "prometheus",
             "uid": "${ds}"
           },
+          "exemplar": true,
           "expr": "sum(kube_pod_container_status_waiting{namespace=~\"$namespace\"})",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
+          "legendFormat": "",
           "refId": "A"
         }
       ],
       "title": "Containers Waiting",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "uid": "${ds}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 10,
+        "x": 10,
+        "y": 3
+      },
+      "id": 14,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "text": {}
+      },
+      "pluginVersion": "8.3.4",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", node=~\"$node\", namespace=~\"$namespace\"})",
+          "interval": "",
+          "legendFormat": "Requets",
+          "queryType": "randomWalk",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", node=~\"$node\", namespace=~\"$namespace\"})",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Limits",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "sum(kube_node_status_allocatable{resource=\"memory\",node=~\"$node\"})",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Allocatable",
+          "refId": "C"
+        }
+      ],
+      "title": "Memory Requested by Containers",
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -410,8 +333,8 @@
       "gridPos": {
         "h": 3,
         "w": 10,
-        "x": 0,
-        "y": 7
+        "x": 10,
+        "y": 6
       },
       "id": 12,
       "links": [],
@@ -461,86 +384,12 @@
       "type": "bargauge"
     },
     {
-      "datasource": {
-        "uid": "${ds}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "bytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 10,
-        "x": 10,
-        "y": 7
-      },
-      "id": 14,
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": true,
-        "text": {}
-      },
-      "pluginVersion": "8.3.4",
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", node=~\"$node\", namespace=~\"$namespace\"})",
-          "interval": "",
-          "legendFormat": "Requets",
-          "queryType": "randomWalk",
-          "refId": "A"
-        },
-        {
-          "exemplar": true,
-          "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", node=~\"$node\", namespace=~\"$namespace\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "Limits",
-          "refId": "B"
-        },
-        {
-          "exemplar": true,
-          "expr": "sum(kube_node_status_allocatable{resource=\"memory\",node=~\"$node\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "Allocatable",
-          "refId": "C"
-        }
-      ],
-      "title": "Memory Requested by Containers",
-      "type": "bargauge"
-    },
-    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 9
       },
       "id": 8,
       "panels": [],
@@ -916,7 +765,7 @@
         "h": 6,
         "w": 20,
         "x": 0,
-        "y": 11
+        "y": 10
       },
       "id": 4,
       "options": {

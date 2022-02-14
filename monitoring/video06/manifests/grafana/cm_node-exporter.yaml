@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
   node-exporter.json.gz.b64: |
-    H4sICF0nBmIAA25vZGUtZXhwb3J0ZXIuanNvbgDtfWlz4zjS5veN2P+A0fS77er2odOyJmI+uHxM
+    H4sICIgECmIAA25vZGUtZXhwb3J0ZXIuanNvbgDtfWlz4zjS5veN2P+A0fS77er2odOyJmI+uHxM
     e6cOT9nVHfPOdChoCrI4pkg1D7tctfX+9sXBmyCpg6RAKSui2xIBkYkECDz5ZCLx7X//L4RaimGY
     juJopmG3/oK+0Wvkqq7ZDvn6L/4V+ddZ2YOr6c6NQYo7h5HLE8VRbNO1VExKWr9qqmNamtKKVsGG
     8qDTYsdycbRgpk1ElzXVNC5M3bToHa3HB+WgfYi6nQ7532BwiDpvYnc3lDl79HnYIvR/0LmOLceO

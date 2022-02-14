@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
   deployment.json.gz.b64: |
-    H4sICPcmBmIAA2RlcGxveW1lbnQuanNvbgDtXOtv3DYS/16g/4OOKA7O3drdXduJWyAfnKQNimse
+    H4sICIYECmIAA2RlcGxveW1lbnQuanNvbgDtXOtv3DYS/16g/4OOKA7O3drdXduJWyAfnKQNimse
     zQu4S4wFV5rd5ZkiVZLyemP4/vYjqRcpUX4kzsOp8sFZzfA5nJnfcCTy7PvvoghhxrjCinAm0c/R
     maFpKiVS6ce3xWNU0S1vnhOqfmOaPRk55AQrLHkuYtActL0dPRZ4gRmOtreRWw4YnlNTRokcXMaK
     JCEyiTl7yCkXplmxnOOt8SiaTib6z/7+KJrc8VpnOLX9HzbTiv4eHVIQSnoFFRZLUM2USzIlKTHU
