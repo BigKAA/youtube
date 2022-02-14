@@ -206,15 +206,15 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: grafana
-        - name: daemonset
+        - name: dashboard-daemonset
           configMap:
-            name: dashboard-daemonset
-        - name: deployment
+            name: daemonset
+        - name: dashboard-deployment
           configMap:
-            name: dashboard-deployment
-        - name: sts
+            name: deployment
+        - name: dashboard-sts
           configMap:
-            name: dashboard-sts
+            name: sts
         - name: dashboard-k8s
           configMap:
             name: k8s
