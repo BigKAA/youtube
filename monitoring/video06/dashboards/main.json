@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 10,
-  "iteration": 1644825152930,
+  "iteration": 1644999320612,
   "links": [
     {
       "asDropdown": false,
@@ -48,7 +48,7 @@
       },
       "id": 2,
       "options": {
-        "content": "---\n* [Список серверов](/d/art-nodes)\n  * [Подробная информация о сервере](/d/art-node-exporter)\n* [Кластер k8s](/d/art-k8s)\n  * [Список подов кластера](/d/art-k8s-list-of-pods)\n  * [Подробная информация по подам](/d/art-k8s-pod-info)\n* [Victoriametrics](/d/art-victoria)\n           ",
+        "content": "---\n* [Список серверов](/d/art-nodes)\n  * [Подробная информация о сервере](/d/art-node-exporter)\n* [Кластер k8s](/d/art-k8s)\n  * [Список подов кластера](/d/art-k8s-list-of-pods)\n  * [Подробная информация по подам](/d/art-k8s-pod-info)\n* [Victoriametrics](/d/art-victoria)\n* [Ingress nginx controller](/d/art-ingress-nginx)\n           ",
         "mode": "markdown"
       },
       "pluginVersion": "8.3.4",
