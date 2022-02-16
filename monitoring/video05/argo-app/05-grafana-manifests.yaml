@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+  labels:
+    app: monitoring
+spec:
+  destination:
+    name: ''
+    namespace: monitoring
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: monitoring/video05/manifests/grafana
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: master
+  project:  monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

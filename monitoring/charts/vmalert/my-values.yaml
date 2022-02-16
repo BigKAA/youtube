@@ -1,0 +1,47 @@
+victoria-metrics-alert:
+  server:
+    image:
+      tag: "v1.72.0"
+    nameOverride: "vmalert"
+    fullnameOverride: "vmalert"
+    datasource:
+      url: "http://victoriametrics-victoria-metrics-single-server:8428"
+    notifier:
+      alertmanager:
+        url: "http://alertmanager:9093"
+    ingress:
+      enabled: true
+      ingressClassName: system-ingress
+      annotations:
+        certmanager.k8s.io/cluster-issuer: monitoring-issuer
+      hosts:
+        - name: vmalert.kryukov.local
+          path: /
+          port: http
+      pathType: Prefix
+      tls:
+        - hosts:
+            - vmalert.kryukov.local
+          secretName: vmalert-tls
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    priorityClassName: "low-priority"
+    # Тут будем добавлять алёрты
+    config:
+      alerts:
+        groups:
+          - name: resources-cpu
+            rules:
+              - alert: NodeCpuUsage
+                expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) without (cpu) * 100 > 85
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  description: "Средняя загрузка процессора по ядрам на (instance {{ $labels.lhostname }}) превышает допустимые значения. \n\n Текущее значение: {{ humanize $value }}%."
+                  summary: "Дополнительная информация: \n "

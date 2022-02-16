@@ -1,0 +1,10 @@
+apiVersion: v2
+name: ksm
+description: Install kube-state-metrics to generate and expose cluster-level metrics
+type: application
+version: 4.4.3
+appVersion: 2.3.0
+dependencies:
+  - name: kube-state-metrics
+    version: 4.4.3
+    repository: https://prometheus-community.github.io/helm-charts

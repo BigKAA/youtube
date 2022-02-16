@@ -1,0 +1,68 @@
+karma:
+  nameOverride: "karma"
+  fullnameOverride: "karma"
+  ingress:
+    enabled: true
+    annotations:
+      certmanager.k8s.io/cluster-issuer: monitoring-issuer
+    hosts:
+      - karma.kryukov.local
+    ingressClassName: "system-ingress"
+    path: /
+    pathType: Prefix
+    tls:
+    - secretName: karma-tls
+      hosts:
+      - karma.kryukov.local
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  configMap:
+    enabled: true
+    rawConfig:
+      alertmanager:
+        interval: 30s
+        servers:
+          - name: alertmanager
+            uri: http://alertmanager:9093
+            timeout: 10s
+            proxy: false
+            readonly: false
+      annotations:
+        default:
+          hidden: true
+        hidden: []
+        visible:
+          - summary
+          - description
+        keep: [ ]
+        strip: [ ]
+        order: [ ]
+        actions:
+          - description
+      filters:
+        default: []
+      labels:
+        color:
+          static:
+            - job
+          unique:
+            - instance
+            - "@receiver"
+            - severity
+        keep: []
+        strip: []
+      listen:
+        address: "0.0.0.0"
+        port: 8080
+        prefix: /
+      log:
+        config: false
+        level: info
+      receivers:
+        keep: []
+        strip: []

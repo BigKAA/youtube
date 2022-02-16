@@ -1,0 +1,160 @@
+---
+# Source: vmalert/charts/victoria-metrics-alert/templates/podsecuritypolicy.yaml
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: vmalert
+  labels:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+    helm.sh/chart: victoria-metrics-alert-0.4.17
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName:  'docker/default'
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    # Default set from Docker, with DAC_OVERRIDE and CHOWN
+    - ALL
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+  readOnlyRootFilesystem: false
+---
+# Source: vmalert/charts/victoria-metrics-alert/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vmalert-victoria-metrics-alert
+  labels:
+    helm.sh/chart: victoria-metrics-alert-0.4.17
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: vmalert/charts/victoria-metrics-alert/templates/clusterrolebinding.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vmalert-clusterrolebinding
+  labels:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+    helm.sh/chart: victoria-metrics-alert-0.4.17
+    app.kubernetes.io/managed-by: Helm
+subjects:
+  - kind: ServiceAccount
+    name: vmalert-victoria-metrics-alert
+    namespace: monitoring
+roleRef:
+  kind: ClusterRole
+  name: vmalert-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: vmalert/charts/victoria-metrics-alert/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name:  vmalert
+  labels:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+    helm.sh/chart: victoria-metrics-alert-0.4.17
+    app.kubernetes.io/managed-by: Helm
+rules:
+  - apiGroups:      ['extensions']
+    resources:      ['podsecuritypolicies']
+    verbs:          ['use']
+    resourceNames:  [vmalert]
+---
+# Source: vmalert/charts/victoria-metrics-alert/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vmalert
+  labels:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+    helm.sh/chart: victoria-metrics-alert-0.4.17
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vmalert
+subjects:
+  - kind: ServiceAccount
+    name: vmalert-victoria-metrics-alert
+---
+# Source: vmalert/charts/victoria-metrics-alert/templates/server-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+    helm.sh/chart: victoria-metrics-alert-0.4.17
+    app.kubernetes.io/managed-by: Helm
+  name: vmalert
+spec:
+  ports:
+    - name: http
+      port: 8880
+      targetPort: http
+      protocol: TCP
+  selector:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+  type: "ClusterIP"
+---
+# Source: vmalert/charts/victoria-metrics-alert/templates/server-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.k8s.io/cluster-issuer: monitoring-issuer
+  labels:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+    helm.sh/chart: victoria-metrics-alert-0.4.17
+    app.kubernetes.io/managed-by: Helm
+
+  name: vmalert
+spec:
+  ingressClassName: system-ingress
+  rules:
+    - host: vmalert.kryukov.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vmalert
+                port:
+                  number: 8880
+  tls:
+    - hosts:
+        - vmalert.kryukov.local
+      secretName: vmalert-tls

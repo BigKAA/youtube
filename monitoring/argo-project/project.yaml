@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: monitoring
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Monitoring applications
+  sourceRepos:
+  - 'https://github.com/BigKAA/youtube'
+  destinations:
+  - server: https://kubernetes.default.svc
+    namespace: 'monitoring'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

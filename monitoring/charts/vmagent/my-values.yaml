@@ -1,0 +1,65 @@
+victoria-metrics-agent:
+  replicaCount: 1
+  image:
+    repository: victoriametrics/vmagent
+    tag: "v1.72.0"
+    pullPolicy: IfNotPresent
+
+  nameOverride: "vmagent-sys"
+  fullnameOverride: "vmagent-sys"
+
+  # Это параметр зависит от установки victoriametrics
+  remoteWriteUrls:
+    - http://victoriametrics-victoria-metrics-single-server:8428/api/v1/write
+
+  service:
+    enabled: true
+    servicePort: 8429
+    type: ClusterIP
+  ingress:
+    enabled: true
+    annotations:
+      certmanager.k8s.io/cluster-issuer: monitoring-issuer
+
+    extraLabels: { }
+    hosts:
+      - name: vmagent.kryukov.local
+        path: /
+        port: http
+    tls:
+      - secretName: "vmagent-tls"
+        hosts:
+          - vmagent.kryukov.local
+    pathType: Prefix
+    ingressClassName: system-ingress
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 200Mi
+    limits:
+      cpu: 500m
+      memory: 600Mi
+
+  persistence:
+    enabled: true
+    storageClassName: managed-nfs-storage
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
+
+  config:
+    global:
+      scrape_interval: 10s
+
+  extraScrapeConfigs:
+    - job_name: 'node-exporter'
+      kubernetes_sd_configs:
+        - role: endpoints
+      relabel_configs:
+        - source_labels: [ __meta_kubernetes_endpoints_name ]
+          regex: 'nexporter-prometheus-node-exporter'
+          action: keep
+    - job_name: 'kube-state-metrics'
+      static_configs:
+        - targets: [ 'ksm-kube-state-metrics.monitoring.svc.cluster.local:8080' ]

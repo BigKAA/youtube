@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nexporter
+  labels:
+    app: monitoring
+spec:
+  destination:
+    name: ''
+    namespace: monitoring
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: monitoring/charts/nexporter
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: master
+    helm:
+      valueFiles:
+        - values.yaml
+  project:  monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
