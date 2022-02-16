@@ -12,7 +12,7 @@ spec:
   source:
     path: monitoring/manifests/reloader
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: monitoring
+    targetRevision: master
   project:  monitoring
   syncPolicy:
     automated:

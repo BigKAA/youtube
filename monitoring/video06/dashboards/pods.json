@@ -602,7 +602,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "k8s list of pods prod",
+  "title": "k8s list of pods",
   "uid": "art-k8s-list-of-pods",
   "version": 2,
   "weekStart": ""

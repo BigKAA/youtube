@@ -12,7 +12,7 @@ spec:
   source:
     path: monitoring/charts/alertmanager
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: monitoring
+    targetRevision: master
     helm:
       valueFiles:
         - my-values.yaml
