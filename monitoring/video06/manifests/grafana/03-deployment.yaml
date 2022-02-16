@@ -138,6 +138,9 @@ spec:
           - name: dashboard-victoria
             mountPath: "/tmp/victoria.json.gz.b64"
             subPath: "victoria.json.gz.b64"
+          - name: dashboard-ingress-nginx
+            mountPath: "/tmp/ingress-nginx.json.gz.b64"
+            subPath: "ingress-nginx.json.gz.b64"
       enableServiceLinks: true
       containers:
         - name: grafana
@@ -236,3 +239,6 @@ spec:
         - name: dashboard-victoria
           configMap:
             name: victoria
+        - name: dashboard-ingress-nginx
+          configMap:
+            name: ingress-nginx
