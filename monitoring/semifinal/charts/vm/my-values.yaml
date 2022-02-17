@@ -23,7 +23,7 @@ victoria-metrics-single:
     ingress:
       enabled: true
       annotations:
-        certmanager.k8s.io/cluster-issuer: monitoring-issuer
+        certmanager.k8s.io/issuer: monitoring-issuer
       hosts:
         - name: "vm.kryukov.local"
           path: /

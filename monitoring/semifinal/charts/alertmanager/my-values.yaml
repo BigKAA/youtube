@@ -5,7 +5,7 @@ alertmanager:
     enabled: true
     className: "system-ingress"
     annotations:
-      certmanager.k8s.io/cluster-issuer: monitoring-issuer
+      certmanager.k8s.io/issuer: monitoring-issuer
     hosts:
       - host: am.kryukov.local
         paths:

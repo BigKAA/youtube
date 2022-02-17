@@ -127,19 +127,11 @@ spec:
     app.kubernetes.io/instance: vmalert
   type: "ClusterIP"
 ---
-# Source: vmalert/charts/victoria-metrics-alert/templates/server-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    certmanager.k8s.io/cluster-issuer: monitoring-issuer
-  labels:
-    app: server
-    app.kubernetes.io/name: victoria-metrics-alert
-    app.kubernetes.io/instance: vmalert
-    helm.sh/chart: victoria-metrics-alert-0.4.17
-    app.kubernetes.io/managed-by: Helm
-
+    certmanager.k8s.io/issuer: monitoring-issuer
   name: vmalert
 spec:
   ingressClassName: system-ingress

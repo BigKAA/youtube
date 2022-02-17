@@ -21,7 +21,7 @@ metadata:
   name: grafana
   namespace: monitoring
   annotations:
-    certmanager.k8s.io/cluster-issuer: monitoring-issuer
+    certmanager.k8s.io/issuer: monitoring-issuer
 spec:
   ingressClassName: system-ingress
   tls:
