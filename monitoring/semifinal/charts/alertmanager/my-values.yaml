@@ -1,0 +1,33 @@
+alertmanager:
+  nameOverride: "alertmanager"
+  fullnameOverride: "alertmanager"
+  ingress:
+    enabled: true
+    className: "system-ingress"
+    annotations:
+      certmanager.k8s.io/cluster-issuer: monitoring-issuer
+    hosts:
+      - host: am.kryukov.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - am.kryukov.local
+        secretName: am-tls
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+  persistence:
+    enabled: true
+    storageClass: "managed-nfs-storage"
+    accessModes:
+      - ReadWriteOnce
+    size: 50Mi
+  config:
+    global:
+      resolve_timeout: 5m
