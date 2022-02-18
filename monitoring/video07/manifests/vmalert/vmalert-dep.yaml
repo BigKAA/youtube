@@ -31,8 +31,6 @@ spec:
     spec:
       containers:
         - name: victoria-metrics-alert-server
-          securityContext:
-            {}
           image: "victoriametrics/vmalert:v1.72.0"
           args:
             - '-datasource.url=http://victoriametrics-victoria-metrics-single-server:8428'
@@ -45,6 +43,7 @@ spec:
             - '-envflag.prefix=VM_'
             - '-loggerFormat=json'
             - '-rule=/node-exporter/*.yaml'
+            - '-rule=/kube/*.yaml'
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -71,8 +70,13 @@ spec:
           volumeMounts:
           - name: node-exporter
             mountPath: /node-exporter
+          - name: kube
+            mountPath: /kube
       priorityClassName: "low-priority"
       volumes:
         - name: node-exporter
           configMap:
             name: vma-rules-node-exporter
+        - name: kube
+          configMap:
+            name: vma-rules-kube
