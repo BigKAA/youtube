@@ -29,7 +29,6 @@ spec:
         app.kubernetes.io/name: victoria-metrics-alert
         app.kubernetes.io/instance: vmalert
     spec:
-      automountServiceAccountToken: true
       containers:
         - name: victoria-metrics-alert-server
           securityContext:
