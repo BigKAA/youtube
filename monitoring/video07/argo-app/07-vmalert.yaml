@@ -5,6 +5,7 @@ metadata:
   labels:
     app: monitoring
 spec:
+  revisionHistoryLimit: 3
   destination:
     name: ''
     namespace: monitoring
