@@ -1,5 +1,4 @@
 ---
-# Source: vmalert/charts/victoria-metrics-alert/templates/server-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8,8 +7,8 @@ metadata:
     app: server
     app.kubernetes.io/name: victoria-metrics-alert
     app.kubernetes.io/instance: vmalert
-    helm.sh/chart: victoria-metrics-alert-0.4.17
-    app.kubernetes.io/managed-by: Helm
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   minReadySeconds: 0
   replicas: 1
@@ -29,14 +28,7 @@ spec:
         app: server
         app.kubernetes.io/name: victoria-metrics-alert
         app.kubernetes.io/instance: vmalert
-        helm.sh/chart: victoria-metrics-alert-0.4.17
-        app.kubernetes.io/managed-by: Helm
-      annotations:
-        checksum/config: 74ac1080e5658b68c8379c4db55b6d3f4f9aed07ba4c090e6bfbf9bdee42c23c
     spec:
-      serviceAccountName: vmalert-victoria-metrics-alert
-      securityContext:
-        {}
       automountServiceAccountToken: true
       containers:
         - name: victoria-metrics-alert-server
