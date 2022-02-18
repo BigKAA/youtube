@@ -15,8 +15,8 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
-  "iteration": 1644570450616,
+  "id": 9,
+  "iteration": 1645170401147,
   "links": [
     {
       "icon": "external link",
@@ -13170,14 +13170,40 @@
       {
         "current": {
           "selected": false,
-          "text": "192.168.218.174:9100",
-          "value": "192.168.218.174:9100"
+          "text": "worker2.kryukov.local",
+          "value": "worker2.kryukov.local"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(node_uname_info{job=\"$job\"}, instance)",
+        "definition": "label_values(node_uname_info{job=\"$job\"},nodename)",
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "nodename",
+        "options": [],
+        "query": {
+          "query": "label_values(node_uname_info{job=\"$job\"},nodename)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "192.168.218.175:9100",
+          "value": "192.168.218.175:9100"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(node_uname_info{job=\"$job\",nodename=\"$nodename\"}, instance)",
         "hide": 0,
         "includeAll": false,
         "label": "Host:",
@@ -13185,7 +13211,7 @@
         "name": "node",
         "options": [],
         "query": {
-          "query": "label_values(node_uname_info{job=\"$job\"}, instance)",
+          "query": "label_values(node_uname_info{job=\"$job\",nodename=\"$nodename\"}, instance)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
@@ -13217,32 +13243,6 @@
         "query": "[a-z]+|nvme[0-9]+n[0-9]+",
         "skipUrlSync": false,
         "type": "custom"
-      },
-      {
-        "current": {
-          "selected": false,
-          "text": "worker1.kryukov.local",
-          "value": "worker1.kryukov.local"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "definition": "label_values(node_uname_info{instance=\"$node\"},nodename)",
-        "hide": 0,
-        "includeAll": false,
-        "multi": false,
-        "name": "nodename",
-        "options": [],
-        "query": {
-          "query": "label_values(node_uname_info{instance=\"$node\"},nodename)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
       }
     ]
   },
@@ -13278,6 +13278,6 @@
   "timezone": "browser",
   "title": "Node Exporter Full",
   "uid": "art-node-exporter",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }
