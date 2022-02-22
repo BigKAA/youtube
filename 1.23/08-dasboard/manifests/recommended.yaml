@@ -40,6 +40,8 @@ spec:
   ports:
     - port: 443
       targetPort: 8443
+    - port: 80
+      targetPort: 9090
   selector:
     k8s-app: kubernetes-dashboard
 
@@ -192,9 +194,13 @@ spec:
           ports:
             - containerPort: 8443
               protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
           args:
             - --auto-generate-certificates
             - --namespace=kubernetes-dashboard
+            # - --enable-insecure-login
+            # - --insecure-bind-address=0.0.0.0
             # Uncomment the following line to manually specify Kubernetes API server Host
             # If not specified, Dashboard will attempt to auto discover the API server and connect
             # to it. Uncomment only if the default does not work.
