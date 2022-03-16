@@ -13,7 +13,7 @@ spec:
   source:
     path: monitoring/video07/manifests/vmalert
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: monitoring
+    targetRevision: master
   project:  monitoring
   syncPolicy:
     automated:
