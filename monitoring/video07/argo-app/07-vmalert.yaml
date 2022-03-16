@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vmalert
+  labels:
+    app: monitoring
+spec:
+  revisionHistoryLimit: 3
+  destination:
+    name: ''
+    namespace: monitoring
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: monitoring/video07/manifests/vmalert
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: master
+  project:  monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

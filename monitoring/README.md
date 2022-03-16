@@ -122,7 +122,3 @@ alertmanager. Отображает текущие (не закрытые) алё
 ## Видео
 
 [Плейлист monitoring](https://www.youtube.com/playlist?list=PLmxqUDFl0XM6GecLZDgRvU3L0KOa-OQEh)
-
-[<img src="https://img.youtube.com/vi/93wK1oTv2CU/maxresdefault.jpg" width="50%">](https://youtu.be/93wK1oTv2CU)
-[<img src="https://img.youtube.com/vi/KZRBDHsh-HM/maxresdefault.jpg" width="50%">](https://youtu.be/KZRBDHsh-HM)
-[<img src="https://img.youtube.com/vi/_8OLOLND1_c/maxresdefault.jpg" width="50%">](https://youtu.be/_8OLOLND1_c)

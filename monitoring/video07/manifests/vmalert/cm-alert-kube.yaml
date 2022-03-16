@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vma-rules-kube
+data:
+  alert-rules-kube.yaml: |
+    groups:
+    - name: kube-pods
+      rules:
+
+      - alert: ZeroDeploymentPods
+        expr: kube_deployment_status_replicas_available == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          description: "Количество подов равно 0!"
+          summary: "Количество подов деплоймента {{ $labels.deployment }} в namespace {{ $labels.namespace }} равно нулю!"
+          dashboard: "https://grafana.kryukov.local/d/art-pods-alerts/alarm-list"
+
+      - alert: ZeroStatefulSetPods
+        expr: kube_statefulset_status_replicas_current == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          description: "Количество подов равно 0!"
+          summary: "Количество подов StatefullSet {{ $labels.statefulset }} в namespace {{ $labels.namespace }} равно нулю!"
+          dashboard: "https://grafana.kryukov.local/d/art-pods-alerts/alarm-list?orgId=1"
+
+      - alert: ZeroDaemonSetPods
+        expr: kube_daemonset_status_number_available == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          description: "Количество подов равно 0!"
+          summary: "Количество подов DaemonSet {{ $labels.daemonset }} в namespace {{ $labels.namespace }} равно нулю!"
+          dashboard: "https://grafana.kryukov.local/d/art-pods-alerts/alarm-list?orgId=1"
+
+      - alert: ToManyContainerRestarts
+        expr: increase(kube_pod_container_status_restarts_total[1m]) > 3
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          description: "Контейнер слишком часто рестартует!"
+          summary: "Контейнер {{ $labels.container }} пода {{ $labels.pod }} в namespace {{ $labels.namespace }} слишком
+                    часто рестартует."
+          dashboard: "https://grafana.kryukov.local/d/art-k8s/kubernetes-cluster?orgId=1&viewPanel=41&var-datasource=Victoria&var-node=All&var-namespace={{ $labels.namespace }}"
+          container: "https://grafana.kryukov.local/d/art-k8s-pod-info/k8s-pod?&orgId=1&var-ds=Victoriavar-pod={{ $labels.pod }}&var-namespace={{ $labels.namespace }}&var-container={{ $labels.container }}"
+
+      - alert: PodPendingToLong
+        expr: kube_pod_status_phase{phase="Pending"} > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: "Pod слишком долго не запускается!"
+          summary: "Под {{ $labels.pod }} в namespace {{ $labels.namespace }} слишком долго не запускается."
+          dashboard: "https://grafana.kryukov.local/d/art-k8s/kubernetes-cluster?orgId=1&viewPanel=31&var-datasource=Victoria&var-node=All&{{ $labels.namespace }}"
+          container: "https://grafana.kryukov.local/d/art-k8s-pod-info/k8s-pod?&orgId=1&var-ds=Victoriavar-pod={{ $labels.pod }}&var-namespace={{ $labels.namespace }}"

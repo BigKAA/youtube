@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vmalert
+  labels:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+      app.kubernetes.io/name: victoria-metrics-alert
+      app.kubernetes.io/instance: vmalert
+  template:
+    metadata:
+      labels:
+        app: server
+        app.kubernetes.io/name: victoria-metrics-alert
+        app.kubernetes.io/instance: vmalert
+    spec:
+      containers:
+        - name: victoria-metrics-alert-server
+          image: "victoriametrics/vmalert:v1.72.0"
+          args:
+            - '-datasource.url=http://victoriametrics-victoria-metrics-single-server:8428'
+            - '-datasource.basicAuth.password='
+            - '-datasource.basicAuth.username='
+            - '-notifier.url=http://alertmanager:9093'
+            - '-remoteRead.url='
+            - '-remoteWrite.url='
+            - '-envflag.enable=true'
+            - '-envflag.prefix=VM_'
+            - '-loggerFormat=json'
+            - '-rule=/node-exporter/*.yaml'
+            - '-rule=/kube/*.yaml'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8880
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+          - name: node-exporter
+            mountPath: /node-exporter
+          - name: kube
+            mountPath: /kube
+      priorityClassName: "low-priority"
+      volumes:
+        - name: node-exporter
+          configMap:
+            name: vma-rules-node-exporter
+        - name: kube
+          configMap:
+            name: vma-rules-kube

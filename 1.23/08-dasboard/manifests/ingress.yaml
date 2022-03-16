@@ -23,3 +23,14 @@ spec:
                 name: kubernetes-dashboard
                 port:
                   number: 443
+
+#    - host: dash.kryukov.local
+#      http:
+#        paths:
+#          - pathType: Prefix
+#            path: /
+#            backend:
+#              service:
+#                name: kubernetes-dashboard
+#                port:
+#                  number: 80

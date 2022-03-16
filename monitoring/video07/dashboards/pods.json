@@ -1,0 +1,609 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Информация по подам",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 8,
+  "iteration": 1644570177739,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Artur Kryukov",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://www.kryukov.biz"
+    }
+  ],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Phase"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    },
+                    {
+                      "color": "blue",
+                      "value": 2
+                    },
+                    {
+                      "color": "red",
+                      "value": 3
+                    },
+                    {
+                      "color": "red",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "text": "Pending"
+                      },
+                      "1": {
+                        "text": "Running"
+                      },
+                      "2": {
+                        "text": "Succeeded"
+                      },
+                      "3": {
+                        "text": "Failed"
+                      },
+                      "4": {
+                        "text": "Unknown"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 101
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Start time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RAM usage %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "gradient-gauge"
+              },
+              {
+                "id": "noValue",
+                "value": "no limits"
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RAM usage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.width",
+                "value": 126
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU usage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "gradient-gauge"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 1
+              },
+              {
+                "id": "noValue",
+                "value": "no limits"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Pod"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "",
+                    "url": "/d/art-k8s-pod-info/?var-pod=${__value.raw}&var-namespace=${__data.fields.Namespace}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Created by"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 109
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU throtled"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 20,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Pod"
+          }
+        ]
+      },
+      "pluginVersion": "8.3.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PC7A11E9A55DE2B14"
+          },
+          "exemplar": false,
+          "expr": "kube_pod_info{namespace=~\"$namespace\"} == 1",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "queryType": "randomWalk",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PC7A11E9A55DE2B14"
+          },
+          "exemplar": false,
+          "expr": "label_replace(\nlabel_replace(\nlabel_replace(\nlabel_replace(\nlabel_replace(kube_pod_status_phase{namespace=~\"$namespace\"}\n    ,\"phasen\", \"0\", \"phase\", \"Pending\")\n    ,\"phasen\", \"1\", \"phase\", \"Running\")\n    ,\"phasen\", \"2\", \"phase\", \"Succeeded\")\n    ,\"phasen\", \"3\", \"phase\", \"Failed\")\n    ,\"phasen\", \"4\", \"phase\", \"Unknown\") == 1",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PC7A11E9A55DE2B14"
+          },
+          "exemplar": false,
+          "expr": "kube_pod_start_time{namespace=~\"$namespace\"} * 1000",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PC7A11E9A55DE2B14"
+          },
+          "exemplar": false,
+          "expr": "sum(container_memory_working_set_bytes{namespace=~\"$namespace\", container!~\"POD|\"}) by (pod,namespace) * 100 / sum(kube_pod_container_resource_limits{namespace=~\"$namespace\", resource=\"memory\"}) by (pod, namespace)",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PC7A11E9A55DE2B14"
+          },
+          "exemplar": false,
+          "expr": "sum(container_memory_working_set_bytes{namespace=~\"$namespace\", container!~\"POD|\"}) by (pod,namespace)",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PC7A11E9A55DE2B14"
+          },
+          "exemplar": false,
+          "expr": "sum by(pod) (rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\", container!~\"POD|\"}[5m])) / \n(sum by(pod) (container_spec_cpu_quota{namespace=~\"$namespace\", container!~\"POD|\"} \n/ container_spec_cpu_period{namespace=~\"$namespace\", container!~\"POD|\"}))",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PC7A11E9A55DE2B14"
+          },
+          "exemplar": false,
+          "expr": "sum by(pod) (rate(container_cpu_cfs_throttled_seconds_total{namespace=~\"$namespace\", container!~\"POD|\"}[5m]))",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "G"
+        }
+      ],
+      "title": "Pods",
+      "transformations": [
+        {
+          "id": "seriesToColumns",
+          "options": {
+            "byField": "pod"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true,
+              "Time 6": true,
+              "Time 7": true,
+              "Value #A": true,
+              "Value #B": true,
+              "Value #D": true,
+              "__name__ 1": true,
+              "__name__ 2": true,
+              "created_by_name": true,
+              "host_ip": true,
+              "host_network": true,
+              "instance 1": true,
+              "instance 2": true,
+              "instance 3": true,
+              "job 1": true,
+              "job 2": true,
+              "job 3": true,
+              "monitor 1": true,
+              "monitor 2": true,
+              "monitor 3": true,
+              "namespace 1": false,
+              "namespace 2": true,
+              "namespace 3": true,
+              "namespace 4": true,
+              "namespace 5": true,
+              "node": true,
+              "phase": true,
+              "pod_ip": true,
+              "priority_class": true,
+              "uid": true,
+              "uid 1": true,
+              "uid 2": true,
+              "uid 3": true
+            },
+            "indexByName": {
+              "Time 1": 13,
+              "Time 2": 22,
+              "Time 3": 31,
+              "Time 4": 37,
+              "Time 5": 38,
+              "Time 6": 40,
+              "Time 7": 41,
+              "Value #A": 21,
+              "Value #B": 30,
+              "Value #C": 4,
+              "Value #D": 9,
+              "Value #E": 3,
+              "Value #F": 5,
+              "Value #G": 6,
+              "__name__ 1": 14,
+              "__name__ 2": 23,
+              "created_by_kind": 2,
+              "created_by_name": 15,
+              "host_ip": 10,
+              "host_network": 16,
+              "instance 1": 17,
+              "instance 2": 24,
+              "instance 3": 32,
+              "job 1": 18,
+              "job 2": 25,
+              "job 3": 33,
+              "monitor 1": 19,
+              "monitor 2": 26,
+              "monitor 3": 34,
+              "namespace 1": 7,
+              "namespace 2": 27,
+              "namespace 3": 35,
+              "namespace 4": 12,
+              "namespace 5": 39,
+              "node": 11,
+              "phase": 28,
+              "phasen": 1,
+              "pod": 0,
+              "pod_ip": 8,
+              "uid 1": 20,
+              "uid 2": 29,
+              "uid 3": 36
+            },
+            "renameByName": {
+              "Time 1": "",
+              "Value #C": "RAM usage %",
+              "Value #D": "Start time",
+              "Value #E": "RAM usage",
+              "Value #F": "CPU usage",
+              "Value #G": "CPU throtled",
+              "created_by_kind": "Created by",
+              "host_ip": "Host IP",
+              "namespace 1": "Namespace",
+              "node": "Node",
+              "phasen": "Phase",
+              "pod": "Pod",
+              "pod_ip": "Pod IP"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 34,
+  "style": "dark",
+  "tags": [
+    "k8s",
+    "art-dashboards"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "Victoria",
+          "value": "Victoria"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "ds",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "monitoring",
+          "value": "monitoring"
+        },
+        "datasource": {
+          "uid": "${ds}"
+        },
+        "definition": "kube_namespace_created",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Namespace",
+        "multi": false,
+        "name": "namespace",
+        "options": [],
+        "query": {
+          "query": "kube_namespace_created",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "/namespace=\"(?<text>[^\"]+)/g",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "k8s list of pods",
+  "uid": "art-k8s-list-of-pods",
+  "version": 2,
+  "weekStart": ""
+}

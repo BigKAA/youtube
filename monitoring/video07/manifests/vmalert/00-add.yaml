@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vmalert
+spec:
+  ports:
+    - name: http
+      port: 8880
+      targetPort: http
+      protocol: TCP
+  selector:
+    app: server
+    app.kubernetes.io/name: victoria-metrics-alert
+    app.kubernetes.io/instance: vmalert
+  type: "ClusterIP"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.k8s.io/issuer: monitoring-issuer
+  name: vmalert
+spec:
+  ingressClassName: system-ingress
+  rules:
+    - host: vmalert.kryukov.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vmalert
+                port:
+                  number: 8880
+  tls:
+    - hosts:
+        - vmalert.kryukov.local
+      secretName: vmalert-tls
