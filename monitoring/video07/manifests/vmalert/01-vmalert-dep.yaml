@@ -10,18 +10,12 @@ metadata:
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
-  minReadySeconds: 0
   replicas: 1
   selector:
     matchLabels:
       app: server
       app.kubernetes.io/name: victoria-metrics-alert
       app.kubernetes.io/instance: vmalert
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
   template:
     metadata:
       labels:
