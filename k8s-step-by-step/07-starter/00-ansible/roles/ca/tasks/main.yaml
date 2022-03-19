@@ -5,6 +5,12 @@
     state: directory
     recurse: yes
 
+- name: CA install the requirements
+  pip:
+    state: forcereinstall
+    name:
+      - cryptography>= 1.2.3
+
 - name: Create private key with password protection
   community.crypto.openssl_privatekey:
     path: "{{ ca_data_dir }}/ca.key"
