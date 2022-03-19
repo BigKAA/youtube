@@ -50,7 +50,6 @@
     dest: "{{ nexus_proxy_config_dir }}/ssl/certs/nexus-proxy.pem"
     content: "{{ certificate.certificate }}"
   delegate_to: server_1
-  recurse: yes
   run_once: true
 
 ####
