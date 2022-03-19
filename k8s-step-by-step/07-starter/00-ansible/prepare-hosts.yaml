@@ -1,0 +1,7 @@
+---
+- name: Prepare starter
+  hosts: starter
+
+  roles:
+    - prepare-hosts
+    - docker

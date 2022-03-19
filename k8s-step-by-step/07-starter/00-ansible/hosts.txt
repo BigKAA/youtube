@@ -1,0 +1,2 @@
+[starter]
+starter.kryukov.local ansible_host=192.168.218.178
