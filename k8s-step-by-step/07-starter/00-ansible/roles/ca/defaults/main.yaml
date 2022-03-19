@@ -1,0 +1,2 @@
+ca_data_dir: "/etc/ssl/ca"
+ca_secret_passphrase: "pAsswOrd"
