@@ -7,15 +7,14 @@
 
 - name: CA install the requirements
   pip:
-    state: forcereinstall
     name:
-      - cryptography>= 1.2.3
+    - cryptography>=1.2.3
 
 - name: Create private key with password protection
   community.crypto.openssl_privatekey:
     path: "{{ ca_data_dir }}/ca.key"
     passphrase: "{{ ca_secret_passphrase }}"
-    cipher: aes256
+    cipher: auto
 
 - name: Create certificate signing request (CSR) for CA certificate
   community.crypto.openssl_csr_pipe:

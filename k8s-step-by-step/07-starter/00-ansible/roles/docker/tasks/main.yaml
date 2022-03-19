@@ -49,3 +49,7 @@
     name: artur
     groups: docker
     append: yes
+
+- name: Install python docker lib
+  pip:
+    name: docker>=5.0.0

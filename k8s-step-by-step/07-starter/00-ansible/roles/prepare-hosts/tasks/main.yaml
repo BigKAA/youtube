@@ -12,6 +12,13 @@
       - network-scripts
     state: latest
 
+- name: Upgrade pip & setuptools
+  pip:
+    name:
+    - pip
+    - setuptools
+    extra_args: --upgrade
+
 - name: Disable NetworkManager
   service:
     name: NetworkManager

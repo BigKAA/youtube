@@ -23,9 +23,9 @@ http {
 
                 server_name {{ nexus_proxy_server_name }};
 
-                ssl_certificate {{ nexus_proxy_config_dir }}/ssl/certs/nexus-proxy.pem;
-                ssl_certificate_key {{ nexus_proxy_config_dir }}/ssl/private/nexus-proxy.key;
-                ssl_dhparam {{ nexus_proxy_config_dir }}/ssl/certs/dhparam.pem;
+                ssl_certificate /etc/nginx/ssl/certs/nexus-proxy.pem;
+                ssl_certificate_key /etc/nginx/ssl/private/nexus-proxy.key;
+                ssl_dhparam /etc/nginx/ssl/dhparams.pem;
                 ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
                 ssl_prefer_server_ciphers on;
                 ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";

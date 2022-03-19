@@ -1,9 +1,11 @@
 ---
+
 - name: Ensure nexus data dir exist
   file:
     path: "{{ item }}"
     state: directory
     recurse: yes
+    owner: 200
   with_items:
     - "{{ nexus_data_dir }}"
     - "{{ nexus_proxy_config_dir }}"
@@ -20,7 +22,7 @@
 - name: Create private key for new certificate for nexus proxy
   community.crypto.openssl_privatekey:
     path: "{{ nexus_proxy_config_dir }}/ssl/private/nexus-proxy.key"
-  delegate_to: server_1
+  delegate_to: starter
   run_once: true
 
 - name: Create certificate signing request (CSR) for new certificate
@@ -28,7 +30,7 @@
     privatekey_path: "{{ nexus_proxy_config_dir }}/ssl/private/nexus-proxy.key"
     subject_alt_name:
       - "DNS:{{ nexus_proxy_server_name }}"
-  delegate_to: server_1
+  delegate_to: starter
   run_once: true
   register: csr
 
@@ -41,15 +43,21 @@
     ownca_privatekey_passphrase: "{{ nexus_ca_secret_passphrase }}"
     ownca_not_after: +365d  # valid for one year
     ownca_not_before: "-1d"  # valid since yesterday
-  delegate_to: server_2
+  delegate_to: starter
   run_once: true
   register: certificate
 
-- name: Write certificate file on server_1
+- name: Write certificate file on starter
   copy:
     dest: "{{ nexus_proxy_config_dir }}/ssl/certs/nexus-proxy.pem"
     content: "{{ certificate.certificate }}"
-  delegate_to: server_1
+  delegate_to: starter
+  run_once: true
+
+- name: Generate Diffie-Hellman parameters
+  openssl_dhparam:
+    path: "{{ nexus_proxy_config_dir }}/ssl/dhparams.pem"
+  delegate_to: starter
   run_once: true
 
 ####
