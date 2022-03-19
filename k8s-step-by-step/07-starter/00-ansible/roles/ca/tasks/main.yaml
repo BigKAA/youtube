@@ -9,6 +9,7 @@
   community.crypto.openssl_privatekey:
     path: "{{ ca_data_dir }}/ca.key"
     passphrase: "{{ ca_secret_passphrase }}"
+    cipher: aes256
 
 - name: Create certificate signing request (CSR) for CA certificate
   community.crypto.openssl_csr_pipe:
