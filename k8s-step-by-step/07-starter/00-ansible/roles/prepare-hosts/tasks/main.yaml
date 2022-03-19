@@ -9,7 +9,7 @@
       - bash-completion
       - tar
       - rsyslog
-      - network
+      - network-scripts
     state: latest
 
 - name: Disable NetworkManager
