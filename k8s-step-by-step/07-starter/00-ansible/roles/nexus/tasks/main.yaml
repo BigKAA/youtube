@@ -29,7 +29,7 @@
   community.crypto.openssl_csr_pipe:
     privatekey_path: "{{ nexus_proxy_config_dir }}/ssl/private/nexus-proxy.key"
     subject_alt_name:
-      - "DNS:{{ nexus_proxy_server_name }}"
+      - "DNS:{{ nexus_proxy_docker_server_name }}"
   delegate_to: starter
   run_once: true
   register: csr
