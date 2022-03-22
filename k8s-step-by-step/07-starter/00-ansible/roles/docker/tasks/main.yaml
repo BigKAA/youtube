@@ -38,23 +38,6 @@
     name: docker-ce
     state: latest
 
-### import CA to docker
-- name: Crete docker_certs_dir
-  file:
-    path: "{{ docker_certs_dir }}"
-    owner: root
-    group: root
-    recurse: yes
-    state: directory
-
-- name: Import CA certificate to docker
-  copy:
-    src: "{{ docker_ca_cert }}"
-    dest: "{{ docker_certs_dir }}"
-    remote_src: yes
-    owner: root
-    group: root
-
 - name: Start Docker service
   service:
     name: docker

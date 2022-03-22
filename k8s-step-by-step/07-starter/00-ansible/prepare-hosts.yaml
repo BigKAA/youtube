@@ -5,9 +5,7 @@
   roles:
     - prepare-hosts
     - ca
-    - role: docker
-      docker_ca_cert: "/etc/ssl/ca/ca.pem"
-      docker_certs_dir: "/etc/docker/certs.d/starter.kryukov.local"
+    - docker
     - role: nexus
       nexus_data_dir: "/var/spool/nexus"
       nexus_container: "sonatype/nexus3:3.38.0"

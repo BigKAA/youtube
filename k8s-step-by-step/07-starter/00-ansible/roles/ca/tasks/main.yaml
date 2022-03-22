@@ -38,3 +38,14 @@
     privatekey_passphrase: "{{ ca_secret_passphrase }}"
     provider: selfsigned
 
+### import CA to system
+- name: Import CA certificate
+  copy:
+    src: "{{ docker_ca_cert }}"
+    dest: "/etc/pki/ca-trust/source/anchors"
+    remote_src: yes
+    owner: root
+    group: root
+  notify:
+    - update ca trust
+
