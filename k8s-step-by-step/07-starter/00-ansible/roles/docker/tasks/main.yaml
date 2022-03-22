@@ -51,6 +51,7 @@
   copy:
     src: "{{ docker_ca_cert }}"
     dest: "{{ docker_certs_dir }}"
+    remote_src: yes
     owner: root
     group: root
 
