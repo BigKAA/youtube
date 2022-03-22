@@ -50,7 +50,7 @@
 - name: Import CA certificate to docker
   copy:
     src: "{{ docker_ca_cert }}"
-    dst: "{{ docker_certs_dir }}"
+    dest: "{{ docker_certs_dir }}"
     owner: root
     group: root
 
