@@ -1,0 +1,23 @@
+---
+- hosts: starter
+  tasks:
+  - name: take CA file
+    fetch:
+      src: /etc/ssl/ca/ca.pem
+      state: latest
+      dest: /tmp/ca.pem
+      flat: true
+
+- hosts: cluster
+  tasks:
+  - name: Copy CA certificate
+    copy:
+      src: /tmp/ca.pem
+      dest: /etc/pki/ca-trust/source/anchors
+    notify:
+    - Update ca trust
+
+  handlers:
+  - name: Update ca trust
+    command: update-ca-trust
+
