@@ -154,7 +154,7 @@ mv -f quay.io_coreos_etcd_v3.5.1.tar /root/k8s-images
   * Поместит образы контейнеров из файлов контейнеров в docker на текущей машине.
   * Добавит контейнерам необходимые теги.
   * Зальёт контейнеры в nexus.
-* [upload-file.sh](00-ansible/roles/prepare-hosts/files/upload-file.sh) - загружает файлы в хранилище files nexus.
+* [upload-file.sh](00-ansible/roles/prepare-hosts/files/upload-files.sh) - загружает файлы в хранилище files nexus.
 
 tags.sh
 

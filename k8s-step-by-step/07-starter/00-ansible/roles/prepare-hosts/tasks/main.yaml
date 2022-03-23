@@ -56,7 +56,8 @@
   copy:
     src: "files/{{ item }}"
     dest: /root
+    mode: u=rwx
   loop:
     - load-i.sh
     - tags.sh
-    - upload-file.sh
+    - upload-files.sh
