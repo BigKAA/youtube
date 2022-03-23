@@ -56,7 +56,9 @@
   copy:
     src: "files/{{ item }}"
     dest: /root
-    mode: u=rwx
+    owner: root
+    group: root
+    mode: '0770'
   loop:
     - load-i.sh
     - tags.sh
