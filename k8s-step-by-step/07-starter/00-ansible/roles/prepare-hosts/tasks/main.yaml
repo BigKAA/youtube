@@ -51,3 +51,12 @@
 - name: Disable SELinux
   shell: setenforce 0
   when: selinux_ret.reboot_required
+
+- name: Copy sample scripts
+  copy:
+    src: "files/{{ item }}"
+    dest: /root
+  loop:
+    - load-i.sh
+    - tags.sh
+    - upload-file.sh
