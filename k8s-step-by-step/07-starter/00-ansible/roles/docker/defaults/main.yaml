@@ -1,0 +1,1 @@
+docker_ca_cert: "/etc/ssl/ca/ca.pem"

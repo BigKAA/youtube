@@ -1,0 +1,55 @@
+---
+- name: Install yum utils
+  dnf:
+    name: yum-utils
+    state: latest
+
+- name: Install device-mapper-persistent-data
+  dnf:
+    name: device-mapper-persistent-data
+    state: latest
+
+- name: Install lvm2
+  dnf:
+    name: lvm2
+    state: latest
+
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docer-ce.repo
+
+- name: Enable Docker Edge repo
+  ini_file:
+    path: /etc/yum.repos.d/docer-ce.repo
+    section: 'docker-ce-edge'
+    option: enabled
+    value: 0
+
+- name: Enable Docker Test repo
+  ini_file:
+    path: /etc/yum.repos.d/docer-ce.repo
+    section: 'docker-ce-test'
+    option: enabled
+    value: 0
+
+- name: Install Docker
+  package:
+    name: docker-ce
+    state: latest
+
+- name: Start Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add user artur to docker group
+  user:
+    name: artur
+    groups: docker
+    append: yes
+
+- name: Install python docker lib
+  pip:
+    name: docker>=5.0.0

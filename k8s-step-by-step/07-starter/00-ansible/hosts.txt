@@ -1,0 +1,17 @@
+[all]
+starter.kryukov.local ansible_host=192.168.218.178
+control1.kryukov.local ansible_host=192.168.218.171
+worker1.kryukov.local ansible_host=192.168.218.174
+worker2.kryukov.local ansible_host=192.168.218.175
+worker3.kryukov.local ansible_host=192.168.218.176
+db1.kryukov.local ansible_host=192.168.218.177
+
+[starter]
+starter.kryukov.local
+
+[cluster]
+control1.kryukov.local
+worker1.kryukov.local
+worker2.kryukov.local
+worker3.kryukov.local
+db1.kryukov.local

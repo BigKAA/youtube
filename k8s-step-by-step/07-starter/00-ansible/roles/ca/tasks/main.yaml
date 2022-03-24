@@ -1,0 +1,51 @@
+---
+- name: CA data dir exist
+  file:
+    path: "{{ ca_data_dir }}"
+    state: directory
+    recurse: yes
+
+- name: CA install the requirements
+  pip:
+    name:
+    - cryptography>=1.2.3
+
+- name: Create private key with password protection
+  community.crypto.openssl_privatekey:
+    path: "{{ ca_data_dir }}/ca.key"
+    passphrase: "{{ ca_secret_passphrase }}"
+    cipher: auto
+
+- name: Create certificate signing request (CSR) for CA certificate
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ ca_data_dir }}/ca.key"
+    privatekey_passphrase: "{{ ca_secret_passphrase }}"
+    common_name: Starter CA
+    use_common_name_for_san: false
+    basic_constraints:
+      - 'CA:TRUE'
+    basic_constraints_critical: yes
+    key_usage:
+      - keyCertSign
+    key_usage_critical: true
+  register: ca_csr
+
+- name: Create self-signed CA certificate from CSR
+  community.crypto.x509_certificate:
+    path: "{{ ca_data_dir }}/ca.pem"
+    csr_content: "{{ ca_csr.csr }}"
+    privatekey_path: "{{ ca_data_dir }}/ca.key"
+    privatekey_passphrase: "{{ ca_secret_passphrase }}"
+    provider: selfsigned
+
+### import CA to system
+- name: Import CA certificate
+  copy:
+    src: "{{ docker_ca_cert }}"
+    dest: "/etc/pki/ca-trust/source/anchors"
+    remote_src: yes
+    owner: root
+    group: root
+  notify:
+    - update ca trust
+

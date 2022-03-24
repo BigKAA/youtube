@@ -1,0 +1,84 @@
+---
+
+- name: Ensure nexus data dir exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+    owner: 200
+  with_items:
+    - "{{ nexus_data_dir }}"
+    - "{{ nexus_proxy_config_dir }}"
+    - "{{ nexus_proxy_config_dir }}/ssl/private"
+    - "{{ nexus_proxy_config_dir }}/ssl/certs"
+
+- name: Copy proxy config
+  template:
+    src: "templates/nginx.conf.j2"
+    dest: "{{ nexus_proxy_config_dir }}/nginx.conf"
+    force: yes
+
+#### generate ssl certificate
+- name: Create private key for new certificate for nexus proxy
+  community.crypto.openssl_privatekey:
+    path: "{{ nexus_proxy_config_dir }}/ssl/private/nexus-proxy.key"
+  delegate_to: starter
+  run_once: true
+
+- name: Create certificate signing request (CSR) for new certificate
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ nexus_proxy_config_dir }}/ssl/private/nexus-proxy.key"
+    subject_alt_name:
+      - "DNS:{{ nexus_proxy_docker_server_name }}"
+  delegate_to: starter
+  run_once: true
+  register: csr
+
+- name: Sign certificate with our CA
+  community.crypto.x509_certificate_pipe:
+    csr_content: "{{ csr.csr }}"
+    provider: ownca
+    ownca_path: "{{ nexus_ca_data_dir }}/ca.pem"
+    ownca_privatekey_path: "{{ nexus_ca_data_dir }}/ca.key"
+    ownca_privatekey_passphrase: "{{ nexus_ca_secret_passphrase }}"
+    ownca_not_after: +365d  # valid for one year
+    ownca_not_before: "-1d"  # valid since yesterday
+  delegate_to: starter
+  run_once: true
+  register: certificate
+
+- name: Write certificate file on starter
+  copy:
+    dest: "{{ nexus_proxy_config_dir }}/ssl/certs/nexus-proxy.pem"
+    content: "{{ certificate.certificate }}"
+  delegate_to: starter
+  run_once: true
+
+- name: Generate Diffie-Hellman parameters
+  openssl_dhparam:
+    path: "{{ nexus_proxy_config_dir }}/ssl/dhparams.pem"
+  delegate_to: starter
+  run_once: true
+
+####
+- name: Launch nexus container
+  docker_container:
+    name: "{{ nexus_container_name }}"
+    image: "{{ nexus_container }}"
+    restart_policy: "always"
+    ports:
+      - "{{ nexus_port }}:8081"
+      - "{{ nexus_hub_port }}:{{ nexus_hub_port }}"
+    volumes:
+      - "{{ nexus_data_dir }}:/nexus-data:rw"
+
+- name: Launch nexus proxy
+  docker_container:
+    name: "{{ nexus_proxy_container_name }}"
+    image: "{{ nexus_proxy_container }}"
+    restart_policy: "always"
+    ports:
+      - "{{ nexus_proxy_port }}:80"
+      - "{{ nexus_proxy_ssl_port }}:443"
+    volumes:
+      - "{{ nexus_proxy_config_dir }}:/etc/nginx:ro"

@@ -1,0 +1,65 @@
+---
+- name: Install packages
+  dnf:
+    name:
+      - net-tools
+      - mc
+      - vim
+      - git
+      - bash-completion
+      - tar
+      - rsyslog
+      - network-scripts
+    state: latest
+
+- name: Upgrade pip & setuptools
+  pip:
+    name:
+    - pip
+    - setuptools
+    extra_args: --upgrade
+
+- name: Disable NetworkManager
+  service:
+    name: NetworkManager
+    state: started
+    enabled: yes
+
+- name: Enable rsyslog
+  service:
+    name: rsyslog
+    state: started
+    enabled: yes
+
+- name: Enable network service
+  service:
+    name: network
+    state: started
+    enabled: yes
+
+- name: Disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Check Disable SELinux
+  selinux:
+    state: disabled
+  register: selinux_ret
+
+- name: Disable SELinux
+  shell: setenforce 0
+  when: selinux_ret.reboot_required
+
+- name: Copy sample scripts
+  copy:
+    src: "files/{{ item }}"
+    dest: /root
+    owner: root
+    group: root
+    mode: '0770'
+  loop:
+    - load-i.sh
+    - tags.sh
+    - upload-files.sh

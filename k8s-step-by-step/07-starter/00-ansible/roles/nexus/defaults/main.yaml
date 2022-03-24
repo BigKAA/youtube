@@ -1,0 +1,16 @@
+---
+nexus_container_name: "nexus"
+nexus_port: 8081
+nexus_hub_port: 8082
+nexus_data_dir: "/var/spool/nexus"
+nexus_container: "sonatype/nexus3:latest"
+nexus_proxy_container_name: "nexus-proxy"
+nexus_proxy_container: "nginx:latest"
+nexus_proxy_port: 80
+nexus_proxy_ssl_port: 443
+nexus_proxy_config_dir: "/etc/nexus"
+nexus_proxy_server_name: "nexus.local"
+nexus_proxy_docker_server_name: "docker.local"
+nexus_proxy_address: "127.0.0.1"
+nexus_ca_data_dir: "/etc/ssl/ca"
+nexus_ca_secret_passphrase: "pAsswOrd"
