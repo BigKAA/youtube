@@ -245,4 +245,10 @@ containerd_registry_auth:
      password: password
 ```
 
-Собственно всё. Можно начинать установку кластера.
+Предполагается, что данных из файла containerd.yml достаточно, что бы приложения могли логиниться в хаб. Но...
+нет. Последняя версия nerdctl (используется в kybespray для работы с контейнерами) 
+[перестала работать](https://github.com/containerd/nerdctl/blob/master/docs/faq.md#nerdctl-ignores-pluginsiocontainerdgrpcv1cri-config) с 
+[plugins."io.containerd.grpc.v1.cri"] config.
+
+Поэтому запускаем установку кластера первый раз. Получаем ошибку. Затем "вручную" логинимся в хабе на каждой ноде 
+при помощи плейбука nerd-login.yaml. И повторно запускаем kubespray.
