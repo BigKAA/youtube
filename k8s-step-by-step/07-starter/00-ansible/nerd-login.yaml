@@ -1,0 +1,5 @@
+---
+- hosts: cluster
+  tasks:
+  - name: Nerd login
+    command: nerdctl login --username docker-user --password password starter.kryukov.local

@@ -10,7 +10,7 @@ http {
     proxy_send_timeout 120;
     proxy_buffering    off;
     tcp_nodelay        on;
-    # client_max_body_size 5000m;
+    client_max_body_size 50000m;
     chunked_transfer_encoding on;
 
     upstream DOCKER_HUB {

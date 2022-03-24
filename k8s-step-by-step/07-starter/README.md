@@ -115,10 +115,6 @@ calico_rr
 
     /root/docker-images/kubeadm-*-amd64 config images list
 
-Прежде чем мы их загрузим, залогинимся в хранилище контейнеров. 
-
-    docker login --username=docker-user --password=password starter.kryukov.local
-
 При помощи скрипта [load-i.sh](00-ansible/roles/prepare-hosts/files/load-i.sh) создадим недостающий файлы образов.
 
 ```bash
@@ -134,7 +130,7 @@ for I in $(/root/docker-images/kubeadm-*-amd64 config images list); do
 done
 # Кое что приходится фиксить руками для kubespray :( 
 nerdctl pull quay.io/coreos/etcd:v3.5.1
-nerdctl save quay.io/coreos/etcd:v3.5.1 /root/k8s-images/quay.io_coreos_etcd_v3.5.1.tar
+nerdctl save quay.io/coreos/etcd:v3.5.1 -o /root/k8s-images/quay.io_coreos_etcd_v3.5.1.tar
 nerdctl rmi quay.io/coreos/etcd:v3.5.1
 
 mv -f k8s.gcr.*.tar /root/k8s-images
@@ -154,6 +150,16 @@ mv -f k8s.gcr.*.tar /root/k8s-images
   * Добавит контейнерам необходимые теги.
   * Зальёт контейнеры в nexus.
 * [upload-file.sh](00-ansible/roles/prepare-hosts/files/upload-files.sh) - загружает файлы в хранилище files nexus.
+
+Поскольку для ssl сертификата nexux-proxy (nginx) мы использовали свой собственный CA. Что бы всё работало, нам 
+потребуется добавить этот сертификат в список доверенный СА сертифкатов на всех, серверах, куда мы будем устанавливать 
+kubernetes. Для этого воспользуемся простейшим плейбуком [prepare-cluster.yaml](00-ansible/prepare-cluster.yaml).
+
+    ansible-playbook prepare-cluster.yaml
+
+Прежде чем мы их загрузим, залогинимся в хранилище контейнеров. 
+
+    docker login --username=docker-user --password=password starter.kryukov.local
 
 tags.sh
 
@@ -200,12 +206,6 @@ do
 done
 ```
 
-Поскольку для ssl сертификата nexux-proxy (nginx) мы использовали свой собственный CA. Что бы всё работало, нам 
-потребуется добавить этот сертификат в список доверенный СА сертифкатов на всех, серверах, куда мы будем устанавливать 
-kubernetes. Для этого воспользуемся простейшим плейбуком [prepare-cluster.yaml](00-ansible/prepare-cluster.yaml).
-
-    ansible-playbook prepare-cluster.yaml
-
 ## 3. Настройка kubespray на использование хранилища.
 
 Для настройки kubespray мы изменим два файла:
@@ -215,7 +215,7 @@ kubernetes. Для этого воспользуемся простейшим п
 Ниже приведены только значащие строки из итогового offline.yml
 ```yaml
 registry_host: "starter.kryukov.local"
-files_repo: "http://nexus.kryukov.local/repository/files/k8s"
+files_repo: "http://docker-user:password@nexus.kryukov.local/repository/files/k8s"
 yum_repo: "http://nexus.kryukov.local/rpm"
 kube_image_repo: "{{ registry_host }}"
 gcr_image_repo: "{{ registry_host }}"
