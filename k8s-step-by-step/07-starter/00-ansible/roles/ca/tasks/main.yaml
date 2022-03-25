@@ -56,7 +56,7 @@
     recurse: yes
 
 - name: Copy CA certificate
-    copy:
-      src: "{{ docker_ca_cert }}"
-      dest: "/etc/docker/certs.d/starter.kryukov.local"
+  copy:
+    src: "{{ docker_ca_cert }}"
+    dest: "/etc/docker/certs.d/starter.kryukov.local"
 
