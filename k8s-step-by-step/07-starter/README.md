@@ -47,9 +47,17 @@
 
 Для скачивания базового набора мы можем воспользоваться возможностями kubespray. 
 
+Подготовим виртуальную среду для kubespray.
+
+    mkdir kubenv && cd kubenv 
+    python3 -m venv env
+    source env/bin/activate
+    cd
+
+Клонируем kubespray.
+
     git clone https://github.com/kubernetes-sigs/kubespray.git
     cd kubespray
-    pip3 install ruamel.yaml
 
 Отредактируйте файлы inventory так, как если бы вы устанавливали кластер kubernetes.
 
