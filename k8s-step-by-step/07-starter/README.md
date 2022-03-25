@@ -260,3 +260,11 @@ containerd_registry_auth:
 
 Поэтому запускаем установку кластера первый раз. Получаем ошибку. Затем "вручную" логинимся в хабе на каждой ноде 
 при помощи плейбука nerd-login.yaml. И повторно запускаем kubespray.
+
+## Ссылка на видео.
+
+Telegramm: https://t.me/arturkryukov/26
+
+VK: https://vk.com/video7111833_456239187
+
+[<img src="https://img.youtube.com/vi/JE-EkrddIJ8/maxresdefault.jpg" width="50%">](https://youtu.be/JE-EkrddIJ8)

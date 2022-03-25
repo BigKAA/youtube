@@ -12,6 +12,7 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **[PriorityClass](PriorityClass)** - Приориеты. Больше вопросов, чем ответов.
 * **[Net](net)** - Про сеть в kubernetes.
 * **[K8s step by step](k8s-step-by-step)** - установка небольшого кластера шаг за шагом.
+  * **[Kubernetes offline installation by kubespray](k8s-step-by-step/07-starter)**
 * **[ArgoCD](argocd/README.md)** - приложение для CD в k8s.
 * **[Keycloak](keycloak/README.md)** - кластер Keycloak.
   * [Gatekeeper](keycloak/gatekeeper/README.md) - ограничение доступа к приложениям.
