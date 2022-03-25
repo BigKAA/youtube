@@ -59,4 +59,5 @@
   copy:
     src: "{{ docker_ca_cert }}"
     dest: "/etc/docker/certs.d/starter.kryukov.local"
+    remote_src: yes
 
