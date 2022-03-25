@@ -7,7 +7,7 @@
     - ca
     - docker
     - role: nexus
-      nexus_data_dir: "/var/spool/nexus"
+      nexus_data_dir: "/data/nexus"
       nexus_container: "sonatype/nexus3:3.38.0"
       nexus_proxy_container: "nginx:1.21.6-alpine"
       nexus_proxy_server_name: "nexus.kryukov.local"
