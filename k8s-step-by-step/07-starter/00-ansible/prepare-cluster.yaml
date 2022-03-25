@@ -17,7 +17,21 @@
     notify:
     - Update ca trust
 
+  - name: Docker certs.d dir
+    file:
+      path: /etc/containerd/certs.d/starter.kryukov.local
+      state: directory
+      recurse: yes
+
+  - name: Copy CA certificate
+    copy:
+      src: "/tmp/ca.pem"
+      dest: "/etc/containerd/certs.d/starter.kryukov.local"
+
   handlers:
   - name: Update ca trust
     command: update-ca-trust
+
+
+
 

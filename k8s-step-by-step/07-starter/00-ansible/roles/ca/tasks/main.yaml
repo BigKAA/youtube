@@ -49,3 +49,14 @@
   notify:
     - update ca trust
 
+- name: Docker certs.d dir
+  file:
+    path: /etc/docker/certs.d/starter.kryukov.local
+    state: directory
+    recurse: yes
+
+- name: Copy CA certificate
+    copy:
+      src: "{{ docker_ca_cert }}"
+      dest: "/etc/docker/certs.d/starter.kryukov.local"
+
