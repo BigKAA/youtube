@@ -1,3 +1,6 @@
 ---
 - name: update ca trust
   command: update-ca-trust
+
+- name: restart docker
+  command: systemctl restart docker

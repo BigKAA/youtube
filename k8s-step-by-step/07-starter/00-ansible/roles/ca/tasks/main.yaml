@@ -60,4 +60,5 @@
     src: "{{ ca_data_dir }}/ca.pem"
     dest: "/etc/docker/certs.d/starter.kryukov.local"
     remote_src: yes
-
+  notify:
+    - restart docker
