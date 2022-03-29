@@ -41,7 +41,7 @@
 ### import CA to system
 - name: Import CA certificate
   copy:
-    src: "{{ docker_ca_cert }}"
+    src: "{{ ca_data_dir }}/ca.pem"
     dest: "/etc/pki/ca-trust/source/anchors"
     remote_src: yes
     owner: root
@@ -57,7 +57,7 @@
 
 - name: Copy CA certificate
   copy:
-    src: "{{ docker_ca_cert }}"
+    src: "{{ ca_data_dir }}/ca.pem"
     dest: "/etc/docker/certs.d/starter.kryukov.local"
     remote_src: yes
 
