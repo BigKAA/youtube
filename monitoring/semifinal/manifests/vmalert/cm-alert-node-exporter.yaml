@@ -1,0 +1,92 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vma-rules-node-exporter
+data:
+  alert-rules-cpu.yaml: |
+    groups:
+    - name: resources-cpu
+      rules:
+      - alert: NodeCpuUsage
+        expr: (100 - (avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) without (cpu)) * 100) * on(instance,job) group_left(nodename) node_uname_info > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "Средняя загрузка процессора"
+          summary: "Средняя загрузка процессора по ядрам на (instance {{ $labels.nodename }}) превышает допустимые
+          значения. \n\n Текущее значение: {{ humanize $value }}%."
+          dashboard: "https://grafana.kryukov.local/d/art-node-exporter/node-exporter-full?orgId=1&var-DS_PROMETHEUS=Victoria&var-job=node-exporter&var-nodename={{ $labels.nodename }}&viewPanel=77"
+
+      - alert: NodeCpuUsage
+        expr: (100 - avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) without (cpu) * 100) * on(instance,job) group_left(nodename) node_uname_info > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          description: "Средняя загрузка процессора"
+          summary: "Средняя загрузка процессора по ядрам на (instance {{ $labels.nodename }})
+          значительно превышает допустимые значения. \n\n Текущее значение: {{ humanize $value }}%."
+          dashboard: "https://grafana.kryukov.local/d/art-node-exporter/node-exporter-full?orgId=1&var-DS_PROMETHEUS=Victoria&var-job=node-exporter&var-nodename={{ $labels.nodename }}&viewPanel=77"
+
+  alert-rules-memory.yaml: |
+    groups:
+    - name: resources-memory
+      rules:
+      - alert: NodeOutOfMemory
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100) * on(instance,job) group_left(nodename) node_uname_info < 10        
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          description: "Осталось свободной физической памяти: {{ humanize $value }} %"
+          summary: "Использование оперативной памяти на {{ $labels.nodename }} превышает допустимые значения."
+          dashboard: "https://grafana.kryukov.local/d/art-node-exporter/node-exporter-full?orgId=1&refresh=1m&viewPanel=78&var-DS_PROMETHEUS=Victoria&var-job=node-exporter&var-nodename={{ $labels.nodename }}"
+
+      - alert: NodeOutOfMemory
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100) * on(instance,job) group_left(nodename) node_uname_info < 5
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          description: "Свободной физической памяти осталось: {{ humanize $value }} %"
+          summary: "Использование оперативной памяти на {{ $labels.nodename }} превышает допустимые значения."
+          dashboard: "https://grafana.kryukov.local/d/art-node-exporter/node-exporter-full?orgId=1&refresh=1m&viewPanel=78&var-DS_PROMETHEUS=Victoria&var-job=node-exporter&var-nodename={{ $labels.nodename }}"
+
+  alert-rules-disk.yaml: |
+    groups:
+    - name: resources-space
+      rules:
+      - alert: FreeSpaceUsage
+        expr: 100 - (node_filesystem_avail_bytes{mountpoint!="/boot", fstype!~"nfs4|nfs|rootfs|tmpfs"} * 100) / node_filesystem_size_bytes * on(instance,job) group_left(nodename) node_uname_info > 92
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          description: "Файловая система почти заполнена"
+          summary: "Файловая система {{ $labels.mountpoint }} на (хосте {{ $labels.nodename }}) заполнена на  {{ humanize $value }}%"
+          dashboard: "https://grafana.kryukov.local/d/art-node-exporter/node-exporter-full?orgId=1&refresh=1m&viewPanel=78&var-DS_PROMETHEUS=Victoria&var-job=node-exporter&var-nodename={{ $labels.nodename }}"
+
+      - alert: FreeSpaceUsage
+        expr: 100 - (node_filesystem_avail_bytes{mountpoint!="/boot", fstype!~"nfs4|nfs|rootfs|tmpfs"} * 100) / node_filesystem_size_bytes * on(instance,job) group_left(nodename) node_uname_info > 95
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          description: "Файловая система доступна на запись только пользователю root!"
+          summary: "Файловая система {{ $labels.mountpoint }} на (хосте {{ $labels.nodename }}) заполнена на  {{ humanize $value }}%"
+          dashboard: "https://grafana.kryukov.local/d/art-node-exporter/node-exporter-full?orgId=1&refresh=1m&viewPanel=78&var-DS_PROMETHEUS=Victoria&var-job=node-exporter&var-nodename={{ $labels.nodename }}"
+  alert-rules-uptime.yaml: |
+    groups:
+    - name: uptime
+      rules:
+      - alert: NodeCriticalSystemUptime
+        expr: time() - node_boot_time_seconds < 600
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Зафиксирована перезагрузка сервера. Текущий uptime: {{ humanize $value }} секунд."
+          description: "Система: {{ $labels.group }} \n Хост: {{ $labels.nodename }} \n Приоритет: {{ $labels.severity }} "
+          dashboard: "https://grafana.kryukov.local/d/art-node-exporter/node-exporter-full?orgId=1&refresh=1m&viewPanel=15&var-DS_PROMETHEUS=Victoria&var-job=node-exporter&var-nodename={{ $labels.nodename }}"
