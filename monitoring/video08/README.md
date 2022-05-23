@@ -10,8 +10,10 @@
 ```yaml
 global:
   resolve_timeout: 5m
-  smtp_smarthost: 'aspmx.l.google.com:25'
+  smtp_smarthost: 'smtp.mail.ru:465'
   smtp_require_tls: false
+  smtp_auth_username: "$SMTP_USER"
+  smtp_auth_password: "$SMTP_PASSWORD"
 ```
 
 resolve_timeout — значение по умолчанию, используемое alertmanager, если алёрт не включает поле EndsAt, 
@@ -26,51 +28,36 @@ resolve_timeout — значение по умолчанию, используе
 
 ```yaml
 receivers:
-- name: gmail
+- name: mail
   email_configs:
-  - to: 'artur@kryukov.biz'
-    from: alert@kryukov.biz
+  - to: 'artur@kryukov.moscow'
+    from: 'artur@kryukov.moscow'
     send_resolved: true
-- name: 'telegramm'
-  webhook_configs:
-  - url: 'http://alertmanager-bot:8080'
-    send_resolved: true
+- name: telegram
+  telegram_configs:
+  - send_resolved: true
+    bot_token: $BOT_TOKEN
+    chat_id: $CHAT_ID
+    api_url: "https://api.telegram.org"
+    parse_mode: HTML
 ```
 
 ### Секция route
 
 ```yaml
 route:
-  group_by: ['alertname', 'severity', 'hostname', 'namespace', ] # По каким меткам группировать.
-  group_wait: 10s # время ожидания перед отправкой уведомления для группы.
   group_interval: 5m # время отправки повторного сообщения для группы.
+  group_wait: 10s # время ожидания перед отправкой уведомления для группы.
   repeat_interval: 3h # время до отправки повторного сообщения.
-  receiver: default # имя receiver-a.
+  group_by: ['alertname', 'priority'] # По каким меткам группировать.
+  receiver: mail
+
   routes:
-  - match_re: 
-      severity: ^(critical|warning)$
-    receiver: telegramm
+  - matchers:
+      - severity=~critical|warning
+    receiver: mail
     continue: true
-  - match_re:
-      severity: ^critical$
-    receiver: gmail
-    continue: true
-```
-
-### Telegramm
-
-Пока в RC release-0.24
-
-https://github.com/prometheus/alertmanager/blob/release-0.24/docs/configuration.md#telegram_config
-
-```yaml
-receivers:
-- name: 'telegramm'
-  telegram_config:
-  - api_url: 'https://api.telegramm.org'
-    bot_token: TOKEN
-    chat_id: 11111111
-    message: '{{ telegramm.default.message }}'
-    parse_mode: MarkdownV2
-    send_resolved: true
+  - matchers:
+      - severity=~critical|warning
+    receiver: telegram
 ```
