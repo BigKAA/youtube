@@ -72,7 +72,7 @@ spec:
                   -e "s/\$BOT_TOKEN/$(echo $BOT_TOKEN)/" \
                   -e "s/\$CHAT_ID/$(echo $CHAT_ID)/" \
                   /config-tmpl/alertmanager.yml > /config/alertmanager.yml
-              cat /config/alertmanager.yml
+              # cat /config/alertmanager.yml
               echo Done, exit code: $?
           envFrom:
             - secretRef:
