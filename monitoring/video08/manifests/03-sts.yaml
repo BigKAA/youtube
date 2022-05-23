@@ -68,9 +68,9 @@ spec:
             - -c
             - |
               sed -e "s/\$SMTP_USER/$(echo $SMTP_USER)/" \
-                  -e "s/\$SMTP_PASSWORD/$(echo $SMTP_PASSWORD)/" \
-                  -e "s/\$BOT_TOKEN/$(echo $BOT_TOKEN)/" \
-                  -e "s/\$CHAT_ID/$(echo $CHAT_ID)/" \
+                  -e "s/\$SMTP_PASSWORD/\"$(echo $SMTP_PASSWORD)\"/" \
+                  -e "s/\$BOT_TOKEN/\"$(echo $BOT_TOKEN)\"/" \
+                  -e "s/\$CHAT_ID/\"$(echo $CHAT_ID)/\"" \
                   /config-tmpl/alertmanager.yml > /config/alertmanager.yml
               cat /config/alertmanager.yml
               echo Done, exit code: $?
