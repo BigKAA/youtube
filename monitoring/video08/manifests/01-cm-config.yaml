@@ -11,7 +11,7 @@ data:
     global:
       resolve_timeout: 5m
       smtp_smarthost: 'smtp.mail.ru:465'
-      # smtp_require_tls: true
+      smtp_require_tls: false
       smtp_auth_username: "$SMTP_USER"
       smtp_auth_password: "$SMTP_PASSWORD"
     route:
