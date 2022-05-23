@@ -22,12 +22,10 @@ data:
       receiver: mail
 
       routes:
-      - matchers:
-          - 'severity=~"critical|warning"'
+      - matchers: [ '{severity=~"critical|warning"}' ]
         receiver: mail
         continue: true
-      - matchers:
-          - 'severity=~"critical|warning"'
+      - matchers: [ '{severity=~"critical|warning"}' ]
         receiver: telegram
         continue: true
 
