@@ -22,12 +22,12 @@ data:
       receiver: mail
 
       routes:
-      - match_re:
-          severity: ^(critical|warning)$
+      - matchers:
+          - severity=~critical|warning
         receiver: mail
         continue: true
-      - match_re:
-          severity: ^(critical|warning)$
+      - matchers:
+          - severity=~critical|warning
         receiver: telegram
 
     receivers:
