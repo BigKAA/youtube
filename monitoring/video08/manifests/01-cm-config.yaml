@@ -9,12 +9,11 @@ metadata:
 data:
   alertmanager.yml: |
     global:
-          resolve_timeout: 5m
-          smtp_smarthost: 'smtp.mail.ru:465'
-          smtp_require_tls: true
-          smtp_auth_username: $SMTP_USER
-          smtp_auth_password: $SMTP_PASSWORD
-
+      resolve_timeout: 5m
+      smtp_smarthost: 'smtp.mail.ru:465'
+      smtp_require_tls: true
+      smtp_auth_username: $SMTP_USER
+      smtp_auth_password: $SMTP_PASSWORD
     route:
       group_interval: 5m
       group_wait: 10s
