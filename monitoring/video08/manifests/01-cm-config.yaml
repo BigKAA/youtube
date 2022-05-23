@@ -15,36 +15,36 @@ data:
           smtp_auth_username: $SMTP_USER
           smtp_auth_password: $SMTP_PASSWORD
 
-        route:
-          group_interval: 5m
-          group_wait: 10s
-          repeat_interval: 3h
-          group_by: ['alertname', 'priority']
-          receiver: mail
+    route:
+      group_interval: 5m
+      group_wait: 10s
+      repeat_interval: 3h
+      group_by: ['alertname', 'priority']
+      receiver: mail
 
-          routes:
-          - matchers:
-            - severity =~ "critical|warning"
-            receiver: mail
-            continue: true
-          - matchers:
-            - severity =~ "critical|warning"
-            receiver: telegram
-            continue: true
+      routes:
+      - matchers:
+        - severity =~ "critical|warning"
+        receiver: mail
+        continue: true
+      - matchers:
+        - severity =~ "critical|warning"
+        receiver: telegram
+        continue: true
 
-        receivers:
-        - name: mail
-          email_configs:
-          - to: 'artur@kryukov.biz'
-            from: 'artur@kryukov.moscow'
-            send_resolved: true
-        - name: telegram
-          telegram_configs:
-          - send_resolved: true
-            bot_token: $BOT_TOKEN
-            chat_id: $CHAT_ID
-            api_url: "https://api.telegram.org"
-            parse_mode: HTML
+    receivers:
+    - name: mail
+      email_configs:
+      - to: 'artur@kryukov.biz'
+        from: 'artur@kryukov.moscow'
+        send_resolved: true
+    - name: telegram
+      telegram_configs:
+      - send_resolved: true
+        bot_token: $BOT_TOKEN
+        chat_id: $CHAT_ID
+        api_url: "https://api.telegram.org"
+        parse_mode: HTML
 
-        templates:
-        - /etc/alertmanager/templates/*.tmpl
+    templates:
+    - /etc/alertmanager/templates/*.tmpl
