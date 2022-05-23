@@ -33,7 +33,7 @@ data:
     receivers:
     - name: mail
       email_configs:
-      - to: 'artur@kryukov.biz'
+      - to: 'artur@kryukov.moscow'
         from: 'artur@kryukov.moscow'
         send_resolved: true
     - name: telegram
