@@ -126,7 +126,7 @@ spec:
       volumes:
         - name: config-tmpl
           configMap:
-            name: alertmanager
+            name: alertmanager-config
         - name: config
           emptyDir:
             medium: Memory
