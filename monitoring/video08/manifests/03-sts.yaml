@@ -42,6 +42,8 @@ metadata:
   labels:
     app.kubernetes.io/name: alertmanager
     app.kubernetes.io/instance: alertmanager
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
   selector:
