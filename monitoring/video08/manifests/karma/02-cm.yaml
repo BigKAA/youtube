@@ -46,5 +46,5 @@ data:
       level: info
     receivers:
       keep: []
-      strip:
-      - telegram
+      strip: []
+      #- telegram
