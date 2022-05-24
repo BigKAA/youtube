@@ -10,7 +10,7 @@ spec:
     namespace: monitoring
     server: 'https://kubernetes.default.svc'
   source:
-    path: monitoring/video08/karma/manifests
+    path: monitoring/video08/manifests/karma
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: master
   project:  monitoring
