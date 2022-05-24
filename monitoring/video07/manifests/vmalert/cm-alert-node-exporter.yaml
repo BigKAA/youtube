@@ -82,7 +82,7 @@ data:
     - name: uptime
       rules:
       - alert: NodeCriticalSystemUptime
-        expr: time() - node_boot_time_seconds < 600
+        expr: (time() - node_boot_time_seconds) * on(instance,job) group_left(nodename) node_uname_info < 600
         for: 1m
         labels:
           severity: critical
