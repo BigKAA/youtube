@@ -61,3 +61,7 @@ route:
       - severity=~critical|warning
     receiver: telegram
 ```
+
+## Видео
+
+[<img src="https://img.youtube.com/vi/ABRy8LBuzSs/maxresdefault.jpg" width="50%">](https://youtu.be/ABRy8LBuzSs)
