@@ -122,3 +122,7 @@ alertmanager. Отображает текущие (не закрытые) алё
 ## Видео
 
 [Плейлист monitoring](https://www.youtube.com/playlist?list=PLmxqUDFl0XM6GecLZDgRvU3L0KOa-OQEh)
+
+## Финальная версия.
+
+[То, что должно получиться в итоге](final).
