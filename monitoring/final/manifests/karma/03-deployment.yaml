@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: karma
+  labels:
+    app.kubernetes.io/name: karma
+    app.kubernetes.io/instance: karma
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: karma
+      app.kubernetes.io/instance: karma
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: karma
+        app.kubernetes.io/instance: karma
+    spec:
+      containers:
+        - name: karma
+          image: "ghcr.io/prymitive/karma:v0.99"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+          - name: CONFIG_FILE
+            value: /etc/karma/karma.conf
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: karma-config
+              mountPath: /etc/karma
+      volumes:
+      - name: karma-config
+        configMap:
+          name: karma-config

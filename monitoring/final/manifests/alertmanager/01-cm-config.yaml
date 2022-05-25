@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  labels:
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/instance: alertmanager
+data:
+  alertmanager.yml: |
+    global:
+      resolve_timeout: 5m
+      smtp_smarthost: 'smtp.mail.ru:465'
+      smtp_require_tls: false
+      smtp_auth_username: "$SMTP_USER"
+      smtp_auth_password: "$SMTP_PASSWORD"
+    route:
+      group_interval: 5m
+      group_wait: 10s
+      repeat_interval: 3h
+      group_by: ['alertname', 'priority']
+      receiver: mail
+
+      routes:
+      - matchers:
+          - severity=~critical|warning
+        receiver: mail
+        continue: true
+      - matchers:
+          - severity=~critical|warning
+        receiver: telegram
+
+    receivers:
+    - name: mail
+      email_configs:
+      - to: 'artur@kryukov.moscow'
+        from: 'artur@kryukov.moscow'
+        send_resolved: true
+    - name: telegram
+      telegram_configs:
+      - send_resolved: true
+        bot_token: $BOT_TOKEN
+        chat_id: $CHAT_ID
+        api_url: "https://api.telegram.org"
+        parse_mode: HTML
+
+    templates:
+    - /etc/alertmanager/templates/*.tmpl

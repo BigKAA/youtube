@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: karma
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: karma
+    app.kubernetes.io/instance: karma
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: karma
+  annotations:
+    certmanager.k8s.io/cluster-issuer: monitoring-issuer
+spec:
+  ingressClassName: system-ingress
+  tls:
+  - secretName: karma-tls
+    hosts:
+      - karma.kryukov.local
+  rules:
+    - host: "karma.kryukov.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: karma
+                port:
+                  name: http
+
