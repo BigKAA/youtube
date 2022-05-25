@@ -13,7 +13,7 @@ spec:
   source:
     path: monitoring/final/manifests/grafana
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: monitoring
+    targetRevision: master
   project:  monitoring
   syncPolicy:
     automated:

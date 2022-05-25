@@ -13,7 +13,7 @@ spec:
   source:
     path: monitoring/final/charts/ksm
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: monitoring
+    targetRevision: master
     helm:
       valueFiles:
         - values.yaml
