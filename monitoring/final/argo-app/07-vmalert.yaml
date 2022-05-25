@@ -5,6 +5,8 @@ metadata:
   namespace: argocd
   labels:
     app: monitoring
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     name: ''
