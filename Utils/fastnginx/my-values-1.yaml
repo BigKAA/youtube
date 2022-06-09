@@ -1,3 +1,12 @@
+ingress:
+  enabled: true
+  className: "system-ingress"
+  hosts:
+    - host: www.kryukov.local
+      paths:
+        - path: /
+          pathType: Prefix
+
 html:
   index: |
     <html>
@@ -7,7 +16,7 @@ html:
     </head>
     <body>
     <h1>Fast nginx deployment</h1>
-    <p>Абзац.</p>
+    <p>Абзац <b>I</b>.</p>
     </body>
     </html>
   50x: |
