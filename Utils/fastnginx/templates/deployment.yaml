@@ -4,10 +4,6 @@ metadata:
   name: {{ include "fastnginx.fullname" . }}
   labels:
     {{- include "fastnginx.labels" . | nindent 4 }}
-  annotations:
-    htmlchecksum: {{ include (print $.Template.BasePath "/configmap-html.yaml") .  | sha256sum }}
-    confdchecksum: {{ include (print $.Template.BasePath "/configmap-confd.yaml") .  | sha256sum }}
-    nginxchecksum: {{ include (print $.Template.BasePath "/configmap-nginx.yaml") .  | sha256sum }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -15,8 +11,11 @@ spec:
       {{- include "fastnginx.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        htmlchecksum: {{ include (print $.Template.BasePath "/configmap-html.yaml") .  | sha256sum }}
+        confdchecksum: {{ include (print $.Template.BasePath "/configmap-confd.yaml") .  | sha256sum }}
+        nginxchecksum: {{ include (print $.Template.BasePath "/configmap-nginx.yaml") .  | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
