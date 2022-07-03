@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-go-prog
+  annotations:
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: sample-go-prog
+    ver: "0.0.1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample-go-prog
+      ver: "0.0.1"
+  template:
+    metadata:
+      labels:
+        app: sample-go-prog
+        ver: "0.0.1"
+    spec:
+      containers:
+      - name: sample-go-prog
+        image: bigkaa/sample-go-prog:0.0.1
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 5000
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: sample-go-prog-cm
+        livenessProbe:
+          httpGet:
+            path: /app/health/livnes
+            port: http
+            scheme: "HTTP"
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /app/health/readnes
+            port: http
+            scheme: "HTTP"
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 200m
+            memory: 128Mi
+
+
+
+

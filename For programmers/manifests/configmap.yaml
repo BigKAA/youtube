@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-go-prog-cm
+data:
+  CONTEXT: "/app"
+  PROBES: "health"
+  DEFAULT_LOG_LEVEL: "info"
+  PROBES_IN_LOGS: "true"
+  
