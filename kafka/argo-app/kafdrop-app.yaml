@@ -7,10 +7,10 @@ metadata:
 spec:
   destination:
     name: ''
-    namespace: monitoring
+    namespace: kafka
     server: 'https://kubernetes.default.svc'
   source:
-    path: monitoring/kafka/charts/kafdrop
+    path: kafka/charts/kafdrop
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: kafka
     helm:
