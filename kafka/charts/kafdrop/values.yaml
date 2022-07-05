@@ -38,7 +38,7 @@ service:
   annotations: {}
   type: NodePort
   port: 9000
-  nodePort: 30900
+  nodePort: 32900
 
 ingress:
   enabled: false
