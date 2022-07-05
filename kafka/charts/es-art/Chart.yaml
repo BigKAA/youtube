@@ -1,0 +1,10 @@
+apiVersion: v2
+name: es-art
+description: Elasticsearch Stack chart for ArgoCD
+type: application
+version: 0.1.0
+dependencies:
+- name: elasticsearch
+  condition: elasticsearch.enabled
+  repository: https://charts.bitnami.com/bitnami
+  version: 18.2.16

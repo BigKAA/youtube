@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+spec:
+  destination:
+    name: ''
+    namespace: kafka
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: kafka/charts/es-art
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: kafka
+    helm:
+      valueFiles:
+        - values-es.yaml
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
