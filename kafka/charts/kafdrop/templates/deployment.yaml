@@ -3,21 +3,16 @@ kind: Deployment
 metadata:
   name: {{ include "kafdrop.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "kafdrop.name" . }}
-    helm.sh/chart: {{ include "kafdrop.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "kafdrop.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "kafdrop.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "kafdrop.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "kafdrop.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- include "kafdrop.selectorLabels" . | nindent 8 }}
       annotations:
 {{- if .Values.podAnnotations }}
 {{ toYaml .Values.podAnnotations | indent 8 }}

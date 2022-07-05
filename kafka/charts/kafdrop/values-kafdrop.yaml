@@ -42,11 +42,14 @@ service:
 
 ingress:
   enabled: true
-  ingressClassName: system-ingress
+  className: system-ingress
   path: /
   pathType: Prefix
   hosts:
-    - host: "kafdrop.kryukov.local"
+    - host: kafdrop.kryukov.local
+      paths:
+        - path: /
+          pathType: Prefix
   tls: []
 
 resources:

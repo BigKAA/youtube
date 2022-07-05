@@ -39,14 +39,20 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 {{- end -}}
 
-{{- define "ingress.apiVersion" }}
-{{- if .Values.ingress.apiVersion -}}
-{{- .Values.ingress.apiVersion -}}
-{{- else if semverCompare "<1.14-0" (include "capabilities.kubeVersion" .) -}}
-{{- print "extensions/v1beta1" -}}
-{{- else if semverCompare "<1.19-0" (include "capabilities.kubeVersion" .) -}}
-{{- print "networking.k8s.io/v1beta1" -}}
-{{- else -}}
-{{- print "networking.k8s.io/v1" -}}
+
+{{- define "kafdrop.labels" -}}
+helm.sh/chart: {{ include "kafdrop.chart" . }}
+{{ include "kafdrop.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "kafdrop.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "kafdrop.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}

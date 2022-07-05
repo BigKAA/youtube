@@ -42,13 +42,15 @@ service:
 
 ingress:
   enabled: false
-  annotations: {}
-  apiVersion: ~
-  #ingressClassName: ~
+  className: system-ingress
   path: /
-  #pathType: ~
-  hosts: []
-  tls: []
+  pathType: Prefix
+  hosts:
+    - host: kafdrop.kryukov.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: [ ]
 
 resources:
   # limits:

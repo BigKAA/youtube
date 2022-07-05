@@ -5,12 +5,9 @@ metadata:
   annotations:
 {{ tpl (toYaml .Values.service.annotations) . | indent 4 }}
 {{- end }}
-  name: {{ include "kafdrop.fullname" . }}
+  name: {{ include "kafdrop.fullname" . }}-svc
   labels:
-    app.kubernetes.io/name: {{ include "kafdrop.name" . }}
-    helm.sh/chart: {{ include "kafdrop.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "kafdrop.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -22,5 +19,4 @@ spec:
       nodePort: {{.Values.service.nodePort}}
 {{ end }}
   selector:
-    app.kubernetes.io/name: {{ include "kafdrop.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "kafdrop.selectorLabels" . | nindent 4 }}
