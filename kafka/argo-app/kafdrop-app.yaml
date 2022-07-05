@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafdrop
+  labels:
+    app: kafka
+spec:
+  destination:
+    name: ''
+    namespace: monitoring
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: monitoring/kafka/charts/kafdrop
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: kafka
+    helm:
+      valueFiles:
+        - values-kafdrop.yaml
+  project: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

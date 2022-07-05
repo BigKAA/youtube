@@ -1,0 +1,10 @@
+apiVersion: v2
+name: kafka-art
+description: Kafka chart for ArgoCD
+type: application
+version: 0.1.0
+dependencies:
+- name: kafka
+  condition: kafka.enabled
+  repository: https://charts.bitnami.com/bitnami
+  version: 18.0.0
