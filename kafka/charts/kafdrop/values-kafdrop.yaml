@@ -41,13 +41,12 @@ service:
   nodePort: 30900
 
 ingress:
-  enabled: false
-  annotations: {}
-  apiVersion: ~
-  #ingressClassName: ~
+  enabled: true
+  ingressClassName: system-ingress
   path: /
-  #pathType: ~
-  hosts: []
+  pathType: Prefix
+  hosts:
+    - host: "kafdrop.kryukov.local"
   tls: []
 
 resources:

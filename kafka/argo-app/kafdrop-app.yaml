@@ -16,7 +16,7 @@ spec:
     helm:
       valueFiles:
         - values-kafdrop.yaml
-  project: monitoring
+  project: default
   syncPolicy:
     automated:
       prune: true
