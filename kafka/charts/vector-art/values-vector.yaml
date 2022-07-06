@@ -131,10 +131,10 @@ vector:
           del(."@timestamp")
           #del(.kubernetes.labels)
           #del(.kubernetes.annotations)
-          if ! is_empty(.kubernetes.labels) { 
+          if ! is_null(.kubernetes.labels) { 
             .kubernetes.labels = map_keys(value: object!(.kubernetes.labels)) -> |key| {replace(key, ".", "_")}
           }
-          if ! is_empty(.kubernetes.annotations) {
+          if ! is_null(.kubernetes.annotations) {
             .kubernetes.annotations = map_keys(value: object!(.kubernetes.annotations)) -> |key| {replace(key, ".", "_")}
           }
 
