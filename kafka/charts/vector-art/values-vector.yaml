@@ -130,14 +130,9 @@ vector:
           del(._p)
           del(."@timestamp")
           #del(.kubernetes.labels)
-          del(.kubernetes.annotations)
+          #del(.kubernetes.annotations)
           .kubernetes.labels = map_keys(value: object!(.kubernetes.labels)) -> |key| {replace(key, ".", "_")}
-          #map_keys(value: .kubernetes.labels, recursive: false) -> |key| {
-          #  new_key = replace(key,".","_")
-          #  value = get!(value: .kubernetes.labels, path: [key])
-          #  del(parse_query_string(".kubernetes.labels." + key))
-          #  .kubernetes.labels, err = set!(value: .kubernetes.labels, path: [new_key], data: value) 
-          #}
+          .kubernetes.annotations = map_keys(value: object!(.kubernetes.annotations)) -> |key| {replace(key, ".", "_")}
 
       transform-host:
         type: remap
