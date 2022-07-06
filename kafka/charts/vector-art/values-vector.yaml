@@ -131,8 +131,14 @@ vector:
           del(."@timestamp")
           #del(.kubernetes.labels)
           #del(.kubernetes.annotations)
-          .kubernetes.labels = map_keys(value: object!(.kubernetes.labels)) -> |key| {replace(key, ".", "_")}
-          .kubernetes.annotations = map_keys(value: object!(.kubernetes.annotations)) -> |key| {replace(key, ".", "_")}
+          labels = object!(.kubernetes.labels)
+          if ! is_empty(labels) { 
+            .kubernetes.labels = map_keys(value: labels) -> |key| {replace(key, ".", "_")}
+          }
+          annotations = object!(.kubernetes.annotations)
+          if ! is_empty(annotations) {
+            .kubernetes.annotations = map_keys(value: annotations) -> |key| {replace(key, ".", "_")}
+          }
 
       transform-host:
         type: remap
