@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: elasticsearch
+  name: fluentbit
   labels:
     app: kafka
 spec:
@@ -10,12 +10,12 @@ spec:
     namespace: kafka
     server: 'https://kubernetes.default.svc'
   source:
-    path: kafka/charts/es-art
+    path: kafka/charts/fluent-bit-art
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: kafka
     helm:
       valueFiles:
-        - values-es.yaml
+        - values-fb.yaml
   project: default
   syncPolicy:
     automated:
