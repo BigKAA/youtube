@@ -129,8 +129,9 @@ vector:
           . = parse_json!(.message)
           del(._p)
           del(."@timestamp")
-          del(.kubernetes.labels)
+          #del(.kubernetes.labels)
           del(.kubernetes.annotations)
+          .kubernetes.labels = map_keys(value: object!(.kubernetes.labels)) -> |key| {replace(key, ".", "_")}
           #map_keys(value: .kubernetes.labels, recursive: false) -> |key| {
           #  new_key = replace(key,".","_")
           #  value = get!(value: .kubernetes.labels, path: [key])
