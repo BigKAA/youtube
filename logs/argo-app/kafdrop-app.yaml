@@ -1,22 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: fluentbit
+  name: kafdrop
   labels:
-    app: fluentbit
+    app: kafka
     env: test
 spec:
   destination:
     name: ''
-    namespace: logs
+    namespace: kafka
     server: 'https://kubernetes.default.svc'
   source:
-    path: kafka/charts/fluent-bit-art
+    path: logs/charts/kafdrop
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: kafka
     helm:
       valueFiles:
-        - values-fb.yaml
+        - values-kafdrop.yaml
   project: default
   syncPolicy:
     automated:
