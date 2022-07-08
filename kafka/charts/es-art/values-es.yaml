@@ -163,25 +163,11 @@ elasticsearch:
           kibanaPassword: "password"
           elasticsearchPasswordSecret: "es"
         tls:
-          ## @param elasticsearch.security.tls.enabled Set to 'true' if Elasticsearch API uses TLS/SSL (HTTPS)
-          ##
           enabled: true
-          ## @param elasticsearch.security.tls.verificationMode Verification mode for SSL communications.
-          ## Supported values: full, certificate, none.
-          ## Ref: https://www.elastic.co/guide/en/kibana/7.x/settings.html#elasticsearch-ssl-verificationmode
           verificationMode: "full"
-          ## @param elasticsearch.security.tls.existingSecret Name of the existing secret containing Elasticsearch Truststore or CA certificate. Required unless verificationMode=none
-          ##
           existingSecret: "es-master-crt"
-          ## @param elasticsearch.security.tls.usePemCerts Set to 'true' to use PEM certificates instead of PKCS12.
-          ##
           usePemCerts: true
-          ## @param elasticsearch.security.tls.truststorePassword Password to access the PKCS12 trustore in case it is password-protected.
-          ##
           truststorePassword: "password"
-          ## @param elasticsearch.security.tls.passwordsSecret Name of a existing secret containing the Truststore password
-          ##
-          passwordsSecret: ""
     persistence:
       enabled: true
       storageClass: "managed-nfs-storage"
