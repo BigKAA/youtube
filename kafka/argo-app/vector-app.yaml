@@ -8,7 +8,7 @@ metadata:
 spec:
   destination:
     name: ''
-    namespace: kafka
+    namespace: logs
     server: 'https://kubernetes.default.svc'
   source:
     path: kafka/charts/vector-art
