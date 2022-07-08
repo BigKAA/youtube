@@ -33,7 +33,7 @@ elasticsearch:
     ingressClassName: "system-ingress"
   master:
     masterOnly: true
-    replicaCount: 2
+    replicaCount: 1
     nameOverride: "es-master"
     fullnameOverride: "es-master"
     resources:
@@ -63,7 +63,7 @@ elasticsearch:
         - ReadWriteOnce
       size: 8Gi
   data:
-    replicaCount: 2
+    replicaCount: 1
     nameOverride: "es-data"
     fullnameOverride: "es-data"
     updateStrategy:
