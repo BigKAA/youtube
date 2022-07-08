@@ -3,11 +3,12 @@ kind: Application
 metadata:
   name: elasticsearch
   labels:
-    app: kafka
+    app: elasticsearch
+    env: test
 spec:
   destination:
     name: ''
-    namespace: kafka
+    namespace: es
     server: 'https://kubernetes.default.svc'
   source:
     path: kafka/charts/es-art

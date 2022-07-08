@@ -4,6 +4,7 @@ metadata:
   name: kafka
   labels:
     app: kafka
+    env: test
 spec:
   destination:
     name: ''
