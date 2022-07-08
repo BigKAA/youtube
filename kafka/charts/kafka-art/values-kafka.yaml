@@ -15,10 +15,10 @@ kafka:
   heapOpts: -Xmx1024m -Xms1024m
   ## @param deleteTopicEnable Switch to enable topic deletion or not
   ##
-  deleteTopicEnable: false
+  deleteTopicEnable: true
   ## @param autoCreateTopicsEnable Switch to enable auto creation of topics. Enabling auto creation of topics not recommended for production or similar environments
   ##
-  autoCreateTopicsEnable: true
+  autoCreateTopicsEnable: flase
   ## @param logFlushIntervalMessages The number of messages to accept before forcing a flush of data to disk
   ##
   logFlushIntervalMessages: _10000
@@ -33,7 +33,7 @@ kafka:
   logRetentionCheckIntervalMs: 300000
   ## @param logRetentionHours The minimum age of a log file to be eligible for deletion due to age
   ##
-  logRetentionHours: 168
+  logRetentionHours: 24
   ## @param logSegmentBytes The maximum size of a log segment file. When this size is reached a new log segment will be created
   ##
   logSegmentBytes: _1073741824
@@ -63,7 +63,7 @@ kafka:
   numNetworkThreads: 3
   ## @param numPartitions The default number of log partitions per topic
   ##
-  numPartitions: 1
+  numPartitions: 20
   ## @param numRecoveryThreadsPerDataDir The number of threads per data directory to be used for log recovery at startup and flushing at shutdown
   ##
   numRecoveryThreadsPerDataDir: 1
@@ -118,9 +118,7 @@ kafka:
     failureThreshold: 15
     successThreshold: 1
   resources:
-    limits:
-      memory: 2048Mi
-      cpu: "2"
+    limits: {}
     requests:
       memory: 1024Mi
       cpu: 500m
@@ -193,9 +191,7 @@ kafka:
       containerPorts:
         metrics: 9308
       resources:
-        limits:
-          memory: 512Mi
-          cpu: 500m
+        limits: {}
         requests:
           memory: 256Mi
           cpu: 250m
@@ -227,9 +223,7 @@ kafka:
         - ReadWriteOnce
       size: 8Gi
     resources:
-      limits:
-        memory: 512Mi
-        cpu: 500m
+      limits: {}
       requests:
         memory: 256Mi
         cpu: 250m
