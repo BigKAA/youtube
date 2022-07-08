@@ -63,7 +63,7 @@ kafka:
   numNetworkThreads: 3
   ## @param numPartitions The default number of log partitions per topic
   ##
-  numPartitions: 20
+  numPartitions: 2
   ## @param numRecoveryThreadsPerDataDir The number of threads per data directory to be used for log recovery at startup and flushing at shutdown
   ##
   numRecoveryThreadsPerDataDir: 1
