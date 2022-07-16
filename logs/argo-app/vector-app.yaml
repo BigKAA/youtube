@@ -16,7 +16,7 @@ spec:
     targetRevision: kafka
     helm:
       valueFiles:
-        - values-vector.yaml
+        - values-vector-opensearch.yaml
   project: default
   syncPolicy:
     automated:
