@@ -127,7 +127,7 @@ opensearch:
   # additionals labels
   labels: {}
 
-  opensearchJavaOpts: "-Xmx512M -Xms512M"
+  opensearchJavaOpts: "-Xmx1024M -Xms1024M"
 
   resources:
     requests:
