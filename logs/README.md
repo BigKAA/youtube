@@ -18,3 +18,5 @@ Elasticsearch пыхтит на грани возможного. Необход�
 [WEB интерфейс](https://github.com/obsidiandynamics/kafdrop) для kafka. Мне их чарт не понравился. Поэтому малость его
 модифицировал и [положил тут](charts/kafdrop).
 
+Вместо elasticsearch можно использовать его клон [opensearch](https://opensearch.org/docs/latest). Я сделал [чарт 
+обертку](charts/opensearch-art), в котором сразу и opensearch и opensearch dashboards (клон kibana).
