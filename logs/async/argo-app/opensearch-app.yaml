@@ -11,9 +11,9 @@ spec:
     namespace: es
     server: 'https://kubernetes.default.svc'
   source:
-    path: logs/charts/opensearch-art
+    path: logs/async/charts/opensearch-art
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: kafka
+    targetRevision: master
     helm:
       valueFiles:
         - values-opensearch.yaml

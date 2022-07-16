@@ -1,22 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kafka
+  name: vector
   labels:
-    app: kafka
+    app: vector
     env: test
 spec:
   destination:
     name: ''
-    namespace: kafka
+    namespace: logs
     server: 'https://kubernetes.default.svc'
   source:
-    path: logs/charts/kafka-art
+    path: logs/async/charts/vector-art
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: kafka
+    targetRevision: master
     helm:
       valueFiles:
-        - values-kafka.yaml
+        - values-vector-opensearch.yaml
   project: default
   syncPolicy:
     automated:

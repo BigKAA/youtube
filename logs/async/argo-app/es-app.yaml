@@ -1,22 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: fluentbit
+  name: elasticsearch
   labels:
-    app: fluentbit
+    app: elasticsearch
     env: test
 spec:
   destination:
     name: ''
-    namespace: logs
+    namespace: es
     server: 'https://kubernetes.default.svc'
   source:
-    path: logs/charts/fluent-bit-art
+    path: logs/async/charts/es-art
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: kafka
+    targetRevision: master
     helm:
       valueFiles:
-        - values-fb.yaml
+        - values-es.yaml
   project: default
   syncPolicy:
     automated:

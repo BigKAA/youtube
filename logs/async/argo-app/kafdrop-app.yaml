@@ -11,9 +11,9 @@ spec:
     namespace: kafka
     server: 'https://kubernetes.default.svc'
   source:
-    path: logs/charts/kafdrop
+    path: logs/async/charts/kafdrop
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: kafka
+    targetRevision: master
     helm:
       valueFiles:
         - values-kafdrop.yaml

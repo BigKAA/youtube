@@ -1,9 +1,9 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: vector
+  name: fluentbit
   labels:
-    app: vector
+    app: fluentbit
     env: test
 spec:
   destination:
@@ -11,12 +11,12 @@ spec:
     namespace: logs
     server: 'https://kubernetes.default.svc'
   source:
-    path: logs/charts/vector-art
+    path: logs/async/charts/fluent-bit-art
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: kafka
+    targetRevision: master
     helm:
       valueFiles:
-        - values-vector-opensearch.yaml
+        - values-fb.yaml
   project: default
   syncPolicy:
     automated:
