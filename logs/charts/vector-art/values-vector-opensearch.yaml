@@ -160,6 +160,9 @@ vector:
           index: 'kube-%Y-%m-%d'
         tls:
           verify_certificate: false
+        auth:
+          user: admin
+          password: admin
       es-host:
         inputs:
           - transform-host
@@ -171,6 +174,9 @@ vector:
           index: 'host-%Y-%m-%d'
         tls:
           verify_certificate: false
+        auth:
+          user: admin
+          password: admin
 
   persistence:
     enabled: true
