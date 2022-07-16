@@ -163,6 +163,7 @@ vector:
         auth:
           user: admin
           password: admin
+          strategy: basic
       es-host:
         inputs:
           - transform-host
@@ -177,6 +178,7 @@ vector:
         auth:
           user: admin
           password: admin
+          strategy: basic
 
   persistence:
     enabled: true
