@@ -158,6 +158,8 @@ vector:
         bulk:
           action: "create"
           index: 'kube-%Y-%m-%d'
+        tls:
+          verify_certificate: false
       es-host:
         inputs:
           - transform-host
@@ -167,6 +169,8 @@ vector:
         bulk:
           action: "create"
           index: 'host-%Y-%m-%d'
+        tls:
+          verify_certificate: false
 
   persistence:
     enabled: true
