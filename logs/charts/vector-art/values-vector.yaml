@@ -154,6 +154,7 @@ vector:
           - transform-kube
         type: elasticsearch
         endpoint: "http://elasticsearch.es.svc:9200"
+        # endpoint: "http://opensearch-cluster-master.es.svc:9200"
         suppress_type_name: true
         bulk:
           action: "create"
@@ -163,6 +164,7 @@ vector:
           - transform-host
         type: elasticsearch
         endpoint: "http://elasticsearch.es.svc:9200"
+        # endpoint: "http://opensearch-cluster-master.es.svc:9200"
         suppress_type_name: true
         bulk:
           action: "create"
