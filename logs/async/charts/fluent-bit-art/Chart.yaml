@@ -1,0 +1,9 @@
+apiVersion: v2
+name: fluent-bit-art
+description: Fluent-bit chart for ArgoCD
+type: application
+version: 0.1.0
+dependencies:
+- name: fluent-bit
+  version: 0.20.3
+  repository: https://fluent.github.io/helm-charts

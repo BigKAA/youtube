@@ -1,8 +1,0 @@
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: {{ include "fastnginx.fullname" . }}-nginx
-data:
-  nginx.conf: |
-{{ .Values.nginxconf | indent 4 }}

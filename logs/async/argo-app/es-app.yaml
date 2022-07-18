@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+    env: test
+spec:
+  destination:
+    name: ''
+    namespace: es
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: logs/async/charts/es-art
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: master
+    helm:
+      valueFiles:
+        - values-es.yaml
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

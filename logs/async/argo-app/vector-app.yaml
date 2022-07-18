@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vector
+  labels:
+    app: vector
+    env: test
+spec:
+  destination:
+    name: ''
+    namespace: logs
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: logs/async/charts/vector-art
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: master
+    helm:
+      valueFiles:
+        - values-vector-opensearch.yaml
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fluentbit
+  labels:
+    app: fluentbit
+    env: test
+spec:
+  destination:
+    name: ''
+    namespace: logs
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: logs/async/charts/fluent-bit-art
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: master
+    helm:
+      valueFiles:
+        - values-fb.yaml
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

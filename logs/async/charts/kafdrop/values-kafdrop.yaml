@@ -1,0 +1,73 @@
+replicaCount: 1
+
+image:
+  repository: obsidiandynamics/kafdrop
+  tag: 3.30.0
+  pullPolicy: IfNotPresent
+
+kafka:
+  brokerConnect: kafka:9092
+  properties: ""
+  truststore: ""
+  keystore: ""
+  propertiesFile: "kafka.properties"
+  truststoreFile: "kafka.truststore.jks"
+  keystoreFile: "kafka.keystore.jks"
+
+host:
+
+jvm:
+  opts: "-Xms32M -Xmx64M"
+jmx:
+  port: 8686
+
+nameOverride: "kafdrop"
+fullnameOverride: "kafdrop"
+
+cmdArgs: ""
+
+global:
+  kubeVersion: ~
+
+server:
+  port: 9000
+  servlet:
+    contextPath: /
+
+service:
+  annotations: {}
+  type: NodePort
+  port: 9000
+  nodePort: 30900
+
+ingress:
+  enabled: true
+  className: system-ingress
+  path: /
+  pathType: Prefix
+  hosts:
+    - host: kafdrop.kryukov.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  requests:
+    cpu: 1m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+podAnnotations: {}
+
+mountProtoDesc: 
+  enabled: false
+  hostPath:
