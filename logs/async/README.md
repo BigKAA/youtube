@@ -8,6 +8,8 @@ Elasticsearch пыхтит на грани возможного. Необход�
 2. Настроить сборщик логов fluentbit на передачу логов в kafka.
 3. Настроить [vector](https://vector.dev/docs) забирать логи из kafka и сохранять их в elasticsearch.
 
+![](images/s1.jpg)
+
 За основу берём чарты:
 * от Bitnami:
   * [Kafka](https://github.com/bitnami/charts/tree/master/bitnami/kafka).
