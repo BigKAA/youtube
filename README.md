@@ -24,3 +24,5 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **[Helm](helm)** - всякое про Helm
 * **[Hashicorp vault](vault)**
 * **[Мониторинг](monitoring)**
+* **Логи**
+  * **[Сбор логов с асинхронной очередью](logs/async)** - kafka, vector, fluentbit, opensearch.
