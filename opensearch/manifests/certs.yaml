@@ -1,0 +1,127 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+  namespace: es
+spec:
+  selfSigned: {}
+---
+# Самоподписанный сертификат CA
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ca
+  namespace: es
+spec:
+  isCA: true
+  duration: 87600h # 10y
+  subject:
+    organizations:
+      - "Artur's home"
+    organizationalUnits:
+      - "IT dep"
+    localities:
+      - "Moscow"
+    countries:
+      - "RU"
+  commonName: Opensearch CA
+  secretName: ca-secret
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
+    group: cert-manager.io
+
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: opensearch-issuer
+  namespace: es
+spec:
+  ca:
+    secretName: ca-secret
+
+---
+# Сертификат для всех нод opensearch
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: master-cert
+  namespace: es
+spec:
+  secretName: master-tls
+
+  duration: 8760h # 1y
+  renewBefore: 360h # 15d
+
+  commonName: nodes
+  subject:
+    organizations:
+      - "Artur's home"
+    organizationalUnits:
+      - "IT dep"
+    localities:
+      - "Moscow"
+    countries:
+      - "RU"
+
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    rotationPolicy: Always
+    size: 4096
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - localhost
+    - esapi.kryukov.local
+    - kibana.kryukov.local
+  ipAddresses:
+    - 127.0.0.1
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: opensearch-issuer
+---
+# Сертификат администратора opensearch
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: admin-cert
+  namespace: es
+spec:
+  secretName: admin-tls
+
+  duration: 8760h # 1y
+  renewBefore: 360h # 15d
+
+  commonName: artur
+  subject:
+    organizations:
+      - "Artur's home"
+    organizationalUnits:
+      - "IT dep"
+    localities:
+      - "Moscow"
+    countries:
+      - "RU"
+
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    rotationPolicy: Always
+    size: 4096
+  usages:
+    - client auth
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: opensearch-issuer
