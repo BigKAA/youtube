@@ -121,6 +121,4 @@ curl -XGET  https://esapi.kryukov.local/ -u 'admin:password' --insecure
 
 ## Видео
 
-## Видео
-
 [<img src="https://img.youtube.com/vi/dXfOpp53X58/maxresdefault.jpg" width="50%">](https://youtu.be/dXfOpp53X58)
