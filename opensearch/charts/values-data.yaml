@@ -86,7 +86,7 @@ config:
 secretMounts:
   - name: master-tls
     secretName: master-tls
-    path: /certs
+    path: /usr/share/opensearch/config/certs
     defaultMode: 0644
   - name: admin-tls
     secretName: admin-tls

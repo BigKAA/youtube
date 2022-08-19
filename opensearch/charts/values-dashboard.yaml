@@ -38,7 +38,7 @@ ingress:
         - path: /
           backend:
             serviceName: dashboard
-            servicePort: 80
+            servicePort: 5601
   tls:
     - secretName: master-tls
       hosts:
