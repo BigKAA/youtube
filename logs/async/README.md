@@ -22,3 +22,9 @@ Elasticsearch пыхтит на грани возможного. Необход�
 
 Вместо elasticsearch можно использовать его клон [opensearch](https://opensearch.org/docs/latest). Я сделал [чарт 
 обертку](charts/opensearch-art), в котором сразу и opensearch и opensearch dashboards (клон kibana).
+
+## Видео
+
+* [Telegramm](https://t.me/arturkryukov/43)
+* [VK](https://vk.com/video7111833_456239197)
+* [YouTube](https://youtu.be/g21BJQX9-34)
