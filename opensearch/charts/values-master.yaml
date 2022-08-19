@@ -1,0 +1,201 @@
+---
+clusterName: "test-cluster"
+nodeGroup: "master"
+masterService: "opensearch-cluster-master"
+roles:
+  - master
+
+replicas: 2
+
+opensearchHome: /usr/share/opensearch
+
+nameOverride: ""
+fullnameOverride: "master"
+
+config:
+  # Values must be YAML literal style scalar / YAML multiline string.
+  # <filename>: |
+  #   <formatted-value(s)>
+  log4j2.properties: |
+    status = error
+  
+    appender.console.type = Console
+    appender.console.name = console
+    #appender.console.layout.type = PatternLayout
+    #appender.console.layout.pattern = [%d{ISO8601}][%-5p][%-25c{1.}] [%node_name]%marker %m%n
+    appender.console.layout.type = OpenSearchJsonLayout
+    appender.console.layout.type_name = server
+  
+    rootLogger.level = info
+    rootLogger.appenderRef.console.ref = console
+  opensearch.yml: |
+    cluster.name: opensearch-cluster
+
+    # Bind to all interfaces because we don't know what IP address Docker will assign to us.
+    network.host: 0.0.0.0
+
+    # Setting network.host to a non-loopback address enables the annoying bootstrap checks. "Single-node" mode disables them again.
+    # discovery.type: single-node
+
+    # Start OpenSearch Security Demo Configuration
+    # WARNING: revise all the lines below before you go into production
+    plugins.security.nodes_dn:
+      - "CN=nodes*,OU=IT dep,O=Artur's home,L=Moscow,C=RU"
+    plugins:
+      security:
+        ssl:
+          transport:
+            pemcert_filepath: certs/tls.crt
+            pemkey_filepath: certs/tls.key
+            pemtrustedcas_filepath: certs/ca.crt
+            enforce_hostname_verification: false
+          http:
+            enabled: true
+            pemcert_filepath: certs/tls.crt
+            pemkey_filepath: certs/tls.key
+            pemtrustedcas_filepath: certs/ca.crt
+        allow_unsafe_democertificates: false
+        allow_default_init_securityindex: true
+        authcz:
+          admin_dn:
+            - "CN=artur,OU=IT dep,O=Artur's home,L=Moscow,C=RU"
+        audit.type: internal_opensearch
+        enable_snapshot_restore_privilege: true
+        check_snapshot_restore_write_privileges: true
+        restapi:
+          roles_enabled: ["all_access", "security_rest_api_access"]
+        system_indices:
+          enabled: true
+          indices:
+            [
+              ".opendistro-alerting-config",
+              ".opendistro-alerting-alert*",
+              ".opendistro-anomaly-results*",
+              ".opendistro-anomaly-detector*",
+              ".opendistro-anomaly-checkpoints",
+              ".opendistro-anomaly-detection-state",
+              ".opendistro-reports-*",
+              ".opendistro-notifications-*",
+              ".opendistro-notebooks",
+              ".opendistro-asynchronous-search-response*",
+            ]
+    ######## End OpenSearch Security Demo Configuration ########
+  # log4j2.properties:
+
+secretMounts:
+  - name: master-tls
+    secretName: master-tls
+    path: /usr/share/opensearch/config/certs
+    defaultMode: 0644
+  - name: admin-tls
+    secretName: admin-tls
+    path: /usr/share/opensearch/config/admin
+    defaultMode: 0644
+
+opensearchJavaOpts: "-Xmx512M -Xms512M"
+
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "100Mi"
+
+persistence:
+  enabled: true
+  enableInitChown: true
+  labels:
+    enabled: false
+  storageClass: "managed-nfs-storage"
+  accessModes:
+    - ReadWriteOnce
+  size: 8Gi
+  annotations: {}
+
+antiAffinityTopologyKey: "kubernetes.io/hostname"
+antiAffinity: "soft"
+podManagementPolicy: "Parallel"
+
+# The environment variables injected by service links are not used, but can lead to slow OpenSearch boot times when
+# there are many services in the current namespace.
+# If you experience slow pod startups you probably want to set this to `false`.
+enableServiceLinks: true
+
+protocol: https
+httpPort: 9200
+transportPort: 9300
+
+securityConfig:
+  enabled: true
+  path: "/usr/share/opensearch/config/opensearch-security"
+  actionGroupsSecret: "opensearch-action-groups"
+  configSecret: "opensearch-config"
+  internalUsersSecret: "opensearch-internal-users"
+  rolesSecret: "opensearch-roles"
+  rolesMappingSecret: "opensearch-roles-mapping"
+  tenantsSecret: "opensearch-tenats"
+  # The following option simplifies securityConfig by using a single secret and
+  # specifying the config files as keys in the secret instead of creating
+  # different secrets for for each config file.
+  # Note that this is an alternative to the individual secret configuration
+  # above and shouldn't be used if the above secrets are used.
+  config:
+    # There are multiple ways to define the configuration here:
+    # * If you define anything under data, the chart will automatically create
+    #   a secret and mount it.
+    # * If you define securityConfigSecret, the chart will assume this secret is
+    #   created externally and mount it.
+    # * It is an error to define both data and securityConfigSecret.
+    securityConfigSecret: ""
+    dataComplete: true
+    data: {}
+      # config.yml: |-
+      # internal_users.yml: |-
+      # roles.yml: |-
+      # roles_mapping.yml: |-
+      # action_groups.yml: |-
+      # tenants.yml: |-
+
+terminationGracePeriod: 120
+sysctlVmMaxMapCount: 262144
+
+startupProbe:
+  tcpSocket:
+    port: 9200
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 30
+readinessProbe:
+  tcpSocket:
+    port: 9200
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+imagePullSecrets: []
+nodeSelector: {}
+tolerations: []
+
+ingress:
+  enabled: true
+  ingressClassName: system-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+  path: /
+  hosts:
+    - esapi.kryukov.local
+  tls:
+    - secretName: master-tls
+      hosts:
+        - esapi.kryukov.local
+
+## Set optimal sysctl's. This requires privilege. Can be disabled if
+## the system has already been preconfigured. (Ex: https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html)
+## Also see: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+sysctl:
+  enabled: false
+
+extraEnvs:
+  - name: DISABLE_INSTALL_DEMO_CONFIG
+    value: "true"
+

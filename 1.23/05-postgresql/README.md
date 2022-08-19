@@ -76,6 +76,8 @@ kind: PostgresCluster
 metadata:
   name: pg
 spec:
+  users:
+    - name: postgres
   image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:centos8-13.5-0
   postgresVersion: 13
   instances:

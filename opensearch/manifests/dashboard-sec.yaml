@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dashboard-user
+  namespace: es
+type: Opaque
+stringData:
+  OPENSEARCH_USERNAME: kibanaserver
+  OPENSEARCH_PASSWORD: password

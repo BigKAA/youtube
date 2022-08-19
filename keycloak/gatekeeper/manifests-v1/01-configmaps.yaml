@@ -58,7 +58,7 @@ metadata:
 data:
   config.yaml: |
     client-id: myapp
-    client-secret: db7b8b62-4fd7-4769-b397-de57614164df
+    client-secret: 4b86bbf0-98d7-46f5-a221-aca4ace8a932
     discovery-url: http://keycloak.kryukov.local/iam/auth/realms/app
     enable-metrics: true
     enable-refresh-tokens: true
