@@ -6,7 +6,7 @@ metadata:
   namespace: es
 type: Opaque
 stringData:
-  roles_mapping.yml: |
+  tenants.yml: |
     ---
     _meta:
       type: "tenants"
