@@ -1,2 +1,2 @@
-# ansible_user: ansible
+ansible_user: artur
 env: k3s_cluster
