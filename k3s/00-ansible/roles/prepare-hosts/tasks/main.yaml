@@ -1,6 +1,6 @@
 ---
 - name: Install packages
-  yum:
+  dnf:
     name:
       - net-tools
       - mc
