@@ -11,6 +11,7 @@
       - python3
       - tar
       - rsyslog
+      - python3-libselinux
     state: latest
 
 - name: Enable rsyslog
