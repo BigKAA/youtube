@@ -1,0 +1,2 @@
+# ansible_user: ansible
+env: k3s_cluster

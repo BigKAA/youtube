@@ -1,0 +1,29 @@
+---
+- name: Install packages
+  yum:
+    name:
+      - net-tools
+      - mc
+      - vim
+      - git
+      - bash-completion
+      - nfs-utils
+      - python3
+      - tar
+      - rsyslog
+    state: latest
+
+- name: Enable rsyslog
+  service:
+    name: rsyslog
+    state: started
+    enabled: yes
+
+- name: Check Disable SELinux
+  selinux:
+    state: disabled
+  register: selinux_ret
+
+- name: Disable SELinux
+  shell: setenforce 0
+  when: selinux_ret.reboot_required
