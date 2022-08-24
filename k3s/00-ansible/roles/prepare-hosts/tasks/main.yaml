@@ -25,6 +25,7 @@
     port: "{{ item }}"
     permanent: yes
     state: enabled
+    immediate: true
   loop:
     - 6443/tcp
     - 51820/tcp
@@ -32,8 +33,3 @@
     - 10250/tcp
     - 2379-2380/tcp
     - 8472/udp
-
-- name: reload service firewalld
-  systemd:
-    name: firewalld
-    state: reloaded
