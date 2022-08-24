@@ -23,6 +23,7 @@
 - name: Add firewalld rules
   firewalld:
     port: "{{ item }}"
+    zone: public
     permanent: yes
     state: enabled
     immediate: true
