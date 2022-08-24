@@ -28,3 +28,29 @@
 - name: Disable SELinux
   shell: setenforce 0
   when: selinux_ret.reboot_required
+
+- name: Add firewalld rules
+  firewalld:
+    port: 6443/tcp
+    permanent: yes
+    state: enabled
+- firewalld:
+    port: 51820/tcp
+    permanent: yes
+    state: enabled
+- firewalld:
+    port: 51821/tcp
+    permanent: yes
+    state: enabled
+- firewalld:
+    port: 10250/tcp
+    permanent: yes
+    state: enabled
+- firewalld:
+    port: 2379-2380/tcp
+    permanent: yes
+    state: enabled
+- firewalld:
+    port: 8472/udp
+    permanent: yes
+    state: enabled
