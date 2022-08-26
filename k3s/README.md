@@ -88,3 +88,9 @@ curl -sfL https://get.k3s.io | K3S_URL="https://k3sm1.kryukov.local:6443" \
       INSTALL_K3S_EXEC="--flannel-iface ens33 --data-dir /var/k3s/data" \
       sh -
 ```
+
+## Видео:
+
+* Youtube: https://youtu.be/p_8mXjZxFb0
+* Telegram: https://t.me/arturkryukov/60
+* VK: https://vk.com/video7111833_456239202

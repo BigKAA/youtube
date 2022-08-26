@@ -26,3 +26,5 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **[Мониторинг](monitoring)**
 * **Логи**
   * **[Сбор логов с асинхронной очередью](logs/async)** - kafka, vector, fluentbit, opensearch.
+* **k3s**
+  * [Установка](k3s)
