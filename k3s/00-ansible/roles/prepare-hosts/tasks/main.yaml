@@ -1,0 +1,36 @@
+---
+- name: Install packages
+  dnf:
+    name:
+      - net-tools
+      - mc
+      - vim
+      - git
+      - bash-completion
+      - nfs-utils
+      - python3
+      - tar
+      - rsyslog
+      - python3-libselinux
+    state: latest
+
+- name: Enable rsyslog
+  service:
+    name: rsyslog
+    state: started
+    enabled: yes
+
+- name: Add firewalld rules
+  firewalld:
+    port: "{{ item }}"
+    zone: public
+    permanent: yes
+    state: enabled
+    immediate: true
+  loop:
+    - 6443/tcp
+    - 51820/tcp
+    - 51821/tcp
+    - 10250/tcp
+    - 2379-2380/tcp
+    - 8472/udp

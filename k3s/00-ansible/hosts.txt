@@ -1,0 +1,19 @@
+[k3s_master1]
+k3sm1.kryukov.local ansible_host=192.168.218.110
+
+[k3s_other_masters]
+k3sm2.kryukov.local ansible_host=192.168.218.111
+k3sm3.kryukov.local ansible_host=192.168.218.112
+
+[k3s_controls:children]
+k3s_master1
+k3s_other_masters
+
+[k3s_workers]
+k3sw1.kryukov.local  ansible_host=192.168.218.113
+k3sw2.kryukov.local  ansible_host=192.168.218.114
+k3sw3.kryukov.local  ansible_host=192.168.218.115
+
+[k3s_cluster:children]
+k3s_controls
+k3s_workers
