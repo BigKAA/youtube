@@ -93,4 +93,4 @@ k3s kubectl delete -f manifests/06-s3-helm.yaml
 
 * Youtube: https://youtu.be/3GPAOJSKvdo
 * VK: https://vk.com/video7111833_456239205
-* https://t.me/arturkryukov/67
+* Телеграмм: https://t.me/arturkryukov/67
