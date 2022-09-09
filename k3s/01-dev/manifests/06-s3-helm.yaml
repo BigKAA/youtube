@@ -1,0 +1,51 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: minio
+  namespace: kube-system
+spec:
+  chart: "https://charts.bitnami.com/bitnami/minio-11.10.0.tgz"
+  #chart: minio
+  #version: "11.10.0"
+  #repo: "https://charts.bitnami.com/bitnami"
+  targetNamespace: default
+  valuesContent: |-
+    mode: distributed
+    auth:
+      rootUser: "admin"
+      rootPassword: "password"
+    defaultBuckets: "test-bucket"
+    statefulset:
+      updateStrategy:
+        type: RollingUpdate
+      podManagementPolicy: Parallel
+      replicaCount: 1
+      zones: 1
+      drivesPerNode: 4
+    containerPort: 9000
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+      runAsNonRoot: true
+    podAntiAffinityPreset: soft
+    service:
+      type: LoadBalancer
+      port: 9000
+    
+    persistence:
+      enabled: true
+      storageClass: "local-path"
+      mountPath: /data 
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
+    volumePermissions:
+      enabled: true
+    serviceAccount:
+      create: true
+      name: ""
+      automountServiceAccountToken: true

@@ -43,3 +43,9 @@ echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> ~/.bashrc
 alias kubectl="k3s kubectl"
 echo 'alias kubectl="k3s kubectl"' >> ~/.bashrc
 ```
+
+## Видео
+
+* Youtube: https://youtu.be/TKGGsvNFMZA
+* Telegram: https://t.me/arturkryukov/64
+* VK: https://vk.com/video7111833_456239203
