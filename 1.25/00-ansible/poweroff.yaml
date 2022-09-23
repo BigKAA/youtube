@@ -1,0 +1,6 @@
+---
+- name: Poweroff k8s_cluster
+  hosts: k8s_cluster
+
+  roles:
+    - poweroff

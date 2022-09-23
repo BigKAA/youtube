@@ -1,0 +1,39 @@
+global
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    daemon
+
+defaults
+    log     global
+    mode    tcp
+    retries 2
+    timeout client 30m
+    timeout connect 4s
+    timeout server 30m
+    timeout check 5s
+
+frontend main
+    bind {{ ha_cluster_virtual_ip }}:{{ ha_cluster_virtual_port }}
+    default_backend             app
+
+#---------------------------------------------------------------------
+# round robin balancing between the various backends
+#---------------------------------------------------------------------
+backend app
+    balance     roundrobin
+
+{% for server in groups['k8s_masters'] %}
+    server {{ hostvars[server]['ansible_facts'].hostname }} {{ hostvars[server]['ansible_facts'].default_ipv4.address }}:6443 check
+{% endfor %}
+
+
+listen stats # Define a listen section called "stats"
+    bind *:9000 # Listen on localhost:9000
+    mode http
+    stats enable  # Enable stats page
+    stats hide-version  # Hide HAProxy version
+    stats realm Haproxy\ Statistics  # Title text for popup window
+    stats uri /haproxy_stats  # Stats URI

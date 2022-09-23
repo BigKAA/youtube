@@ -1,0 +1,17 @@
+---
+
+- name: Create /etc/kubernetes directory
+  file:
+    path: /etc/kubernetes
+    state: directory
+
+- name: Copy kubeadm-config.yaml
+  template:
+    src: kebeadm-init.j2
+    dest: /etc/kubernetes/kubeadm-config.yaml
+
+- name: Init master control node
+  shell: kubeadm init --config kubeadm-config.yaml
+
+### insert 
+### kubeadm init phase upload-certs --upload-certs --config /etc/kubernetes/kubeadm-config.yaml

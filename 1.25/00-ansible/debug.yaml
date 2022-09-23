@@ -1,0 +1,25 @@
+---
+- name: Test playbook
+  hosts: control1.kryukov.local
+  #become: yes
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: test template
+      template:
+        src: roles/masters/templates/kebeadm-init.yaml
+        dest: /root/123.yaml
+    # - name: facts
+    #   debug:
+    #     var=ansible_facts
+    # - name: IP
+    #   debug:
+    #     var=ansible_facts.default_ipv4.address
+# hostvars['test.example.com']['ansible_facts']['distribution']
+#    - name: Interface 
+#      debug:
+#        var=ansible_facts.default_ipv4.interface
+    # - name: List
+    #   debug:
+    #     msg: ""

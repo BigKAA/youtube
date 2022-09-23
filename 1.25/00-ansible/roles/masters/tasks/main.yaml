@@ -1,0 +1,4 @@
+---
+- name: Init master node
+  include_tasks: master.yml
+  when: inventory_hostname == groups['k8s_masters'][0]

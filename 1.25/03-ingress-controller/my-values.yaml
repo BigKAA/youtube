@@ -1,0 +1,45 @@
+controller:
+  # This section refers to the creation of the IngressClass resource
+  # IngressClass resources are supported since k8s >= 1.18 and required since k8s >= 1.19
+  ingressClassResource:
+    name: system-ingress
+    enabled: true
+    default: true
+    controllerValue: "k8s.io/ingress-nginx"
+
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: "app.kubernetes.io/name"
+                operator: In
+                values:
+                  - ingress-nginx
+          topologyKey: "kubernetes.io/hostname"
+
+  replicaCount: 1
+  minAvailable: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 90Mi
+
+  service:
+    enabled: true
+    type: LoadBalancer
+    loadBalancerIP: 192.168.218.180
+
+  admissionWebhooks:
+    enabled: false
+
+  metrics:
+    enabled: true
+    service:
+      annotations:
+       prometheus.io/scrape: "true"
+       prometheus.io/port: "10254"
+
+  priorityClassName: "medium-priority"
+
+revisionHistoryLimit: 3

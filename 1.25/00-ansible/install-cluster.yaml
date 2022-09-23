@@ -1,0 +1,22 @@
+---
+
+- name: Install packages
+  hosts: k8s_cluster
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - prepare-hosts
+
+- name: Install HA master nodes
+  hosts: k8s_masters
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - role: ha
+      when: 'ha_cluster_virtual_ip is defined and ha_cluster_virtual_ip != ""'
+    #- master
+
+#- name: Install worker nodes
+#  hosts: k8s_workers
+#  roles:
+#    - workers

@@ -1,0 +1,28 @@
+vrrp_script chk_haproxy {
+  script "killall -0 haproxy" # check the haproxy process
+  interval 2                  # every 2 seconds
+  weight 2                    # add 2 points if OK
+}
+
+vrrp_instance VI_1 {
+  interface ens33            # interface to monitor
+{% if inventory_hostname == groups['k8s_masters'][0] %}
+  state MASTER                # MASTER on master, BACKUP on slaves
+{% else %}
+  state BACKUP                # MASTER on master, BACKUP on slaves
+{% endif %}
+  virtual_router_id 51
+{% if inventory_hostname == groups['k8s_masters'][0] %}
+  priority 101                # 101 on master, 100 on slaves
+{% else %}
+  priority 100                # 101 on master, 100 on slaves
+{% endif %}
+
+  virtual_ipaddress {
+    {{ ha_cluster_virtual_ip }}/24          # virtual ip address
+  }
+
+  track_script {
+    chk_haproxy
+  }
+}
