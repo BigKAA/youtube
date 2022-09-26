@@ -6,10 +6,15 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
   tasks:
-    - name: test template
-      template:
-        src: roles/masters/templates/kebeadm-init.yaml
-        dest: /root/123.yaml
+    - name: "Test for installed tigera-operator"
+      shell: kubeadm init phase upload-certs --upload-certs --config /etc/kubernetes/kubeadm-config.yaml | tail -1
+      register: out
+      ignore_errors: yes
+
+    - name: print
+      debug:
+        var=out
+    
     # - name: facts
     #   debug:
     #     var=ansible_facts

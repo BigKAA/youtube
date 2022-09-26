@@ -13,8 +13,8 @@
     ansible_python_interpreter: /usr/bin/python3
   roles:
     - role: ha
-      when: 'ha_cluster_virtual_ip is defined and ha_cluster_virtual_ip != ""'
-    #- master
+      when: ha_cluster_virtual_ip is defined and ha_cluster_virtual_ip != ""
+    - role: masters
 
 #- name: Install worker nodes
 #  hosts: k8s_workers

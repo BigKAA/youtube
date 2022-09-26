@@ -7,7 +7,7 @@
   tasks:
 
   - name: Reset k8s cluster
-    shell: kebeadm reset --force
+    shell: kubeadm reset --force
     ignore_errors: yes
 
   - name: Disable keepalived and haproxy services

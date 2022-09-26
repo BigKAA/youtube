@@ -1,5 +1,5 @@
 ---
-
+# 1-st control node
 - name: Create /etc/kubernetes directory
   file:
     path: /etc/kubernetes
@@ -7,11 +7,46 @@
 
 - name: Copy kubeadm-config.yaml
   template:
-    src: kebeadm-init.j2
+    src: kubeadm-config.j2
     dest: /etc/kubernetes/kubeadm-config.yaml
 
-- name: Init master control node
-  shell: kubeadm init --config kubeadm-config.yaml
+- name: Check if kubeadm has already run
+  stat:
+    path: "/etc/kubernetes/pki/ca.key"
+  register: kubeadm_ca
 
-### insert 
-### kubeadm init phase upload-certs --upload-certs --config /etc/kubernetes/kubeadm-config.yaml
+- name: Init master control node
+  when: not kubeadm_ca.stat.exists
+  shell: kubeadm init --config /etc/kubernetes/kubeadm-config.yaml
+  run_once: yes
+  register: kubeadm_init
+
+- debug:
+    var=kubeadm_init.out
+
+# Calico
+- name: Check for installed tigera-operator
+  shell: kubectl get ns tigera-operator
+  register: tigera_operator_out
+  ignore_errors: yes
+
+- name: Install tigera-operator
+  when: tigera_operator_out.rc == 1
+  shell: "kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/{{ tigera_operator_version }}/manifests/tigera-operator.yaml"
+
+- name: Copy calico-install.yaml
+  template:
+    src: calico-install.j2
+    dest: /etc/kubernetes/calico-install.yaml
+
+- name: Insatall Calico
+  shell: kubectl apply -f /etc/kubernetes/calico-install.yaml
+
+## Prepare to join another control nodes and worker nodes
+- name: Get discovery-token-ca-cert-hash
+  shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+  register: discovery_token_ca_cert_hash
+
+- name: Upload certs
+  shell: kubeadm init phase upload-certs --upload-certs | tail -1
+  register: certificate_key
