@@ -1,7 +1,0 @@
-- name: discovery_token_ca_cert_hash
-  debug:
-    var=hostvars[groups['k8s_masters'][0]].discovery_token_ca_cert_hash.stdout
-
-- name: certificate_key
-  debug:
-    var=hostvars[groups['k8s_masters'][0]].certificate_key.stdout

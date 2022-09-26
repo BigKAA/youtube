@@ -1,0 +1,14 @@
+---
+- name: Check if kubeadm has already run
+  stat:
+    path: "/etc/kubernetes/pki/ca.key"
+  register: kubeadm_ca
+
+- name: Join control nodes
+  when: not kubeadm_ca.stat.exists
+  shell: 
+    cmd: |
+      kubeadm join {{ hostvars[groups['k8s_masters'][0]].join_path.stdout }} \
+      --token {{ hostvars[groups['k8s_masters'][0]].join_token.stdout }} \
+      --discovery-token-ca-cert-hash sha256:{{ hostvars[groups['k8s_masters'][0]].discovery_token_ca_cert_hash.stdout }} \
+      --control-plane --certificate-key {{ hostvars[groups['k8s_masters'][0]].certificate_key.stdout }}

@@ -1,8 +1,0 @@
----
-- name: Init 1st control node
-  include_tasks: master.yaml
-  when: inventory_hostname == groups['k8s_masters'][0]
-
-- name: Init another control nodes
-  include_tasks: second.yaml
-  when: inventory_hostname != groups['k8s_masters'][0]

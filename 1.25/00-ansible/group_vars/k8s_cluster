@@ -22,11 +22,6 @@ kubeadmin_config: /etc/kubernetes/kubeadm.conf
 
 cri_socket: unix:///var/run/containerd/containerd.sock
 
-# Уникальный токен в формате [a-z0-9]{6}.[a-z0-9]{16}
-# Нужен для присоединения нод кластера.
-# TTL по умолчанию 24 часа
-token: ff56a8.7fac83ff18493ad2
-
 # Возможные варианты:
 # Для 1.24 -> k8s.gcr.io
 # Для 1.25 -> registry.k8s.io

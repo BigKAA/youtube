@@ -1,28 +1,31 @@
 ---
 # 1-st control node
+- name: Check if kubeadm has already run
+  stat:
+    path: "/etc/kubernetes/pki/ca.key"
+  register: kubeadm_ca
+
+- meta: end_play
+  when: kubeadm_ca.stat.exists
+
 - name: Create /etc/kubernetes directory
   file:
     path: /etc/kubernetes
     state: directory
+
+- name: Generate join token
+  shell: kubeadm token create
+  register: join_token
 
 - name: Copy kubeadm-config.yaml
   template:
     src: kubeadm-config.j2
     dest: /etc/kubernetes/kubeadm-config.yaml
 
-- name: Check if kubeadm has already run
-  stat:
-    path: "/etc/kubernetes/pki/ca.key"
-  register: kubeadm_ca
-
 - name: Init master control node
-  when: not kubeadm_ca.stat.exists
   shell: kubeadm init --config /etc/kubernetes/kubeadm-config.yaml
   run_once: yes
   register: kubeadm_init
-
-- debug:
-    var=kubeadm_init.out
 
 # Calico
 - name: Check for installed tigera-operator
@@ -41,12 +44,3 @@
 
 - name: Insatall Calico
   shell: kubectl apply -f /etc/kubernetes/calico-install.yaml
-
-## Prepare to join another control nodes and worker nodes
-- name: Get discovery-token-ca-cert-hash
-  shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
-  register: discovery_token_ca_cert_hash
-
-- name: Upload certs
-  shell: kubeadm init phase upload-certs --upload-certs | tail -1
-  register: certificate_key

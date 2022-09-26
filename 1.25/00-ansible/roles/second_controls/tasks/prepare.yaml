@@ -1,0 +1,16 @@
+---
+- name: Generate join token
+  shell: kubeadm token create
+  register: join_token
+
+- name: Get discovery-token-ca-cert-hash
+  shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+  register: discovery_token_ca_cert_hash
+
+- name: Upload certs
+  shell: kubeadm init phase upload-certs --upload-certs | tail -1
+  register: certificate_key
+
+- name: Get join path
+  shell: kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}' | cut -c9-
+  register: join_path

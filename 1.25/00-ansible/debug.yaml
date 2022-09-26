@@ -6,14 +6,12 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
   tasks:
-    - name: "Test for installed tigera-operator"
-      shell: kubeadm init phase upload-certs --upload-certs --config /etc/kubernetes/kubeadm-config.yaml | tail -1
-      register: out
-      ignore_errors: yes
-
-    - name: print
+    - name: Check
       debug:
-        var=out
+        msg: "Abort"
+      #when: groups['k8s_masters'] | length | int is divisibleby 2
+      failed_when: groups['k8s_masters'] | length | int is divisibleby 2
+    
     
     # - name: facts
     #   debug:
