@@ -5,6 +5,6 @@
   run_once: yes
 
 
-- name: Join another control nodes
+- name: Join worker nodes
   include_tasks: join.yaml
-  when: inventory_hostname != groups['k8s_masters'][0]
+  when: inventory_hostname in groups['k8s_workers']

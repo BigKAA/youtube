@@ -13,10 +13,6 @@
     path: /etc/kubernetes
     state: directory
 
-- name: Generate join token
-  shell: kubeadm token create
-  register: join_token
-
 - name: Copy kubeadm-config.yaml
   template:
     src: kubeadm-config.j2

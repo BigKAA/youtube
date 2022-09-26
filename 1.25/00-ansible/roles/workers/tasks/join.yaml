@@ -1,0 +1,14 @@
+---
+- name: Check if kubelet.conf exists
+  stat:
+    path: "/etc/kubernetes/kubelet.conf"
+  register: kubelet_conf
+
+- name: Join worker nodes
+  when: not kubelet_conf.stat.exists
+  shell: 
+    cmd: |
+      kubeadm join {{ hostvars[groups['k8s_masters'][0]].join_path.stdout }} \
+      --token {{ hostvars[groups['k8s_masters'][0]].join_token.stdout }} \
+      --discovery-token-ca-cert-hash sha256:{{ hostvars[groups['k8s_masters'][0]].discovery_token_ca_cert_hash.stdout }} 
+      
