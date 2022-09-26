@@ -1,8 +1,8 @@
 # Ansible playbook для установки кластера k8s
 
 В данный момент поддерживает:
-* Установку одной control node.
-* Установка несколько control node и HA доступ к API kubernetes.
+* Установку одной или несколько control nodes.
+* HA доступ к API kubernetes.
 * containerd.
 * calico.
 
@@ -39,29 +39,33 @@ ssh-copy-id root@db1.kryukov.local
 
 ## Конфигурационные параметры
 
-* [Инвентори](hosts.yml).
-* [Инвентори HA](hosts-ha.yml).
+* [Инвентори](hosts.yaml).
 * [Общая конфигурация](group_vars/k8s_cluster).
 
-## Запуск
+## Установка
 
-### Личное
+### k8s с одной control node.
 
-Если ansible установлен в venv
+В [инвентори](hosts.yaml) в группе `k8s_masters` необходимо указать только один хост.
 
-```bash
-. ~/venv/bin/activate
-```
+    ansible-playbook install-cluster.yaml
 
-K8s с одним мастером:
+### k8s с несколькими control nodes.
 
-    ansible-playbook -i hosts.yml install-single-master.yaml
+В [инвентори](hosts.yaml) в группе `k8s_masters` необходимо указать **нечётное количество
+control nodes**.
 
-HA с несколькими мастерами:
+    ansible-playbook install-cluster.yaml
 
-    ansible-playbook -i hosts-ha.yml install-ha-cluster.yaml
+### k8s c HA.
 
-Удалить кластер (-i hosts.yml или -i hosts-ha.yml):
+Используются haproxy и keepalived.
 
-    ansible-playbook -i hosts.yml reset.yaml
+В конфигурационнм файле определите параметры доступа к API :
 
+* `ha_cluster_virtual_ip` - виртуальный IP адрес.
+* `ha_cluster_virtual_port` - порт. Не должен быть равен 6443.
+
+## Удалить кластер
+
+    ansible-playbook reset.yaml

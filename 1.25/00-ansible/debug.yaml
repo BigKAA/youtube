@@ -1,3 +1,4 @@
+# Холст для всяких тестов.
 ---
 - name: Test playbook
   hosts: control1.kryukov.local
