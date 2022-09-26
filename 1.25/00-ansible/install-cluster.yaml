@@ -1,8 +1,8 @@
 ---
-- hosts: groups['k8s_masters'][0]
+- name: Checking for an odd number of nodes.
+  hosts: groups['k8s_masters'][0]
   tasks:
-    - name: Checking for an odd number of nodes.
-      debug:
+    - debug:
         msg: "Abort. Аn even number of nodes"
       failed_when: groups['k8s_masters'] | length | int is divisibleby 2
 

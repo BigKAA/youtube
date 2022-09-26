@@ -41,7 +41,7 @@ kubernetesVersion: {{ kube_version }}
 controlPlaneEndpoint: {{ ha_cluster_virtual_ip }}:{{ ha_cluster_virtual_port }}
 {% endif %}
 networking:
-  dnsDomain: cluster.local
+  dnsDomain: {{ kube_domain_name }}
   podSubnet: {{ pod_network_cidr }}
   serviceSubnet: {{ service_cidr }}
 scheduler: {}
