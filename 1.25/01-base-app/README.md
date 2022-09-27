@@ -4,10 +4,12 @@
 
 * PriorityClass
 * nfs-subdir-external-provisioner
+* cert-manager
 
 ```shell
 kubectl create -f 00-priorityclass.yaml
 kubectl -n kube-system create -f 01-nfs.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.yaml
 ```
 
 ## Helm
