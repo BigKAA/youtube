@@ -5,6 +5,7 @@
 * HA доступ к API kubernetes.
 * containerd.
 * calico.
+* В KubeProxyConfiguration установлены параметры для раьоты Metallb.
 
 Не оттестировано на дистрибутивах Debian.
 
