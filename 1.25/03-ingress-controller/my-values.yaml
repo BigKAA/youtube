@@ -42,4 +42,4 @@ controller:
 
   priorityClassName: "medium-priority"
 
-revisionHistoryLimit: 3
+revisionHistoryLimit: 2
