@@ -15,34 +15,48 @@ ipvs:
   strictARP: true
 ```
 
-    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
-    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
+```shell
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
+```
 
 Только при первой установке создаём сикрет:
 
-    kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+```shell
+kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+```
 
 Применяем базовую конфигурацию layer2.
 
-    kubectl apply -f metallb/00-mlb.yaml
+```shell
+kubectl apply -f metallb/00-mlb.yaml
+```
 
 Добавляем сервис для ingres-controller типа LoadBalancer
 
-    kubectl apply -f metallb/01-lb-ingress-controller-svc.yaml
+```shell
+kubectl apply -f metallb/01-lb-ingress-controller-svc.yaml
+```
 
 ## Установка keycloak
 
 У нас установлен cert-manager. Добавляем ClusterIssuer (если он еще не установлен).
 
-    kubectl -n cert-manager create secret tls kube-ca-secret \
+```shell
+kubectl -n cert-manager create secret tls kube-ca-secret \
     --cert=/etc/kubernetes/ssl/ca.crt \
     --key=/etc/kubernetes/ssl/ca.key
-    kubectl -n keycloak apply -f 00-certs.yaml
+```
+```shell
+kubectl -n keycloak apply -f 00-certs.yaml
+```
+   
 
 Подготовка манифестов
 
-    helm repo add codecentric https://codecentric.github.io/helm-charts
-    helm template kk codecentric/keycloak -f values.yaml | \
+```shell
+helm repo add codecentric https://codecentric.github.io/helm-charts
+helm template kk codecentric/keycloak -f values.yaml | \
     sed '/^#/d' | \
     sed '/helm.sh\/chart/d' | \
     sed '/managed-by: Helm/d' | \
@@ -52,16 +66,21 @@ ipvs:
     sed '/type: RollingUpdate/d' | \
     sed '/serviceName/d' | \
     sed '/kind: StatefulSet/c\kind: Deployment' > manifests/02-keycloak.yaml
+```
 
 Установка. Можно руками:
 
-    kubectl -n keycloak apply -f manifests
+```shell
+kubectl -n keycloak apply -f manifests
+```
 
 Можно при помощи ArgoCD:
     
 Пушим manifests/* в Git. Редактируем argo-app/{00-iam-project.yaml,01-keycloak-app.yaml}
 
-    kubectl  apply -f argo-app
+```shell
+kubectl  apply -f argo-app
+```
 
 ## Настройка ArgoCD
 

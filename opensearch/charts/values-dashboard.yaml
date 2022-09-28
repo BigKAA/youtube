@@ -1,0 +1,53 @@
+opensearchHosts: "https://opensearch-cluster-master:9200"
+replicaCount: 1
+
+fullnameOverride: "dashboard"
+
+secretMounts:
+  - name: certs
+    secretName: master-tls
+    path: /usr/share/opensearch-dashboards/certs
+
+envFrom:
+  - secretRef:
+      name: dashboard-user
+
+config:
+  opensearch_dashboards.yml: |
+    server:
+      name: dashboards
+      host: 0.0.0.0
+      ssl:
+        enabled: false
+        key: /usr/share/opensearch-dashboards/certs/tls.key
+        certificate: /usr/share/opensearch-dashboards/certs/tls.crt
+    opensearch:
+      ssl:
+        certificateAuthorities: /usr/share/opensearch-dashboards/certs/ca.crt
+        verificationMode: certificate
+
+serverHost: "0.0.0.0"
+
+ingress:
+  enabled: true
+  annotations: {}
+  ingressClassName: "system-ingress"
+  hosts:
+    - host: kibana.kryukov.local
+      paths:
+        - path: /
+          backend:
+            serviceName: dashboard
+            servicePort: 5601
+  tls:
+    - secretName: master-tls
+      hosts:
+        - kibana.kryukov.local
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "512M"
+  limits:
+    cpu: "100m"
+    memory: "512M"

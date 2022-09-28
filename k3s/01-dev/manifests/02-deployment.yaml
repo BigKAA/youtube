@@ -1,0 +1,88 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nginx
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      k8s-app: nginx
+  template:
+    metadata:
+      labels:
+        k8s-app: nginx
+    spec:
+      initContainers:
+        - name: busybox
+          image: busybox:1.35.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - 'sh'
+            - '-c'
+            - |
+              echo "test 50x"
+              if [ ! -f /html/50x.html ]; then
+                echo "create 50x"
+                cat <<EOF > /html/50x.html 
+                <!DOCTYPE html>
+                <html>
+                <head>
+                <title>Error</title>
+                <style>
+                html { color-scheme: light dark; }
+                body { width: 35em; margin: 0 auto;
+                font-family: Tahoma, Verdana, Arial, sans-serif; }
+                </style>
+                </head>
+                <body>
+                <h1>An error occurred.</h1>
+                <p>Sorry, the page you are looking for is currently unavailable.<br/>
+                Please try again later.</p>
+                <p>If you are the system administrator of this resource then you should check
+                the error log for details.</p>
+                <p><em>Faithfully yours, nginx.</em></p>
+                </body>
+                </html>
+              EOF
+                chmod 666 /html/50x.html
+                chown 101:101 /html/50x.html
+              fi
+              echo "test index"
+              if [ ! -f /html/index.html ]; then
+                echo "create index"
+                cat <<EOF > /html/index.html 
+                <html>
+                <head>
+                    <title>Тестовая страница</title>
+                    <meta charset="UTF-8">
+                </head>
+                <body>
+                  <h1>Тестовая страница</h1>
+                </body>
+                </html>
+              EOF
+                chmod 666 /html/index.html
+                chown 101:101 /html/index.html
+              fi
+
+          volumeMounts:
+            - name: html
+              mountPath: /html
+      containers:
+        - name: nginx
+          image: nginx:1.23.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html/
+      volumes:
+        - name: html
+          persistentVolumeClaim:
+            claimName: nginx-pvc
+
