@@ -311,10 +311,10 @@ spec:
         app.kubernetes.io/instance: ingress-nginx
         app.kubernetes.io/component: controller
       annotations:
-        prometheus.io.scrape: "true"
-        prometheus.io.scheme: http
-        prometheus.io.path: /metrics
-        prometheus.io.port: "10254"
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: http
+        prometheus.io/path: /metrics
+        prometheus.io/port: "10254"
     spec:
       affinity:
         podAntiAffinity:
