@@ -1,0 +1,43 @@
+---
+kind: "postgresql"
+apiVersion: "acid.zalan.do/v1"
+
+metadata:
+  name: "acid-artur"
+  namespace: "pgo"
+spec:
+  teamId: "acid"
+  postgresql:
+    version: "14"
+    parameters:  # Expert section
+      shared_buffers: "32MB"
+      max_connections: "50"
+      log_statement: "all"
+  numberOfInstances: 1
+  volume:
+    size: "10Gi"
+    storageClass: managed-nfs-storage
+  users:
+    artur:
+    - superuser
+    - createdb
+
+  allowedSourceRanges:
+    # IP ranges to access your cluster go here
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: "1"
+      memory: 1024Mi
+
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: pgo
+              operator: In
+              values:
+                - enabled
