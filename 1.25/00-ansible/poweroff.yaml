@@ -1,8 +1,0 @@
----
-- name: Poweroff k8s_cluster
-  hosts: k8s_cluster
-
-  tasks:
-    - name: Poweroff
-      shell: poweroff
-      

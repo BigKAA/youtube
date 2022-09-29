@@ -57,8 +57,7 @@ kubectl -n argocd create -f 03-service-lb.yaml
 ```
 
 ```shell
-kubectl -n argocd create -f 04-certs.yaml
-kubectl -n argocd create -f 05-ingress.yaml
+kubectl -n argocd create -f 04-certs.yaml -f 05-ingress.yaml
 ```
 
 ## Установка ArgoCD CLI
