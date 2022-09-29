@@ -80,12 +80,17 @@ spec:
         volumeMounts:
           - mountPath: /var/lib/pgadmin
             name: state
+      nodeSelector: 
+        kubernetes.io/hostname: db1.kryukov.local
+      tolerations:
+        - key: "db"
+          operator: "Equal"
+          value: "pgsql"
+          effect: "NoSchedule"
       volumes:
         - name: state
           persistentVolumeClaim:
             claimName: pgadmin-pvc
-
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
