@@ -83,7 +83,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 Логинимся с этим паролем в cli. У меня доступ через ingress controller. 
 
 ```shell
-argocd login argocd login argocd.kryukov.local:443 --grpc-web
+argocd login argocd.kryukov.local:443 --grpc-web
 ```
 
 Пользователь admin. Пароль из сикрета мы получили выше.

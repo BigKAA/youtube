@@ -8,7 +8,7 @@ spec:
     namespace: pgo
     server: 'https://kubernetes.default.svc'
   source:
-    path: 1.25/07-postgresql/postgresql/manifestst
+    path: 1.25/07-postgresql/postgresql/manifests
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: master
   project: system
