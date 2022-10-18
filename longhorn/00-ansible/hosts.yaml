@@ -1,0 +1,17 @@
+k8s_masters:
+  hosts:
+    # Control nodes
+    control1.kryukov.local:
+    control2.kryukov.local:
+    control3.kryukov.local:
+k8s_workers:
+  hosts:
+    # Worker nodes
+    worker1.kryukov.local:
+    worker2.kryukov.local:
+    worker3.kryukov.local:
+    db1.kryukov.local:
+k8s_cluster:
+  children:
+    k8s_masters:
+    k8s_workers:

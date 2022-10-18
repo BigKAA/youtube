@@ -1,0 +1,27 @@
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: data
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "120" # 2 hours in minutes
+  replicaAutoBalance: "best-effort"
+  fromBackup: ""
+  diskSelector: "ssd"
+
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: data-db
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "120" # 2 hours in minutes
+  replicaAutoBalance: "best-effort"
+  fromBackup: ""
+  diskSelector: "db"
