@@ -31,7 +31,7 @@ Playbook [prepare_host.yaml](prepare_host.yaml) устанавливает не�
 ansible-playbook -i 00-ansible/hosts.yaml 00-ansible/prepare_host.yaml
 ```
 
-## Установка
+## Установка по умолчанию.
 
 ```shell
 helm repo add longhorn https://charts.longhorn.io
@@ -79,14 +79,16 @@ kubectl -n longhorn-system apply -f manifests/02-storage-class.yaml
 
 Добавим диски (директория /mnt/data), пометив диски меткой ssd. Так же зарезервируем на диске 0.5Gi места.
 
-## Используем
+### Используем
+
+В качестве примера будем устанавливать postgresql и pgadmin. Используя разные тома longhorn. 
 
 ```shell
 kubectl create ns postgresql
 kubectl -n postgresql apply -f postgresql
 ```
 
-## Резервная копия.
+### Резервная копия.
 
 Сначала необходимо добавить внешний диск, куда будет помещаться бэкап. Это может быть NFS или S3 хранилище.
 У меня есть отдельная машина с NFS, будем использовать её.
@@ -95,47 +97,70 @@ kubectl -n postgresql apply -f postgresql
 
     nfs://192.168.218.170:/var/nfs-disk/longhorn-back
 
-Так же доступны снапшоты. Единственное замечание, восстановление из снапшота возможно только у отключённого тома.
+Так же доступны снапшоты. Единственное замечание - восстановление из снапшота возможно только у отключённого тома.
 
-## Улучшаем
+## Немного автоматизации.
 
-Удалим базу данных, pvc, storage classes
+Небольшая автоматизация создания томов, что бы не настраивать их вручную, при помощи UI. 
+
+Удалим то, что мы делали в предыдущем разделе: базу данных, pvc, storage classes.
 
 ```shell
 kubectl -n postgresql delete -f postgresql
-helm uninstall longhorn -n longhorn-system 
 kubectl delete StorageClass data-db
 kubectl delete StorageClass data
 kubectl -n longhorn-system delete -f manifests/01-ingress-ui.yaml
 kubectl -n longhorn-system delete -f manifests/00-basic-auth-secret.yaml
+helm uninstall longhorn -n longhorn-system 
 ```
 
 ### Подготовка нод кластера
 
+[Документаця](https://longhorn.io/docs/1.3.2/advanced-resources/default-disk-and-node-config/).
+
 Пометим ноды кластера, диски которых будет использовать Longhorn.
 
-Скрипт [prepare_longhorn.sh](prepare_longhorn.sh) устанавливает аннотации на ноды, где
-находятся диски, которые будет использовать Longhorn.
-
-```yaml
-node.longhorn.io/default-node-tags: '["ssd","storage"]'
- 
-node.longhorn.io/default-disks-config: >
-    [
-        {   
-            "name":"ssd-disk", 
-            "path":"/mnt/data",
-            "allowScheduling":false,
-            "storageReserved":10485760,
-            "tags": ["ssd","fast"]
-        }
-    ]
+```shell
+kubectl annotate node worker1.kryukov.local node.longhorn.io/default-node-tags='["data"]'
+kubectl annotate node worker2.kryukov.local node.longhorn.io/default-node-tags='["data","db"]'
+kubectl annotate node worker3.kryukov.local node.longhorn.io/default-node-tags='["db"]'
+kubectl label node worker1.kryukov.local node.longhorn.io/create-default-disk='config'
+kubectl label node worker2.kryukov.local node.longhorn.io/create-default-disk='config'
+kubectl label node worker3.kryukov.local node.longhorn.io/create-default-disk='config'
+kubectl annotate node worker1.kryukov.local node.longhorn.io/default-disks-config='[{"name":"data","path":"/mnt/data","allowScheduling":true,"tags":["ssd"]}]'
+kubectl annotate node worker2.kryukov.local node.longhorn.io/default-disks-config='[{"name":"data","path":"/mnt/data","allowScheduling":false,"tags":["ssd"]}]'
+kubectl annotate node worker3.kryukov.local node.longhorn.io/default-disks-config='[{"name":"data","path":"/mnt/data","allowScheduling":true,"tags":["ssd"]}]'
 ```
 
+На всякий пожарный, ниже команды удаляющие метки и аннотации.
 
-    kubectl annotate node worker1.kryukov.local node.longhorn.io/default-node-tags='["ssd","storage"]'
+```shell
+kubectl annotate node worker1.kryukov.local node.longhorn.io/default-node-tags-
+kubectl annotate node worker2.kryukov.local node.longhorn.io/default-node-tags-
+kubectl annotate node worker3.kryukov.local node.longhorn.io/default-node-tags-
+kubectl label node worker1.kryukov.local node.longhorn.io/create-default-disk-
+kubectl label node worker2.kryukov.local node.longhorn.io/create-default-disk-
+kubectl label node worker3.kryukov.local node.longhorn.io/create-default-disk-
+kubectl annotate node worker1.kryukov.local node.longhorn.io/default-disks-config-
+kubectl annotate node worker2.kryukov.local node.longhorn.io/default-disks-config-
+kubectl annotate node worker3.kryukov.local node.longhorn.io/default-disks-config-
+```
 
+### Изменяем параметры по умолчанию
 
-    helm repo add longhorn https://charts.longhorn.io
+Создаём свой файл [values.yaml](values.yaml) для установки longhorn.
 
-    --set defaultSetting.createDefaultDiskLabeledNodes=true
+```shell
+helm install longhorn longhorn/longhorn -n longhorn-system -f values.yaml --create-namespace
+```
+
+```shell
+kubectl -n longhorn-system apply -f manifests/00-basic-auth-secret.yaml
+kubectl -n longhorn-system apply -f manifests/01-ingress-ui.yaml
+kubectl -n longhorn-system apply -f manifests/02-storage-class.yaml
+```
+
+```shell
+kubectl create ns postgresql
+kubectl -n postgresql apply -f postgresql
+```
