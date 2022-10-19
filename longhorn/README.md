@@ -65,7 +65,7 @@ kubectl -n longhorn-system apply -f manifests/02-storage-class.yaml
 
 ### Настройка томов в UI
 
-Переходим в раздел `Node`. `ExpandAll`
+Переходим в раздел `Node` -> `ExpandAll`
 
 Установка longhorn по умолчанию, на всех воркер нодах создаёт тома, которые мы использовать не будем.
 Поэтому мы отключим все тома по умолчанию.
