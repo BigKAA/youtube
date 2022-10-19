@@ -47,7 +47,7 @@ helm install longhorn longhorn/longhorn -n longhorn-system --create-namespace
 USER=admin; PASSWORD=password; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" 
 ```
 
-Добавляем полученную строку в сикрет.
+Добавляем полученную строку в сикрет [00-basic-auth-secret.yaml](manifests/00-basic-auth-secret.yaml).
 
 ```shell
 kubectl -n longhorn-system apply -f manifests/00-basic-auth-secret.yaml
@@ -55,12 +55,47 @@ kubectl -n longhorn-system apply -f manifests/01-ingress-ui.yaml
 kubectl -n longhorn-system apply -f manifests/02-storage-class.yaml
 ```
 
+### Настройка томов в UI
+
+Переходим в раздел `Node`. `ExpandAll`
+
+Установка longhorn по умолчанию, на всех воркер нодах создаёт тома, которые мы использовать не будем.
+Поэтому мы отключим все тома по умолчанию.
+
+Напомню, что на воркер нодах (worker{1-3}) добавлены диски, смонтированные в /mnt/data. Они предназначены для
+использования в longhorn. 
+
+Ноду db1 необходимо убрать из обслуживания. Поэтому ставим `Node Scheduling` в состояние `Disable`.
+
+На всех нодах, в том числе и db1, удаляем диски по умолачнию. Для этого надо их перевести в состояние `Disable`, а
+затем удалить.
+
+Теперь расставим метки (tags) на ноды:
+* worker1, worker2 - data
+* worker2, worker3 - db
+
+Предполагается, что на первых двух будут храниться файлы приложений (StorageClass data). На других файлы базы данных
+(StorageClass db).
+
+Добавим диски (директория /mnt/data), пометив диски меткой ssd. Так же зарезервируем на диске 0.5Gi места.
+
 ## Используем
 
 ```shell
 kubectl create ns postgresql
 kubectl -n postgresql apply -f postgresql
 ```
+
+## Резервная копия.
+
+Сначала необходимо добавить внешний диск, куда будет помещаться бэкап. Это может быть NFS или S3 хранилище.
+У меня есть отдельная машина с NFS, будем использовать её.
+
+Переходим в настройки: `Settings` -> `General` -> `BackupTarget`
+
+    nfs://192.168.218.170:/var/nfs-disk/longhorn-back
+
+Так же доступны снапшоты. Единственное замечание, восстановление из снапшота возможно только у отключённого тома.
 
 ## Улучшаем
 
@@ -71,19 +106,22 @@ kubectl -n postgresql delete -f postgresql
 helm uninstall longhorn -n longhorn-system 
 kubectl delete StorageClass data-db
 kubectl delete StorageClass data
+kubectl -n longhorn-system delete -f manifests/01-ingress-ui.yaml
+kubectl -n longhorn-system delete -f manifests/00-basic-auth-secret.yaml
 ```
 
 ### Подготовка нод кластера
 
 Пометим ноды кластера, диски которых будет использовать Longhorn.
 
-Скрипт [prepare_longhorn.sh](prepare_longhorn.sh) устанавливает аннотации на ноды на которых
+Скрипт [prepare_longhorn.sh](prepare_longhorn.sh) устанавливает аннотации на ноды, где
 находятся диски, которые будет использовать Longhorn.
 
-    node.longhorn.io/default-node-tags: '["ssd","storage"]'
+```yaml
+node.longhorn.io/default-node-tags: '["ssd","storage"]'
  
-    node.longhorn.io/default-disks-config: 
-    '[
+node.longhorn.io/default-disks-config: >
+    [
         {   
             "name":"ssd-disk", 
             "path":"/mnt/data",
@@ -91,11 +129,13 @@ kubectl delete StorageClass data
             "storageReserved":10485760,
             "tags": ["ssd","fast"]
         }
-    ]'
+    ]
+```
 
-kubectl annotate node worker1.kryukov.local node.longhorn.io/default-node-tags='["ssd","storage"]'
+
+    kubectl annotate node worker1.kryukov.local node.longhorn.io/default-node-tags='["ssd","storage"]'
 
 
-helm repo add longhorn https://charts.longhorn.io
+    helm repo add longhorn https://charts.longhorn.io
 
---set defaultSetting.createDefaultDiskLabeledNodes=true
+    --set defaultSetting.createDefaultDiskLabeledNodes=true

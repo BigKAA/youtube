@@ -6,7 +6,7 @@ metadata:
 spec:
   storageClassName: "data"
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 500Mi
@@ -78,8 +78,6 @@ spec:
         volumeMounts:
           - mountPath: /var/lib/pgadmin
             name: state
-      nodeSelector: 
-        kubernetes.io/hostname: db1.kryukov.local
       tolerations:
         - key: "db"
           operator: "Equal"
