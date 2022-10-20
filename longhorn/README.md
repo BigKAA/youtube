@@ -60,7 +60,6 @@ USER=admin; PASSWORD=password; echo "${USER}:$(openssl passwd -stdin -apr1 <<< $
 ```shell
 kubectl -n longhorn-system apply -f manifests/00-basic-auth-secret.yaml
 kubectl -n longhorn-system apply -f manifests/01-ingress-ui.yaml
-kubectl -n longhorn-system apply -f manifests/02-storage-class.yaml
 ```
 
 ### Настройка томов в UI
@@ -86,6 +85,10 @@ kubectl -n longhorn-system apply -f manifests/02-storage-class.yaml
 (StorageClass db).
 
 Добавим диски (директория /mnt/data), пометив диски меткой ssd. Так же зарезервируем на диске 0.5Gi места.
+
+```shell
+kubectl -n longhorn-system apply -f manifests/02-storage-class.yaml
+```
 
 ### Используем
 

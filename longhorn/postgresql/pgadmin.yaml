@@ -78,11 +78,6 @@ spec:
         volumeMounts:
           - mountPath: /var/lib/pgadmin
             name: state
-      tolerations:
-        - key: "db"
-          operator: "Equal"
-          value: "pgsql"
-          effect: "NoSchedule"
       volumes:
         - name: state
           persistentVolumeClaim:
