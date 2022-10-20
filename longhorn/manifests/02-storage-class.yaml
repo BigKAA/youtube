@@ -1,0 +1,32 @@
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: data
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+parameters:
+  numberOfReplicas: "2"
+  fsType: xfs
+  staleReplicaTimeout: "120" # 2 hours in minutes
+  replicaAutoBalance: "best-effort" # https://longhorn.io/docs/1.3.2/high-availability/auto-balance-replicas/
+  dataLocality: "best-effort" # https://longhorn.io/docs/1.3.2/high-availability/data-locality/
+  fromBackup: ""
+  diskSelector: "ssd"
+  nodeSelector: "data"
+
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: data-db
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+parameters:
+  numberOfReplicas: "2"
+  fsType: xfs
+  staleReplicaTimeout: "120" # 2 hours in minutes
+  replicaAutoBalance: "best-effort"
+  fromBackup: ""
+  diskSelector: "ssd"
+  nodeSelector: "db"

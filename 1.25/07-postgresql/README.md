@@ -8,7 +8,7 @@
 ```shell
 kubectl create ns postgresql
 kubectl -n postgresql apply -f postgresql/manifests
-kubectl -n postgresql apply -f pgadmin/manifestst
+kubectl -n postgresql apply -f pgadmin/manifests
 ```
 
 Оба приложения приземляются на ноду db1.kryukov.local

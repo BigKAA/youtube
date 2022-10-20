@@ -1,0 +1,28 @@
+---
+- name: Install Longhorn requirements.
+  hosts: k8s_cluster
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_user: root
+  tasks:
+    - name: Install packages
+      dnf:
+        name:
+          - iscsi-initiator-utils
+          - jq
+        state: latest
+
+    - name: Load modules
+      modprobe:
+        name: iscsi_tcp
+
+    - name: Load module permanet
+      copy:
+        src: modules-iscsi.conf
+        dest: /etc/modules-load.d/modules-iscsi.conf
+
+    - name: iscsi service
+      service:
+        name: iscsid
+        state: started
+        enabled: yes
