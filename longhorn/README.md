@@ -181,3 +181,9 @@ kubectl -n longhorn-system apply -f manifests/02-storage-class.yaml
 kubectl create ns postgresql
 kubectl -n postgresql apply -f postgresql
 ```
+
+## Видео
+
+* [Youtube](https://youtu.be/Q7SSlGnXOLY)
+* [Telegram](https://t.me/arturkryukov/87)
+* [VK](https://vk.com/video7111833_456239208)
