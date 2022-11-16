@@ -27,7 +27,7 @@ helm list -n ingress-nginx
 kubectl -n ingress-nginx get svc
 ```
 
-Контролирум, что mtallb выдал кластерный IP. Поле EXTERNAL-IP. 
+Контролируем, что mtallb выдал кластерный IP. Поле EXTERNAL-IP. 
 
 Проверяем, что контроллер отвечает на запросы.
 
