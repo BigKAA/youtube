@@ -170,3 +170,8 @@ spec:
 kubectl apply -f pod-name-label/ingress.yaml
 ```
 
+## Видео
+
+* [Telegram](https://t.me/arturkryukov/95)
+* [VK](https://vk.com/video7111833_456239209)
+* [YouTube](https://youtu.be/9SS-0GeH2ho)
