@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: application
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: application
+  serviceName: application-headless
+  template:
+    metadata:
+      labels:
+        app: application
+    spec:
+      initContainers:
+        - name: init-configs
+          image: busybox:1.35.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SERVER
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          command:
+            - 'sh'
+            - '-c'
+            - |
+              sed -e "s/\$SERVER/$(echo $SERVER)/" \
+              /html-template/index.html > /html/index.html
+              cp /html-template/50x.html /html/50x.html
+          volumeMounts:
+            - mountPath: /html-template
+              name: html-template
+            - mountPath: /html
+              name: html
+      containers:
+        - name: application
+          image: nginx:1.23.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - mountPath: /usr/share/nginx/html/
+              name: html
+      volumes:
+        - name: html-template
+          configMap:
+            name: nginx-template
+        - name: html
+          emptyDir: {}

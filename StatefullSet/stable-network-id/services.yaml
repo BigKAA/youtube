@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: application-headless
+spec:
+  ports:
+  - port: 80
+    name: http
+  clusterIP: None
+  selector:
+    app: application
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: application
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: application

@@ -1,0 +1,28 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: application-headless
+spec:
+  ingressClassName: system-ingress
+  rules:
+  - host: app0.kryukov.local
+    http:
+      paths:
+        - pathType: Prefix
+          path: /
+          backend:
+            service:
+              name: app0
+              port:
+                name: http
+  - host: app1.kryukov.local
+    http:
+      paths:
+        - pathType: Prefix
+          path: /
+          backend:
+            service:
+              name: app1
+              port:
+                name: http
