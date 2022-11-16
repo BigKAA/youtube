@@ -15,23 +15,3 @@ spec:
            name: application
            port:
              name: http
-  - host: app0.kryukov.local
-    http:
-      paths:
-        - pathType: Prefix
-          path: /
-          backend:
-            service:
-              name: application-0.application-headless
-              port:
-                name: http
-  - host: app1.kryukov.local
-    http:
-      paths:
-        - pathType: Prefix
-          path: /
-          backend:
-            service:
-              name: application-1.application-headless
-              port:
-                name: http
