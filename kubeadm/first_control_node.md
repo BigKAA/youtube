@@ -224,3 +224,95 @@ containerLogMaxFiles: 3
 * **systemReserved** - резервируем ресурсы для приложений работающих не под управлением kubernetes.
 * **containerLogMaxSize** - определяем максимальный размер файла журнала контейнера до его ротации.
 * **containerLogMaxFiles** - максимальный размер журнального файла контейнера.
+
+## Инициализация первой ноды
+
+```shell
+kubeadm init --config /etc/kubernetes/kubeadm-config.yaml
+```
+
+Если приложение долго не завершает свою работу, значит что-то пошло не так. Необходимо отменить все действия и запустить
+его ещё раз, но с большим уровнем отладки.
+
+ ```shell
+ kubeadm reset
+ kubeadm init --config /etc/kubernetes/kubeadm-config.yaml -v5
+ ```
+
+Если нода установилась нормально, добавим конфиг kubectl. И посмотрим, всё ли действительно у нас нормально.
+
+```shell
+mkdir -p $HOME/.kube
+ln -s /etc/kubernetes/admin.conf $HOME/.kube/config
+```
+
+Я предпочитаю делать символьную ссылку. Но, если вы обыкновенный пользователь, можно файл скопировать.
+
+Убедимся, что нода в кластере.
+
+```shell
+kubectl get nodes
+```
+
+Убедимся, что на самом деле ничего не работает.
+
+```shell
+kubectl get pods -A
+```
+
+## nodeloacaldns
+
+Для нормальной работы нам необходимо установить кеширующий DNS сервер.
+
+Сначала узнаем IP адрес основного DNS сервера клавстера. Он нам понадобится на следующем шаге. 
+
+```shell
+kubectl -n kube-system get svc kube-dns -o jsonpath='{.spec.clusterIP}'
+```
+
+Подставим его в фале [манифеста](manifests/nodelocaldns-daemonset.yaml) на 24-й, 36-й и 47-й строках.
+
+Скопируем файл манифеста на первую ноду клвстера в  `/etc/kubernetes/nodelocaldns-daemonset.yaml`. И запустим 
+приложение.
+
+```shell
+kubectl apply -f /etc/kubernetes/nodelocaldns-daemonset.yaml
+```
+
+Обратите внимание на 23-ю строку: `hostNetwork: true`. Это значит что контейнер будет открывть порт на прослушивание на 
+сетевых интерфейсах хоста.
+
+```shell
+ ss -nltp | grep :53
+```
+
+## Драйвер сети
+
+Я привык к calico. Но вы можете поставить любой другой драйвер.
+
+Будем ставить при помощи оператора. Сначала сам опреатор
+
+```shell
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/tigera-operator.yaml
+```
+
+Пока в системе устанавливаются CRD calico. Подготовим [манифест для оператора](manifests/calico-install.yaml).
+
+В 14-й и 15-й строках укажите параметры вашей сети.
+
+* **cidr** - сеть, используемую для подов кластера. (_Сетью для сервисов будет управлять kube-proxy_)
+* **encapsulation** - режим энкапсуляции трафика. Возможные варианты: IPIP, VXLAN, IPIPCrossSubnet, VXLANCrossSubnet, None.
+  Я предпочитаю использовать IPIP или IPIPCrossSubnet. Несмотря на то, что это энкапсуляция IP в IP, а не Ethernet в
+  в IP (вариант VXLAN*). C VXLAN могут быть сюрпризы.
+
+Скопируйте файл в `/etc/kubernetes/calico-install.yaml`. И примените манифест.
+
+```shell
+kubectl apply -f /etc/kubernetes/calico-install.yaml
+```
+
+Убедимся, что всё работает.
+
+```shell
+kubectl get pods -A
+```

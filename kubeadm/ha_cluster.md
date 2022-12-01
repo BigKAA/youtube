@@ -140,9 +140,9 @@ frontend main
 
 backend app
     balance     roundrobin
-    server 192.168.218.171:6443 check
-    server 192.168.218.172:6443 check
-    server 192.168.218.173:6443 check
+    server control1 192.168.218.171:6443 check
+    server control2 192.168.218.172:6443 check
+    server control3 192.168.218.173:6443 check
 
 listen stats
     bind *:9000
@@ -162,4 +162,4 @@ systemctl status haproxy
 ```
 
 Поскольку у нас включен модуль статистики, мы можем к нему подключиться. Для этого в браузере откройте следующую
-страницу `http://192.168.218.189:9000`.
+страницу `http://192.168.218.189:9000/haproxy_stats`.

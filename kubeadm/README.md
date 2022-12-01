@@ -15,6 +15,8 @@ kubernetes API из-за пределов кластера.
 
 Как включить High availability [описано тут](ha_cluster.md).
 
-## Первая control нода
+## Установка кластера
 
-[Установка первой control ноды](first_control_node.md).
+* [Первая control нода](first_control_node.md).
+* Другие control ноды.
+

@@ -124,9 +124,9 @@ dnf install -y mc vim git rsyslog jq
 сертификатами.
 
 ```shell
-systemctl enable chrony
-systemctl start chrony
-systemctl status chrony
+systemctl enable chronyd
+systemctl start chronyd
+systemctl status chronyd
 ```
 
 ### syslog
