@@ -55,7 +55,9 @@ data:
         reload
         loop
         bind 169.254.25.10
-        forward . /etc/resolv.conf
+        forward . /etc/resolv.conf {
+          prefer_udp
+        }
         prometheus :9253
     }
 ---
