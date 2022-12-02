@@ -102,6 +102,9 @@ containerLogMaxFiles: 3
 Основные параметры, на которые следует обратить внимание.
 
 ```yaml
+bootstrapTokens:
+- groups:
+  ttl: 24h0m0s
 localAPIEndpoint:
   advertiseAddress: 192.168.218.171
   bindPort: 6443
@@ -114,6 +117,10 @@ nodeRegistration:
     key: node-role.kubernetes.io/master
 ```
 
+* **bootstrapTokens.groups[0].ttl** - Время жизни токена. После инициализации первой ноды, kubeadm выведет на стандартный
+  вывод команды для подключения остальных нод кластера. В этих командах будет использован токен. Необходимо учесть,
+  что срок жизни этого токена 24 часа. Если, например через сутки, потребуется добавить новые ноды в кластер, придётся
+  генерировать новый токен.
 * **localAPIEndpoint** - определяем IP адрес и порт, на котором на этой ноде будет слушать запросы kubernetes API сервер.
   Тут надо указывать IP машины, а не кластерный IP адрес, используемый в High availability конфигурации. Если эти
   параметры не указывать, kubeadm попытается автоматически определить значения. Если у вас несколько сетевых интерфесов,
@@ -340,9 +347,8 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.5
 kubectl apply -f /etc/kubernetes/calico-install.yaml
 ```
 
-Убедимся, что всё работает.
+Проверяем, что все поды запустились.
 
 ```shell
-kubectl get pods -A
+watch kubectl get pods -A
 ```
-

@@ -78,11 +78,13 @@ net.bridge.bridge-nf-call-ip6tables=1
 ```shell
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
-name=Kubernetes
-baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+async = 1
 enabled=1
-gpgcheck=1
-gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+baseurl = https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+gpgcheck = 1
+gpgkey = https://packages.cloud.google.com/yum/doc/yum-key.gpg
+        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+name = Base programs for k8s
 EOF
 ```
 

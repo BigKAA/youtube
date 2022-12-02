@@ -33,8 +33,8 @@ options {
         recursing-file  "/var/named/data/named.recursing";
         allow-query     { any; };
         recursion yes;
-        dnssec-enable yes;
-        dnssec-validation yes;
+        dnssec-enable no;
+        dnssec-validation no;
         managed-keys-directory "/var/named/dynamic";
         pid-file "/run/named/named.pid";
         session-keyfile "/run/named/session.key";
