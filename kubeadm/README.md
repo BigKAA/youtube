@@ -18,9 +18,13 @@ kubernetes API из-за пределов кластера.
 ## Установка кластера
 
 * [Первая control нода](first_control_node.md).
-* [Другие control ноды](another-control-nodes.md).
-* [Worker ноды](worker-nodes.md).
+* [Добавление дополнительных control нод](another-control-nodes.md).
+* [Добавление worker ноды](worker-nodes.md).
 * [Проверка работоспособности](check.md).
+
+## Обновление версии кластера.
+
+
 
 ## Удаление нод.
 

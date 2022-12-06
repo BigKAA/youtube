@@ -163,3 +163,7 @@ systemctl status haproxy
 
 Поскольку у нас включен модуль статистики, мы можем к нему подключиться. Для этого в браузере откройте следующую
 страницу `http://192.168.218.189:9000/haproxy_stats`.
+
+## Немного автоматизации
+
+Ansible [install-ha.yaml](https://github.com/BigKAA/00-kube-ansible/blob/main/services/install-ha.yaml)

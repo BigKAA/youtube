@@ -65,3 +65,7 @@ kubeadm join 192.168.218.189:7443 --token 8g5max.xfbtvkmud52htbmv \
 kubectl get nodes
 kubectl get pods -A
 ```
+
+## Немного автоматизации
+
+Ansible [install-workers.yam](https://github.com/BigKAA/00-kube-ansible/blob/main/services/install-workers.yaml)

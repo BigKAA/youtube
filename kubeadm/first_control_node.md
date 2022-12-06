@@ -352,3 +352,7 @@ kubectl apply -f /etc/kubernetes/calico-install.yaml
 ```shell
 watch kubectl get pods -A
 ```
+
+## Немного автоматизации
+
+Ansible [install-1st-control.yaml](https://github.com/BigKAA/00-kube-ansible/blob/main/services/install-1st-control.yaml)

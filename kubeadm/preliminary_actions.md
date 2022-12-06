@@ -172,3 +172,7 @@ crictl ps -a
 ```
 
 _Ещё одни интересный документ про [crictl](https://kubernetes.io/docs/tasks/debug/debug-cluster/crictl/)_
+
+## Немного автоматизации
+
+Ansible [prepare-hosts.yaml](https://github.com/BigKAA/00-kube-ansible/blob/main/services/prepare-hosts.yaml)
