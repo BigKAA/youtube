@@ -20,8 +20,7 @@ kubeadm certs check-expiration
 kubeadm certs renew --help
 ```
 
-Поскольку обычно все сертификаты живут около года. Что бы не вносить путаницы лучше обновить все сертификаты одной
-командой.
+Поскольку обычно все сертификаты живут около года, что бы не вносить путаницы лучше обновить их одной командой.
 
 ```shell
 kubeadm certs renew all
@@ -44,7 +43,6 @@ mv -f /tmp/kube/* /etc/kubernetes/manifests
 sleep 45
 systemctl restart kubelet
 systemctl status kubelet
-
 ```
 
 Вобщем вам придётся рестартовать весь control plane и kubelet. 
