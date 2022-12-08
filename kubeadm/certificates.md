@@ -45,6 +45,15 @@ systemctl restart kubelet
 systemctl status kubelet
 ```
 
+Или так ([честно позаимствовано из kubespray](https://github.com/kubernetes-sigs/kubespray/blob/master/roles/kubernetes/control-plane/templates/k8s-certs-renew.sh.j2)):
+
+```shell
+crictl pods -n kube-system --name 'kube-scheduler-*|kube-controller-manager-*|kube-apiserver-*|etcd-*' -q | xargs crictl rmp -f
+until printf "" 2>>/dev/null >>/dev/tcp/127.0.0.1/6443; do sleep 1; done
+systemctl restart kubelet
+systemctl status kubelet
+```
+
 Вобщем вам придётся рестартовать весь control plane и kubelet. 
 Мне кажется, что проще это сделать перезагрузив ноду целиком.
 
@@ -54,4 +63,19 @@ reboot
 ```
 
 Вы можете добавить процедуру обновления сертификатов в систему cron на 
-сервере. Но не забывайте о необходимости перезапуска приложений.  
+сервере. Но не забывайте о необходимости перезапуска приложений.
+
+## kubectl
+
+После обновления сертификатов, обновится конфигурационный файл клиента kubectl - `/etc/kubernetes/admin.conf`.
+
+Если вы, как я рекомендовал, делали символьную ссылку `~/.kube/config` -> `/etc/kubernetes/admin.conf`, то
+ничего делать не надо.
+
+Иначе, скопируйте файл к себе в домашнюю директорию.
+
+```shell
+cp -f /etc/kubernetes/admin.conf ~/.kube/config
+```
+
+И не забудьте поменять его во всех своих инструментах, используемых для доступа к API кластера.
