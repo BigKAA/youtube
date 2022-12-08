@@ -34,25 +34,17 @@ You must restart the kube-apiserver, kube-controller-manager, kube-scheduler and
 so that they can use the new certificates.
 ```
 
-Т.е. мало обновить сертификаты, необходимо еще перезапустить приложения.
+Т.е. мало обновить сертификаты, необходимо еще перезапустить приложения. Так же не стоит забывать про kubelet.
 
 ```shell
-mkdir ~/tmp-kube
-cp -r /etc/kubernetes/manifests ~/tmp-kube
-rm -f /etc/kubernetes/manifests/*
-```
+mkdir /tmp/kube
+mv -f /etc/kubernetes/manifests/* /tmp/kube
+sleep 45
+mv -f /tmp/kube/* /etc/kubernetes/manifests
+sleep 45
+systemctl restart kubelet
+systemctl status kubelet
 
-Ждем несколько минут и обратно включаем приложения.
-
-```shell
-cp ~/tmp-kube/manifests/* /etc/kubernetes/manifests/
-```
-
-Так же не стоит забывать про kubelet.
-
-```shell
-service restart kubelet
-service status kubelet
 ```
 
 Вобщем вам придётся рестартовать весь control plane и kubelet. 
