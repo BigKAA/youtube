@@ -14,8 +14,8 @@ kubectl delete node worker1.kryukov.local
 kubeadm reset
 ```
 
-После `kubeadm reset` продолжает работать containerd (или то что вы используете).
-Есть вероятность, что какие то контейнеры продолжат работать.
+После `kubeadm reset` containerd (или то что вы используете) не выключается.
+Есть вероятность, что какие-то контейнеры продолжат работать.
 
 Тут либо выключаем containerd, либо вручную останавливаем все запущенные контейнеры.
 
@@ -48,7 +48,7 @@ kubectl -n kube-system get pods | grep etcd
 Получаем список членов кластера etcd. Нам нужен id неработающего сервера.
 
 ```shell
-kubectl exec etcd-control1.kryukov.local -n kube-system -- etcdctl \
+kubectl -n kube-system exec etcd-control1.kryukov.local -- etcdctl \
   --endpoints '192.168.218.171:2379' \
   --cacert /etc/kubernetes/pki/etcd/ca.crt \
   --key /etc/kubernetes/pki/etcd/server.key \
@@ -59,8 +59,8 @@ kubectl exec etcd-control1.kryukov.local -n kube-system -- etcdctl \
 Удаляем неработающий сервер из списка.
 
 ```shell
-kubectl exec etcd-control1.kryukov.local -n kube-system -- etcdctl \
-  --endpoints 'https://192.168.218.171:2379' \
+kubectl -n kube-system exec etcd-control1.kryukov.local -- etcdctl \
+  --endpoints '192.168.218.171:2379' \
   --cacert /etc/kubernetes/pki/etcd/ca.crt \
   --key /etc/kubernetes/pki/etcd/server.key \
   --cert /etc/kubernetes/pki/etcd/server.crt \
