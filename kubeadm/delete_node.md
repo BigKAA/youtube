@@ -8,7 +8,7 @@
 kubectl delete node worker1.kryukov.local
 ```
 
-Хатем на самой ноде удалем приложения кластера.
+Затем на самой ноде удалем приложения кластера.
 
 ```shell
 kubeadm reset
