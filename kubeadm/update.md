@@ -35,9 +35,9 @@
 Например, в RedHat совместимом дистрибутиве.
 
 ```shell
-dnf update kubelet-1.25.4-0.x86_64
-dnf update kubectl-1.25.4-0.x86_64
-dnf update kubeadm-1.25.4-0.x86_64
+dnf update kubelet-1.25.4-0.x86_64 -y
+dnf update kubectl-1.25.4-0.x86_64 -y
+dnf update kubeadm-1.25.4-0.x86_64 -y
 ```
 
 2. Запустите процедуру очистки (миграции приложений) этой ноды.
@@ -75,9 +75,9 @@ kubectl get nodes
 Например, в RedHat совместимом дистрибутиве.
 
 ```shell
-dnf update kubelet-1.25.4-0.x86_64
-dnf update kubectl-1.25.4-0.x86_64
-dnf update kubeadm-1.25.4-0.x86_64
+dnf update kubelet-1.25.4-0.x86_64 -y
+dnf update kubectl-1.25.4-0.x86_64 -y
+dnf update kubeadm-1.25.4-0.x86_64 -y
 ```
 
 2. Запустите процедуру очистки (миграции приложений) этой ноды.
@@ -115,9 +115,9 @@ kubectl get nodes
 Например, в RedHat совместимом дистрибутиве.
 
 ```shell
-dnf update kubelet-1.25.4-0.x86_64
-dnf update kubectl-1.25.4-0.x86_64
-dnf update kubeadm-1.25.4-0.x86_64
+dnf update kubelet-1.25.4-0.x86_64 -y
+dnf update kubectl-1.25.4-0.x86_64 -y
+dnf update kubeadm-1.25.4-0.x86_64 -y
 ```
 
 2. Запустите процедуру очистки (миграции приложений) этой ноды.
