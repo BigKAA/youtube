@@ -28,4 +28,4 @@ Nexus внутри kubernetes, делаем свой docker registry.
   * **[Сбор логов с асинхронной очередью](logs/async)** - kafka, vector, fluentbit, opensearch.
 * **k3s**
   * [Установка](k3s)
-* **[kuneadm](kubeadm)** - управление кластером при помощи kubeadm.
+* **[kubeadm](kubeadm)** - управление кластером при помощи kubeadm.
