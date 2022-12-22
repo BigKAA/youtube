@@ -1,0 +1,266 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &cluster_name pg
+  labels:
+    application: spilo
+    spilo-cluster: *cluster_name
+spec:
+  selector:
+    matchLabels:
+      application: spilo
+      spilo-cluster: *cluster_name
+  replicas: 2
+  serviceName: *cluster_name
+  template:
+    metadata:
+      labels:
+        application: spilo
+        spilo-cluster: *cluster_name
+    spec:
+      # service account that allows changing endpoints and assigning pod labels
+      # in the given namespace: https://kubernetes.io/docs/user-guide/service-accounts/
+      # not required unless you've changed the default service account in the namespace
+      # used to deploy Spilo
+      serviceAccountName: operator
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchExpressions:
+                  - key: "spilo-cluster"
+                    operator: "In"
+                    values:
+                      - "pg"
+      containers:
+      - name: *cluster_name
+        image: registry.opensource.zalan.do/acid/spilo-14:2.1-p7
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8008
+          protocol: TCP
+        - containerPort: 5432
+          protocol: TCP
+        startupProbe:
+          tcpSocket:
+            port: 8008
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          failureThreshold: 20
+        livenessProbe:
+          # postgres check
+          exec:
+            command: [ "psql", "-U", "postgres", "-c", "SELECT 1" ]
+          periodSeconds: 15
+        readinessProbe:
+          # patroni check
+          tcpSocket:
+            port: 8008
+          periodSeconds: 15
+        volumeMounts:
+        - mountPath: /home/postgres/pgdata
+          name: pgdata
+        - mountPath: /data/pg_wal
+          name: backup
+        env:
+        - name: DCS_ENABLE_KUBERNETES_API
+          value: 'true'
+        - name: CRONTAB
+          value: "[\"00 01 * * * envdir /config /scripts/postgres_backup.sh /home/postgres/pgdata/pgroot/data\"]"
+        - name: KUBERNETES_SCOPE_LABEL
+          value: spilo-cluster
+        - name: KUBERNETES_ROLE_LABEL
+          value: role
+        - name: SPILO_CONFIGURATION
+          value: | ## https://github.com/zalando/patroni#yaml-configuration
+            bootstrap:
+              initdb:
+                - auth-host: md5
+                - auth-local: md5
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: PGPASSWORD_SUPERUSER
+          valueFrom:
+            secretKeyRef:
+              name: *cluster_name
+              key: superuser-password
+        - name: PGUSER_ADMIN
+          value: superadmin
+        - name: PGPASSWORD_ADMIN
+          valueFrom:
+            secretKeyRef:
+              name: *cluster_name
+              key: admin-password
+        - name: PGPASSWORD_STANDBY
+          valueFrom:
+            secretKeyRef:
+              name: *cluster_name
+              key: replication-password
+        - name: SCOPE
+          value: *cluster_name
+        - name: PGROOT
+          value: /home/postgres/pgdata/pgroot
+        - name: TZ
+          value: "Europe/Moscow"
+        - name: WALG_FILE_PREFIX
+          value: "/data/pg_wal"
+
+      terminationGracePeriodSeconds: 0
+  volumeClaimTemplates:
+  - metadata:
+      name: pgdata
+      labels:
+        application: spilo
+        spilo-cluster: *cluster_name
+    spec:
+      storageClassName: managed-nfs-storage
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+  - metadata:
+      name: backup
+      labels:
+        application: spilo
+        spilo-cluster: *cluster_name
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+      storageClassName: managed-nfs-storage
+
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: &cluster_name pg
+  labels:
+    application: spilo
+    spilo-cluster: *cluster_name
+subsets: []
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: &cluster_name pg
+  labels:
+    application: spilo
+    spilo-cluster: *cluster_name
+spec:
+  type: ClusterIP
+  ports:
+  - name: postgresql
+    port: 5432
+    targetPort: 5432
+
+---
+# headless service to avoid deletion of patronidemo-config endpoint
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-config
+  labels:
+    application: spilo
+    spilo-cluster: pg
+spec:
+  clusterIP: None
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: &cluster_name pg
+  labels:
+    application: spilo
+    spilo-cluster: *cluster_name
+type: Opaque
+stringData:
+  superuser-password: password
+  replication-password: password
+  admin-password: password
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: operator
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: operator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+  # delete is required only for 'patronictl remove'
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - get
+  - patch
+  - update
+  # the following three privileges are necessary only when using endpoints
+  - create
+  - list
+  - watch
+  # delete is required only for for 'patronictl remove'
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# The following privilege is only necessary for creation of headless service
+# for patronidemo-config endpoint, in order to prevent cleaning it up by the
+# k8s master. You can avoid giving this privilege by explicitly creating the
+# service like it is done in this manifest (lines 160..169)
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: operator
+subjects:
+- kind: ServiceAccount
+  name: operator

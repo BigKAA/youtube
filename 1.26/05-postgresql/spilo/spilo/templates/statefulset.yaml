@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "postgres-cluster.fullname" . }}
+  labels:
+    application: spilo
+    spilo-cluster: {{ include "postgres-cluster.fullname" . }}
+spec:
+  podManagementPolicy: {{ .Values.podManagementPolicy }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      application: spilo
+      spilo-cluster: {{ include "postgres-cluster.fullname" . }}
+  serviceName: {{ include "postgres-cluster.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        application: spilo
+        spilo-cluster: {{ include "postgres-cluster.fullname" . }}
+    spec:                    
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "postgres-cluster.serviceAccountName" . }}
+      containers:
+        - name: {{ include "postgres-cluster.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          
+          ports:
+            - containerPort: 8008
+              protocol: TCP
+            - containerPort: {{ .Values.service.spilo.targetPort }}
+              protocol: {{ .Values.service.spilo.protocol }}
+          {{- toYaml .Values.probes | nindent 10 }}
+          env:
+            {{- range .Values.config }}
+            - name: {{ .name }}
+              {{ if .value -}}
+              value: {{ .value | quote }}
+              {{- else if .valueYaml -}}
+              value: {{ toYaml .valueYaml | indent 14 }}
+              {{- end }}
+            {{- end }}
+            - name: DCS_ENABLE_KUBERNETES_API
+              value: "true"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: KUBERNETES_SCOPE_LABEL # name of the label containing cluster name
+              value: spilo-cluster
+            - name: KUBERNETES_ROLE_LABEL # name of the label containing role (master or replica).
+                                          # Patroni will set this label on the pod it runs in.
+              value: role
+            {{- if .Values.volumeClaim.backup.enable }}
+            - name: WALG_FILE_PREFIX
+              value: "{{ .Values.volumeClaim.backup.path }}"
+            {{- if .Values.volumeClaim.backup.crontab }}
+            - name: CRONTAB
+              value: {{ tpl .Values.volumeClaim.backup.crontab $ | quote }}
+            {{- end }}
+            {{- end }}
+            - name: PGPASSWORD_SUPERUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: postgresPassword
+            - name: PGPASSWORD_ADMIN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: adminPassword
+            - name: PGPASSWORD_STANDBY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: replicationPassword
+            - name: SCOPE
+              value: {{ include "postgres-cluster.fullname" . }}
+            - name: PGROOT
+              value: "{{ .Values.volumeClaim.pgdata.path }}/pgroot"
+          volumeMounts:
+            - mountPath: {{ .Values.volumeClaim.pgdata.path }}
+              name: {{ .Values.volumeClaim.pgdata.name }}
+            {{- if .Values.volumeClaim.backup.enable }}
+            - mountPath: {{ .Values.volumeClaim.backup.path }}
+              name: {{ .Values.volumeClaim.backup.name }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      terminationGracePeriodSeconds:  {{ .Values.terminationGracePeriodSeconds }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        application: spilo
+        spilo-cluster: {{ include "postgres-cluster.fullname" . }}
+      name: {{ .Values.volumeClaim.pgdata.name }}
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.volumeClaim.pgdata.storage }}
+      storageClassName: {{ .Values.volumeClaim.pgdata.storageClass }}
+  {{- if .Values.volumeClaim.backup.enable }}
+  - metadata:
+      labels:
+        application: spilo
+        spilo-cluster: {{ include "postgres-cluster.fullname" . }}
+      name: {{ .Values.volumeClaim.backup.name }}
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.volumeClaim.backup.storage }}
+      storageClassName: {{ .Values.volumeClaim.backup.storageClass }}
+  {{- end }}

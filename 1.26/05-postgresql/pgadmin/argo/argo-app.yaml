@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pgadmin
+spec:
+  destination:
+    name: ''
+    namespace: pgo
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: 1.25/07-postgresql/pgadmin/manifests
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: master
+  project: system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

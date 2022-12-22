@@ -1,0 +1,76 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+  namespace: argocd
+spec:
+  selfSigned: {}
+---
+# Самоподписанный сертификат CA
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ca
+  namespace: argocd
+spec:
+  isCA: true
+  duration: 87600h # 10y
+  subject:
+    organizations:
+      - "Artur's home"
+    organizationalUnits:
+      - "IT dep"
+    localities:
+      - "Moscow"
+    countries:
+      - "RU"
+  commonName: CA
+  secretName: ca-secret
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: argocd-issuer
+  namespace: argocd
+spec:
+  ca:
+    secretName: ca-secret
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: argocd-certificate
+  namespace: argocd
+spec:
+  secretName: argocd-tls
+  duration: 9125h # 1y
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+    - arturs k8s
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+    rotationPolicy: Always
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - argocd.kryukov.local
+  ipAddresses:
+    - 192.168.218.181
+  issuerRef:
+    name: argocd-issuer
+    kind: Issuer
+    group: cert-manager.io

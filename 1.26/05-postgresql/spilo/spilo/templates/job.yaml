@@ -1,0 +1,80 @@
+{{- if .Values.job.enabled -}}
+{{ $secretName := (include "postgres-cluster.secretName" .)}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "postgres-cluster.jobName" . }}
+  labels:
+    application: spilo
+    spilo-cluster: {{ include "postgres-cluster.fullname" . }}
+spec:
+  template:
+    metadata:
+      name: {{ include "postgres-cluster.jobName" . }}
+      labels:
+        application: spilo
+        spilo-cluster: {{ include "postgres-cluster.fullname" . }}
+    spec:
+      restartPolicy: "OnFailure"
+      containers:
+      - name: {{ include "postgres-cluster.jobName" . }}
+        image: {{ .Values.job.image.repository -}} : {{- .Values.job.image.tag }}
+        imagePullPolicy: {{ .Values.job.image.pullPolicy }}
+        command:
+          - bash
+          - -ec
+          - >-
+            PGPASSWORD=$POSTGRES_PASSWORD psql -w -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" 
+          {{- range $elm := (.Values.job.init.databases) }}
+            -c "create database {{ printf "$DB_%s" $elm.name}};"
+          {{- end }} 
+          {{- range $elm := (.Values.job.init.users) }}
+            -c "create user {{ printf "$USER_%s with encrypted password '$PASSWORD_%s'" $elm.user $elm.user}};" 
+          {{- end }} 
+          {{- range $elm := (.Values.job.init.databases) }}
+            -c "grant all privileges on database {{ printf "$DB_%s to $USER_%s" $elm.name $elm.user}};"
+          {{- end -}}
+            ;
+          {{- range $elm := (.Values.job.init.databases) }}
+            {{- if $elm.schema }}
+            PGPASSWORD=$POSTGRES_PASSWORD psql -w -U "$POSTGRES_USER" -d "{{ printf "$DB_%s" $elm.name }}" -h "$POSTGRES_HOST" -p "$POSTGRES_PORT"
+            -c "{{ printf "create schema $SCHEMA_%s AUTHORIZATION $USER_%s" $elm.schema $elm.user }};";
+            {{- end }}
+          {{- end }}
+        env:
+          - name: POSTGRES_HOST
+            value: '{{ include "postgres-cluster.fullname" . }}'
+          - name: POSTGRES_PORT
+            value: '{{ .Values.service.spilo.port }}'
+          - name: POSTGRES_DB
+            value: "postgres"
+          - name: POSTGRES_USER
+            value: "postgres"
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "postgres-cluster.fullname" . }}
+                key: postgres-password
+          {{- range $elm := (.Values.job.init.users) }}
+          - name: {{ printf "USER_%s" $elm.user }}
+            value: {{ printf "%s" $elm.user }}
+          - name: {{ printf "PASSWORD_%s" $elm.user }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ $secretName }}
+                key: {{ printf "%s" $elm.user}}
+          {{- end }}
+          {{- range $elm := (.Values.job.init.databases) }}
+          - name: {{ printf "DB_%s" $elm.name }}
+            value: {{ printf "%s" $elm.name }}
+          {{- if $elm.schema }}
+          - name: {{ printf "SCHEMA_%s" $elm.schema }}
+            value: {{ printf "%s" $elm.schema }}
+          {{- end }}
+          {{- end }}        
+          {{- if .Values.timeZone }}
+          - name: TZ
+            value: {{ .Values.timeZone }}
+          {{- end }}
+      dnsPolicy: ClusterFirst
+{{- end -}}

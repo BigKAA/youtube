@@ -1,0 +1,174 @@
+# Default values for postgres-cluster.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 2
+podManagementPolicy: Parallel
+
+image:
+  repository: registry.opensource.zalan.do/acid/spilo-14
+  tag: "2.1-p7"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  # name: "operator"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 101
+
+probes:
+  startupProbe:
+    tcpSocket:
+      port: 8008
+    initialDelaySeconds: 120
+    periodSeconds: 30
+    failureThreshold: 20
+  livenessProbe:
+    # postgres check
+    exec:
+      command: [ "psql", "-U", "postgres", "-c", "SELECT 1" ]
+    periodSeconds: 15
+#  readinessProbe: # Проба не нужна. Патрони сам управляет Endpoint.
+#    # patroni check
+#    tcpSocket:
+#      port: 8008
+#    periodSeconds: 15
+
+service:
+  spilo:
+    type: ClusterIP # ClusterIP or NodePort
+    name: postgresql
+    port: 5432
+    targetPort: 5432
+    protocol: TCP
+    # nodePort: 30507
+  config:
+    clusterIP: None
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+role:
+  configmaps:
+    - create
+    - get
+    - list
+    - patch
+    - update
+    - watch
+    - delete
+  endpoints:
+    - get
+    - patch
+    - update
+    - create
+    - list
+    - watch
+    - delete
+  pods:
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  services:
+    - create
+
+terminationGracePeriodSeconds: 0
+
+volumeClaim:
+  pgdata:
+    name: pgdata
+    storage: 2Gi
+    path: /home/postgres/pgdata
+    storageClass: managed-nfs-storage
+  backup:
+    enable: true
+    name: backup
+    storage: 2Gi
+    path: /data/pg_wal
+    storageClass: managed-nfs-storage
+    crontab: '["00 01 * * * envdir /config /scripts/postgres_backup.sh {{ .Values.volumeClaim.pgdata.path }}/pgroot/data"]'
+
+# https://github.com/zalando/spilo/blob/master/ENVIRONMENT.rst
+config:
+  - name: PGUSER_ADMIN # username for the default admin user
+    value: admin
+  - name: PGUSER_SUPERUSER # username for the superuser
+    value: postgres
+  - name: SPILO_CONFIGURATION
+    valueYaml: |
+      bootstrap:
+        initdb:
+          - auth-host: md5
+          - auth-local: md5
+  - name: TZ
+    value: "Europe/Moscow"
+
+secret:
+  name: pg-secret
+  external: false # if false - define defaultPassword
+  defaultPassword:
+    postgresPassword: password
+    replicationPassword: password
+    adminPassword: password
+
+affinity: 
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: "spilo-cluster"
+            operator: In
+            values:
+              - '{{ include "postgres-cluster.fullname" . }}'
+        topologyKey: kubernetes.io/hostname
+
+# Create databases and users (under construction)
+job:
+  enabled: false
+#  image:
+#
+#    repository: postgres
+#    pullPolicy: IfNotPresent
+#    tag: "13"
+#  init:
+#    users:
+#    - user: user1
+#    databases:
+#    - name: db1
+#      user: user1
+#      schema: schema1

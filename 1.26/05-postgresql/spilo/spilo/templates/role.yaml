@@ -1,0 +1,13 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "postgres-cluster.serviceAccountName" . }}
+rules:
+  {{ range $key, $val := .Values.role }}
+  - apiGroups:
+    - ""
+    resources:
+      - {{ $key }}
+    verbs: {{ toYaml $val | nindent 6 }}
+  {{- end }}
