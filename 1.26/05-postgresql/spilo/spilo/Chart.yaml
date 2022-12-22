@@ -4,3 +4,6 @@ description: A Helm chart of spilo
 type: application
 version: 1.0.1
 appVersion: "0.2.1-p7"
+maintainers:
+  - name: Dmitry Frolenkov
+  - name: Arthur Kryukov
