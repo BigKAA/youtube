@@ -4,6 +4,8 @@ description: A Helm chart of spilo
 type: application
 version: 1.0.1
 appVersion: "0.2.1-p7"
+sources:
+  - "https://github.com/zalando/spilo/blob/master/kubernetes/spilo_kubernetes.yaml"
 maintainers:
   - name: Dmitry Frolenkov
   - name: Arthur Kryukov
