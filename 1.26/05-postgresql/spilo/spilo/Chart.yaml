@@ -7,3 +7,4 @@ appVersion: "0.2.1-p7"
 maintainers:
   - name: Dmitry Frolenkov
   - name: Arthur Kryukov
+    url: "https://www.kryukov.biz"
