@@ -1,0 +1,22 @@
+{{- if .Values.volumeClaim.backup.enable -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "postgres-cluster.fullname" $ }}
+  labels:
+    application: spilo
+    spilo-cluster: {{ include "postgres-cluster.fullname" $ }}
+data:
+  PGHOST: "/var/run/postgresql"
+  PGUSER: "postgres"
+  PGROOT: "{{ .Values.volumeClaim.pgdata.path }}/pgroot"
+  PGLOG: "{{ .Values.volumeClaim.pgdata.path }}/pgroot/pg_log"
+  PGDATA: "{{ .Values.volumeClaim.pgdata.path }}/pgroot/data"
+  BACKUP_NUM_TO_RETAIN: "5"
+  USE_WALG_BACKUP: "true"
+  USE_WALG_RESTORE: "true"
+  WALG_ALIVE_CHECK_INTERVAL: "5m"
+  WALE_BINARY: "wal-g"
+  WALG_FILE_PREFIX: "{{ .Values.volumeClaim.backup.path }}"
+  WALE_ENV_DIR: "/config"
+{{- end -}}

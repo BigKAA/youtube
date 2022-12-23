@@ -105,12 +105,22 @@ spec:
             - mountPath: {{ .Values.volumeClaim.backup.path }}
               name: {{ .Values.volumeClaim.backup.name }}
             {{- end }}
+            {{- if .Values.volumeClaim.backup.enable }}
+            - mountPath: /config
+              name: config
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       terminationGracePeriodSeconds:  {{ .Values.terminationGracePeriodSeconds }}
       {{- with .Values.affinity }}
       affinity:
         {{- tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- if .Values.volumeClaim.backup.enable }}
+      volumes:
+      - configMap:
+          name: {{ include "postgres-cluster.fullname" $ }}
+        name: config
       {{- end }}
   volumeClaimTemplates:
   - metadata:
