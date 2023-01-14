@@ -1,0 +1,10 @@
+{{- if and .Values.ingester.enabled .Values.ingester.serviceAccount.create -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "jaeger.ingester.serviceAccountName" . }}
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingester
+automountServiceAccountToken: {{ .Values.ingester.serviceAccount.automountServiceAccountToken }}
+{{- end -}}

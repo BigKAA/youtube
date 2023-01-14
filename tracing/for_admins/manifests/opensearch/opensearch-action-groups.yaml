@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: opensearch-action-groups
+  namespace: es
+type: Opaque
+stringData:
+  action_groups.yml: |
+    _meta:
+      type: "actiongroups"
+      config_version: 2

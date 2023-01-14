@@ -1,0 +1,10 @@
+{{- if and .Values.esIndexCleaner.enabled .Values.esIndexCleaner.serviceAccount.create -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "jaeger.esIndexCleaner.serviceAccountName" . }}
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: es-index-cleaner
+automountServiceAccountToken: {{ .Values.esIndexCleaner.serviceAccount.automountServiceAccountToken }}
+{{- end -}}

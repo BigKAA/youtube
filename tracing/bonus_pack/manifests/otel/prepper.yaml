@@ -1,0 +1,175 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: es-credentials
+  namespace: otel
+type: Opaque
+stringData:
+  ES_ADMIN: admin
+  ES_PASSWORD: password
+...
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-prepper-config
+  namespace: otel
+data:
+  pipelines.yaml: |
+    entry-pipeline:
+      delay: "100"
+      source:
+        otel_trace_source:
+          ssl: false
+          #record_type: event
+      buffer:
+        bounded_blocking:
+          buffer_size: 10240
+          batch_size: 160
+      sink:
+        - pipeline:
+            name: "raw-pipeline"
+        - pipeline:
+            name: "service-map-pipeline"
+    raw-pipeline:
+      source:
+        pipeline:
+          name: "entry-pipeline"
+      buffer:
+        bounded_blocking:
+          buffer_size: 10240
+          batch_size: 160
+      processor:
+        - otel_trace_raw:
+        #- otel_trace_group:
+        #    hosts: [ "https://opensearch-cluster-master.es.svc:9200" ]
+        #    # Change to your credentials
+        #    username: $ES_ADMIN
+        #    password: $ES_PASSWORD
+      sink:
+        - opensearch:
+            hosts: ["https://opensearch-cluster-master.es.svc:9200"]
+            insecure: true
+            username: $ES_ADMIN
+            password: $ES_PASSWORD
+            index_type: trace-analytics-raw
+    service-map-pipeline:
+      delay: "100"
+      source:
+        pipeline:
+          name: "entry-pipeline"
+      buffer:
+        bounded_blocking:
+          buffer_size: 10240
+          batch_size: 160
+      processor:
+        - service_map_stateful:
+      sink:
+        - opensearch:
+            hosts: ["https://opensearch-cluster-master.es.svc:9200"]
+            insecure: true
+            username: $ES_ADMIN
+            password: $ES_PASSWORD
+            index_type: trace-analytics-service-map
+  data-prepper-config.yaml: |
+    ssl: false
+#    peer_forwarder:
+#      discovery_mode: dns
+#      domain_name: "data-prepper-cluster.my-domain.net"
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-prepper
+  namespace: otel
+  labels:
+    app: &app data-prepper
+    version: &ver 2.0.1
+spec:
+  clusterIP: None
+  ports:
+    - name: otlp
+      port: 21890
+      targetPort: otlp
+  selector:
+    app: *app
+    version: *ver
+...
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app data-prepper
+  namespace: otel
+  labels:
+    app: *app
+    version: &ver 2.0.1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: *app
+      version: *ver
+  template:
+    metadata:
+      labels:
+        app: *app
+        version: *ver
+    spec:
+      initContainers:
+        - name: prepare
+          image: busybox:1.36.0
+          imagePullPolicy: "IfNotPresent"
+          envFrom:
+            - secretRef:
+                name: es-credentials
+          command:
+            - sh
+            - -c
+            - |
+              sed -e "s/\$ES_ADMIN/$(echo $ES_ADMIN)/" \
+                  -e "s/\$ES_PASSWORD/$(echo $ES_PASSWORD)/" \
+                  /tmp1/pipelines.yaml > /tmp2/pipelines.yaml
+              echo "Done"
+          volumeMounts:
+            - mountPath: /tmp1/pipelines.yaml
+              name: pipeline-tepmplate
+              subPath: pipelines.yaml
+            - mountPath: /tmp2
+              name: pipeline
+      containers:
+        - image: opensearchproject/data-prepper:2.0.1
+          name: data-prepper
+          ports:
+            - containerPort: 21890
+              name: otlp
+            - containerPort: 4900
+              name: metrics
+          resources: {}
+          volumeMounts:
+            - name: config
+              mountPath: /usr/share/data-prepper/config/data-prepper-config.yaml
+              subPath: data-prepper-config.yaml
+            - name: pipeline
+              mountPath: /usr/share/data-prepper/pipelines/
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+        - name: pipeline
+          emptyDir:
+            medium: Memory
+        - name: pipeline-tepmplate
+          configMap:
+            name: data-prepper-config
+            items:
+              - key: pipelines.yaml
+                path: pipelines.yaml
+        - name: config
+          configMap:
+            name: data-prepper-config
+            items:
+              - key: data-prepper-config.yaml
+                path: data-prepper-config.yaml
+...

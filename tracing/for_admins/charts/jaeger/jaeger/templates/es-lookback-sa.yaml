@@ -1,0 +1,10 @@
+{{- if and .Values.esLookback.enabled .Values.esLookback.serviceAccount.create -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "jaeger.esLookback.serviceAccountName" . }}
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: es-lookback
+automountServiceAccountToken: {{ .Values.esLookback.serviceAccount.automountServiceAccountToken }}
+{{- end -}}

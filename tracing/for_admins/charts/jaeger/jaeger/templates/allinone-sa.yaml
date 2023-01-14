@@ -1,0 +1,9 @@
+{{- if .Values.allInOne.enabled -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "jaeger.fullname" . }}
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: all-in-one
+{{- end -}}

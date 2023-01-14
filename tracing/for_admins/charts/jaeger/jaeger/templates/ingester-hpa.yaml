@@ -1,0 +1,27 @@
+{{- if .Values.ingester.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "jaeger.ingester.name" . }}
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingester
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "jaeger.ingester.name" . }}
+  minReplicas: {{ .Values.ingester.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.ingester.autoscaling.maxReplicas }}
+  metrics:
+  {{- if .Values.ingester.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.ingester.autoscaling.targetMemoryUtilizationPercentage }}
+  {{- end }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.ingester.autoscaling.targetCPUUtilizationPercentage | default 80 }}
+{{- end }}
