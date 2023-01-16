@@ -165,7 +165,7 @@ query:
       readOnly: true
 
 spark:
-  enabled: false
+  enabled: true
   annotations: {}
   image: jaegertracing/spark-dependencies
   imagePullSecrets: []

@@ -45,22 +45,19 @@ kubectl apply -f manifests/opensearch
 Установка мастер подов:
 
 ```shell
-cd charts/opensearch
-helm install master opensearch/opensearch -f values-master.yaml -n es
+helm install master opensearch/opensearch -f charts/opensearch/values-master.yaml -n es
 ```
 
 Установка data и ingest подов.
 
 ```shell
-cd charts/opensearch
-helm install data opensearch/opensearch -f values-data.yaml -n es
+helm install data opensearch/opensearch -f charts/opensearch/values-data.yaml -n es
 ```
 
 Установка dashboards
 
 ```shell
-cd charts/opensearch
-helm install dashboard opensearch/opensearch-dashboards -f values-dashboard.yaml -n es
+helm install dashboard opensearch/opensearch-dashboards -f charts/opensearch/values-dashboard.yaml -n es
 ```
 
 В итоге получаем следующие точки доступа к кластеру opensearch:
@@ -98,15 +95,15 @@ kubectl create ns jaeger
 приложения и файлы есть непосредственно в контейнере opensearch.
 
 ```shell
-kubectl -n es exec -it master-0 -- keytool -import -trustcacerts -keystore trust.store -storepass changeit -alias es-root -file config/certs/ca.crt
+kubectl -n es exec -it master-0 -c opensearch -- keytool -import -trustcacerts -keystore trust.store -storepass changeit -alias es-root -file config/certs/ca.crt
 ```
 
 ```shell
-kubectl -n es exec -it master-0 -- cat config/certs/ca.crt > es.pem
+kubectl -n es exec -it master-0 -c opensearch -- cat config/certs/ca.crt > es.pem
 ```
 
 ```shell
-kubectl -n es cp master-0:trust.store trust.store
+kubectl -n es cp master-0:trust.store trust.store -c opensearch
 ```
 
 Создадим ConfigMap с этими файлами.
