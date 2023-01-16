@@ -1,0 +1,182 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: &app otel-collector-agent
+  namespace: otel
+  labels:
+    app: *app
+    version: &ver 0.69.0
+data:
+  relay.yaml: |
+    receivers:
+      jaeger:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:14250
+          thrift_compact:
+            endpoint: 0.0.0.0:6831
+          thrift_http:
+            endpoint: 0.0.0.0:14268
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    processors:
+      batch:
+        timeout: 1s
+        send_batch_size: 50
+      memory_limiter:
+        check_interval: 5s
+        limit_percentage: 80
+        spike_limit_percentage: 25
+    exporters:
+      otlp:
+        endpoint: data-prepper:21890
+        tls:
+          insecure: true
+    extensions:
+      health_check: {}
+      memory_ballast:
+        size_in_percentage: 40
+    service:
+      extensions:
+      - health_check
+      - memory_ballast
+      pipelines:
+        traces:
+          receivers:
+          - otlp
+          - jaeger
+          processors:
+          - memory_limiter
+          - batch
+          exporters:
+          - otlp
+      telemetry:
+        metrics:
+          address: 0.0.0.0:8888
+...
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: &app otel-collector-agent
+  namespace: otel
+  labels:
+    app: *app
+    version: &ver 0.69.0
+spec:
+  selector:
+    matchLabels:
+      app: *app
+      version: *ver
+  template:
+    metadata:
+      labels:
+        app: *app
+        version: *ver
+    spec:
+      containers:
+        - name: *app
+          command:
+            - /otelcol-contrib
+            - --config=/conf/relay.yaml
+          image: "otel/opentelemetry-collector-contrib:0.69.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: jaeger-compact
+              containerPort: 6831
+              protocol: UDP
+              hostPort: 6831
+            - name: jaeger-grpc
+              containerPort: 14250
+              protocol: TCP
+              hostPort: 14250
+            - name: jaeger-thrift
+              containerPort: 14268
+              protocol: TCP
+              hostPort: 14268
+            - name: otlp
+              containerPort: 4317
+              protocol: TCP
+              hostPort: 4317
+            - name: otlp-http
+              containerPort: 4318
+              protocol: TCP
+              hostPort: 4318
+            - name: zipkin
+              containerPort: 9411
+              protocol: TCP
+              hostPort: 9411
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          resources:
+            limits:
+              cpu: 256m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /conf/relay.yaml
+              subPath: relay.yaml
+              name: config
+      volumes:
+        - name: config
+          configMap:
+            name: otel-collector-agent
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app otel-collector-agent
+  namespace: otel
+  annotations:
+    app: *app
+    version: &ver 0.69.0
+spec:
+  type: ClusterIP
+  ports:
+    - name: jaeger-compact
+      targetPort: jaeger-compact
+      protocol: UDP
+      port: 6831
+    - name: jaeger-grpc
+      targetPort: jaeger-grpc
+      protocol: TCP
+      port: 14250
+    - name: jaeger-thrift
+      targetPort: jaeger-thrift
+      protocol: TCP
+      port: 14268
+    - name: otlp
+      targetPort: 4317
+      protocol: TCP
+      port: 4317
+    - name: otlp-http
+      targetPort: otlp-http
+      protocol: TCP
+      port: 4318
+    - name: zipkin
+      targetPort: 9411
+      protocol: TCP
+      port: 9411
+  selector:
+    app: *app
+    version: *ver
+...

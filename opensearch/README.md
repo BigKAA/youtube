@@ -65,6 +65,7 @@ helm search repo opensearch
 использующие эти сикреты, данные в сикретах не обновляются.
 
 ```shell
+kubectl create ns es
 kubectl apply -f manifests
 ```
 

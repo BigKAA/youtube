@@ -1,0 +1,195 @@
+# Default values for jaeger.
+# This is a YAML-formatted file.
+# Jaeger values are grouped by component. Cassandra values override subchart values
+
+provisionDataStore:
+  cassandra: false
+  elasticsearch: false
+  kafka: false
+
+# Overrides the image tag where default is the chart appVersion.
+tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+allInOne:
+  enabled: false
+
+storage:
+  # allowed values (cassandra, elasticsearch)
+  type: elasticsearch
+  elasticsearch:
+    scheme: https
+    host: opensearch-cluster-master.es.svc
+    port: 9200
+    user: admin
+    usePassword: true
+    password: changeme
+    indexPrefix: jaeger
+    ## Use existing secret (ignores previous password)
+    existingSecret: opensearch-secret
+    existingSecretKey: ES_PASSWORD
+    nodesWanOnly: false
+
+agent:
+  enabled: true
+  image: jaegertracing/jaeger-agent
+  tag: 1.41.0
+  daemonset:
+    useHostPort: true
+  service:
+    type: ClusterIP
+    # zipkinThriftPort :accept zipkin.thrift over compact thrift protocol
+    zipkinThriftPort: 5775
+    # compactPort: accept jaeger.thrift over compact thrift protocol
+    compactPort: 6831
+    # binaryPort: accept jaeger.thrift over binary thrift protocol
+    binaryPort: 6832
+    # samplingPort: (HTTP) serve configs, sampling strategies
+    samplingPort: 5778
+  resources:
+     limits:
+       cpu: 500m
+       memory: 512Mi
+     requests:
+       cpu: 256m
+       memory: 128Mi
+  serviceAccount:
+    create: false
+  useHostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+
+collector:
+  enabled: true
+  image: jaegertracing/jaeger-collector
+  tag: 1.41.0
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+  service:
+    type: ClusterIP
+    grpc:
+      port: 14250
+      # nodePort:
+    # httpPort: can accept spans directly from clients in jaeger.thrift format
+    http:
+      port: 14268
+      # nodePort:
+    # can accept Zipkin spans in JSON or Thrift
+    zipkin: {}
+      # port: 9411
+      # nodePort:
+    otlp:
+      grpc:
+        port: 4317
+        # nodePort:
+      http:
+        port: 4318
+        # nodePort:
+  ingress:
+    enabled: true
+    ingressClassName: system-ingress
+    hosts:
+      - host: chart-example.local
+        servicePort: grpc
+  resources:
+     limits:
+       cpu: 1
+       memory: 1Gi
+     requests:
+       cpu: 256m
+       memory: 256Mi
+  serviceAccount:
+    create: false
+  extraConfigmapMounts:
+    - name: opensearch-tls
+      mountPath: /tls
+      subPath: ""
+      configMap: opensearch-tls
+      readOnly: true
+  cmdlineParams:
+    es.tls.ca: "/tls/es.pem"
+    es.tls.enabled: "true"
+
+query:
+  enabled: true
+  basePath: /
+  oAuthSidecar:
+    enabled: false
+  podSecurityContext: {}
+  securityContext: {}
+  agentSidecar:
+    enabled: false
+#    resources:
+#      limits:
+#        cpu: 500m
+#        memory: 512Mi
+#      requests:
+#        cpu: 256m
+#        memory: 128Mi
+  annotations: {}
+  image: jaegertracing/jaeger-query
+  tag: 1.41.0
+  imagePullSecrets: []
+  pullPolicy: IfNotPresent
+  dnsPolicy: ClusterFirst
+  cmdlineParams:
+    es.tls.ca: "/tls/es.pem"
+    es.tls.enabled: "true"
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 80
+  ingress:
+    enabled: true
+    # Used to create an Ingress record.
+    hosts:
+      - jaeger.kryukov.local
+    ingressClassName: system-ingress
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 256m
+      memory: 128Mi
+  serviceAccount:
+    create: false
+
+  extraConfigmapMounts:
+    - name: opensearch-tls
+      mountPath: /tls
+      subPath: ""
+      configMap: opensearch-tls
+      readOnly: true
+
+spark:
+  enabled: true
+  annotations: {}
+  image: jaegertracing/spark-dependencies
+  imagePullSecrets: []
+  tag: latest
+  pullPolicy: Always
+  cmdlineParams:
+    java.opts: "-Djavax.net.ssl.trustStore=/tls/trust.store -Djavax.net.ssl.trustStorePassword=changeit"
+  serviceAccount:
+    create: false
+  extraConfigmapMounts:
+    - name: opensearch-tls
+      mountPath: /tls
+      subPath: ""
+      configMap: opensearch-tls
+      readOnly: true
+  initContainer:
+    - name: init-configs
+      image: busybox:1.33.0
+      imagePullPolicy: "IfNotPresent"
+      command:
+        - sh
+        - -c
+        - |
+          base64 -d trust.store.b64 > trust.store
+      volumeMounts:
+        - name: opensearch-tls
+          mountPath: /tls

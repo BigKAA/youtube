@@ -1,0 +1,200 @@
+{{- if .Values.collector.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "jaeger.collector.name" . }}
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collector
+{{- if .Values.collector.annotations }}
+  annotations:
+    {{- toYaml .Values.collector.annotations | nindent 4 }}
+{{- end }}
+spec:
+{{- if not .Values.collector.autoscaling.enabled }}
+  replicas: {{ .Values.collector.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "jaeger.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: collector
+  template:
+    metadata:
+      annotations:
+        checksum/config-env: {{ include (print $.Template.BasePath "/collector-configmap.yaml") . | sha256sum }}
+{{- if .Values.collector.podAnnotations }}
+        {{- toYaml .Values.collector.podAnnotations | nindent 8 }}
+{{- end }}
+      labels:
+        {{- include "jaeger.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: collector
+{{- if .Values.collector.podLabels }}
+        {{- toYaml .Values.collector.podLabels | nindent 8 }}
+{{- end }}
+    spec:
+      {{- with .Values.collector.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.collector.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ template "jaeger.collector.serviceAccountName" . }}
+      {{- with .Values.collector.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ template "jaeger.collector.name" . }}
+        securityContext:
+          {{- toYaml .Values.collector.securityContext | nindent 10 }}
+        image: {{ .Values.collector.image }}:{{- .Values.collector.tag | default (include "jaeger.image.tag" .) }}
+        imagePullPolicy: {{ .Values.collector.pullPolicy }}
+        args:
+          {{ include "extra.cmdArgs" ( dict "cmdlineParams" .Values.collector.cmdlineParams ) | nindent 10  }}
+          {{- if not .Values.ingester.enabled -}}
+          {{- include "storage.cmdArgs" . | nindent 10 }}
+          {{- end }}
+        env:
+          {{- if .Values.collector.extraEnv }}
+            {{- toYaml .Values.collector.extraEnv | nindent 10 }}
+          {{- end }}
+          {{- if .Values.collector.service.zipkin }}
+          - name: COLLECTOR_ZIPKIN_HOST_PORT
+            value: {{ .Values.collector.service.zipkin.port | quote }}
+          {{- end }}
+          {{- if or .Values.collector.service.otlp.grpc .Values.collector.service.otlp.http }}
+          - name: COLLECTOR_OTLP_ENABLED
+            value: "true"
+          {{- end }}
+          {{- if ne (default 4317 .Values.collector.service.otlp.grpc.port | toString ) "4317" }}
+          - name: COLLECTOR_OTLP_GRPC_HOST_PORT
+            value: {{ .Values.collector.service.otlp.grpc.port | quote }}
+          {{- end }}
+          {{- if ne (default 4318 .Values.collector.service.otlp.http.port | toString) "4318" }}
+          - name: COLLECTOR_OTLP_HTTP_HOST_PORT
+            value: {{ .Values.collector.service.otlp.http.port | quote }}
+          {{- end }}
+          {{- if .Values.ingester.enabled }}
+          - name: SPAN_STORAGE_TYPE
+            value: kafka
+          {{- range $key, $value := .Values.storage.kafka.env }}
+          - name: {{ $key | quote }}
+            value: {{ $value | quote }}
+          {{- end }}
+        {{- if .Values.storage.kafka.extraEnv }}
+          {{- toYaml .Values.storage.kafka.extraEnv | nindent 10 }}
+        {{- end }}
+          - name: KAFKA_PRODUCER_BROKERS
+            value: {{ tpl (include "helm-toolkit.utils.joinListWithComma" .Values.storage.kafka.brokers) . }}
+          - name: KAFKA_PRODUCER_TOPIC
+            value: {{ .Values.storage.kafka.topic }}
+          - name: KAFKA_PRODUCER_AUTHENTICATION
+            value: {{ .Values.storage.kafka.authentication }}
+          {{ else }}
+          - name: SPAN_STORAGE_TYPE
+            value: {{ .Values.storage.type }}
+          {{- include "storage.env" . | nindent 10 }}
+          {{- end }}
+          {{- if .Values.collector.samplingConfig}}
+          - name: SAMPLING_STRATEGIES_FILE
+            value: /etc/conf/strategies.json
+          {{- end }}
+        ports:
+        - containerPort: {{ .Values.collector.service.grpc.port }}
+          name: grpc
+          protocol: TCP
+        - containerPort: {{ .Values.collector.service.http.port }}
+          name: http
+          protocol: TCP
+        - containerPort: 14269
+          name: admin
+          protocol: TCP
+        {{- if .Values.collector.service.zipkin }}
+        - containerPort: {{ .Values.collector.service.zipkin.port }}
+          name: zipkin
+          protocol: TCP
+        {{- end }}
+        {{- if or .Values.collector.service.otlp.grpc .Values.collector.service.otlp.http }}
+        - containerPort: {{ default 4317 .Values.collector.service.otlp.grpc.port }}
+          name: otlp-grpc
+          protocol: TCP
+        - containerPort: {{ default 4318 .Values.collector.service.otlp.http.port }}
+          name: otlp-http
+          protocol: TCP
+        {{- end }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: admin
+        livenessProbe:
+          httpGet:
+            path: /
+            port: admin
+        resources:
+          {{- toYaml .Values.collector.resources | nindent 10 }}
+        volumeMounts:
+        {{- range .Values.collector.extraConfigmapMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .mountPath }}
+            subPath: {{ .subPath }}
+            readOnly: {{ .readOnly }}
+        {{- end }}
+        {{- range .Values.collector.extraSecretMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .mountPath }}
+            subPath: {{ .subPath }}
+            readOnly: {{ .readOnly }}
+        {{- end }}
+        {{- if .Values.storage.cassandra.tls.enabled }}
+          - name: {{ .Values.storage.cassandra.tls.secretName }}
+            mountPath: "/cassandra-tls/ca-cert.pem"
+            subPath: "ca-cert.pem"
+            readOnly: true
+          - name: {{ .Values.storage.cassandra.tls.secretName }}
+            mountPath: "/cassandra-tls/client-cert.pem"
+            subPath: "client-cert.pem"
+            readOnly: true
+          - name: {{ .Values.storage.cassandra.tls.secretName }}
+            mountPath: "/cassandra-tls/client-key.pem"
+            subPath: "client-key.pem"
+            readOnly: true
+        {{- end }}
+        {{- if .Values.collector.samplingConfig}}
+          - name: strategies
+            mountPath: /etc/conf/
+        {{- end }}
+      dnsPolicy: {{ .Values.collector.dnsPolicy }}
+      restartPolicy: Always
+      volumes:
+      {{- range .Values.collector.extraConfigmapMounts }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ .configMap }}
+      {{- end }}
+      {{- range .Values.collector.extraSecretMounts }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+      {{- end }}
+      {{- if .Values.collector.samplingConfig}}
+        - name: strategies
+          configMap:
+            name: {{ include "jaeger.fullname" . }}-sampling-strategies
+      {{- end }}
+      {{- if .Values.storage.cassandra.tls.enabled }}
+        - name: {{ .Values.storage.cassandra.tls.secretName }}
+          secret:
+            secretName: {{ .Values.storage.cassandra.tls.secretName }}
+      {{- end }}
+    {{- with .Values.collector.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.collector.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.collector.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end -}}

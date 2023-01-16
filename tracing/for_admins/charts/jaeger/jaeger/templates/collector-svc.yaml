@@ -1,0 +1,65 @@
+{{- if .Values.collector.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "jaeger.collector.name" . }}
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collector
+{{- if .Values.collector.service.annotations }}
+  annotations:
+    {{- toYaml .Values.collector.service.annotations | nindent 4 }}
+{{- end }}
+spec:
+  ports:
+  - name: grpc
+    port: {{ .Values.collector.service.grpc.port }}
+{{- if and (eq .Values.collector.service.type "NodePort") (.Values.collector.service.grpc.nodePort) }}
+    nodePort: {{ .Values.collector.service.grpc.nodePort }}
+{{- end }}
+    protocol: TCP
+    targetPort: grpc
+  - name: http
+    port: {{ .Values.collector.service.http.port }}
+{{- if and (eq .Values.collector.service.type "NodePort") (.Values.collector.service.http.nodePort) }}
+    nodePort: {{ .Values.collector.service.http.nodePort }}
+{{- end }}
+    protocol: TCP
+    targetPort: http
+{{- if .Values.collector.service.zipkin }}
+  - name: zipkin
+    port: {{ .Values.collector.service.zipkin.port }}
+{{- if and (eq .Values.collector.service.type "NodePort") (.Values.collector.service.zipkin.nodePort) }}
+    nodePort: {{ .Values.collector.service.zipkin.nodePort }}
+{{- end }}
+    protocol: TCP
+    targetPort: zipkin
+{{- end }}
+{{- if or .Values.collector.service.otlp.grpc .Values.collector.service.otlp.http }}
+  - name: otlp-grpc
+    port: {{ default 4317 .Values.collector.service.otlp.grpc.port }}
+{{- if and (eq .Values.collector.service.type "NodePort") (.Values.collector.service.otlp.grpc.nodePort) }}
+    nodePort: {{ .Values.collector.service.otlp.grpc.nodePort }}
+{{- end }}
+    protocol: TCP
+    targetPort: otlp-grpc
+  - name: otlp-http
+    port: {{ default 4318 .Values.collector.service.otlp.http.port }}
+{{- if and (eq .Values.collector.service.type "NodePort") (.Values.collector.service.otlp.http.nodePort) }}
+    nodePort: {{ .Values.collector.service.otlp.http.nodePort }}
+{{- end }}
+    protocol: TCP
+    targetPort: otlp-http
+{{- end }}
+  - name: admin
+    port: 14269
+    targetPort: admin
+  selector:
+    {{- include "jaeger.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: collector
+  {{- if and (eq .Values.collector.service.type "ClusterIP") .Values.collector.service.clusterIP }}
+  clusterIP: {{ .Values.collector.service.clusterIP }}
+  {{- end }}
+  type: {{ .Values.collector.service.type }}
+{{- template "loadBalancerSourceRanges" .Values.collector }}
+{{- end -}}

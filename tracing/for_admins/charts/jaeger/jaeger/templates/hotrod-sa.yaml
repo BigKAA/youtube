@@ -1,0 +1,10 @@
+{{- if and .Values.hotrod.enabled .Values.hotrod.serviceAccount.create -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "jaeger.hotrod.serviceAccountName" . }}
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: hotrod
+automountServiceAccountToken: {{ .Values.hotrod.serviceAccount.automountServiceAccountToken }}
+{{- end -}}

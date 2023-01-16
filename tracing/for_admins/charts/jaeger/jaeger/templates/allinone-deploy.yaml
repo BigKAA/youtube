@@ -1,0 +1,115 @@
+{{- if .Values.allInOne.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "jaeger.fullname" . }}
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: all-in-one
+    prometheus.io/port: "14269"
+    prometheus.io/scrape: "true"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "jaeger.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: all-in-one
+  template:
+    metadata:
+      labels:
+        {{- include "jaeger.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: all-in-one
+{{- if .Values.allInOne.podLabels }}
+        {{- toYaml .Values.allInOne.podLabels | nindent 8 }}
+{{- end }}
+      annotations:
+        prometheus.io/port: "14269"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+        - env:
+          {{- if .Values.allInOne.extraEnv }}
+            {{- toYaml .Values.allInOne.extraEnv | nindent 12 }}
+          {{- end }}
+            - name: SPAN_STORAGE_TYPE
+              value: memory
+            - name: COLLECTOR_ZIPKIN_HOST_PORT
+              value: :9411
+            - name: JAEGER_DISABLED
+              value: "false"
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
+            {{- if .Values.allInOne.samplingConfig }}
+            - name: SAMPLING_STRATEGIES_FILE
+              value: /etc/conf/strategies.json
+            {{- end }}
+          image: {{ .Values.allInOne.image }}:{{- .Values.allInOne.tag | default (include "jaeger.image.tag" .) }}
+          imagePullPolicy: {{ .Values.allInOne.pullPolicy }}
+          name: jaeger
+          args:
+            {{- range $arg := .Values.allInOne.args }}
+            - "{{ tpl $arg $ }}"
+            {{- end }}
+          ports:
+            - containerPort: 5775
+              protocol: UDP
+            - containerPort: 6831
+              protocol: UDP
+            - containerPort: 6832
+              protocol: UDP
+            - containerPort: 5778
+              protocol: TCP
+            - containerPort: 16686
+              protocol: TCP
+            - containerPort: 16685
+              protocol: TCP
+            - containerPort: 9411
+              protocol: TCP
+            - containerPort: 4317
+              protocol: TCP
+            - containerPort: 4318
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /
+              port: 14269
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 14269
+              scheme: HTTP
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+      {{- with .Values.allInOne.resources }}
+          resources:
+        {{- toYaml . | nindent 12 }}
+      {{- end }}
+
+        {{- if .Values.allInOne.samplingConfig}}
+          volumeMounts:
+            - name: strategies
+              mountPath: /etc/conf/
+        {{- end }}
+      serviceAccountName: {{ template "jaeger.fullname" . }}
+    {{- if .Values.allInOne.samplingConfig}}
+      volumes:
+        - name: strategies
+          configMap:
+            name: {{ include "jaeger.fullname" . }}-sampling-strategies
+    {{- end }}
+    {{- with .Values.allInOne.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end -}}

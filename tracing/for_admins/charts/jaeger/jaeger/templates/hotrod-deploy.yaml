@@ -1,0 +1,65 @@
+{{- if .Values.hotrod.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "jaeger.fullname" . }}-hotrod
+  labels:
+    {{- include "jaeger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: hotrod
+spec:
+  replicas: {{ .Values.hotrod.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "jaeger.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: hotrod
+  template:
+    metadata:
+      labels:
+        {{- include "jaeger.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: hotrod
+    spec:
+      securityContext:
+        {{- toYaml .Values.hotrod.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ template "jaeger.hotrod.serviceAccountName" . }}
+      {{- with .Values.hotrod.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "jaeger.fullname" . }}-hotrod
+          securityContext:
+            {{- toYaml .Values.hotrod.securityContext | nindent 12 }}
+          image: {{ .Values.hotrod.image.repository }}:{{- include "jaeger.image.tag" . }}
+          imagePullPolicy: {{ .Values.hotrod.image.pullPolicy }}
+          env:
+            - name: JAEGER_AGENT_HOST
+              value: {{ template "jaeger.hotrod.tracing.host" . }}
+            - name: JAEGER_AGENT_PORT
+              value: {{ .Values.hotrod.tracing.port | quote }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.hotrod.resources | nindent 12 }}
+    {{- with .Values.hotrod.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.hotrod.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.hotrod.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end }}
