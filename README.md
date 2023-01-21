@@ -17,7 +17,6 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **[ArgoCD](argocd/README.md)** - приложение для CD в k8s.
 * **[Keycloak](keycloak/README.md)** - кластер Keycloak.
   * [Gatekeeper](keycloak/gatekeeper/README.md) - ограничение доступа к приложениям.
-* **[Loki](loki/README.md)** - первая попытка поставить Loki в k8s.
 * **[Mino](minio/README.md)** - установка minio в k8s. Версия под мой [миникластер](k8s-step-by-step/00-planning/README.md).
 * **[Подстановка данных из Secret](keycloak/gatekeeper/manifests-v3)** - подстановка данных из Secret в 
 конфигурационный файл приложения.
@@ -28,6 +27,7 @@ Nexus внутри kubernetes, делаем свой docker registry.
   * **[Мониторинг](monitoring)**
   * **Логи**
     * **[Сбор логов с асинхронной очередью](logs/async)** - kafka, vector, fluentbit, opensearch.
+    * **[Loki](loki/README.md)** - первая попытка поставить Loki в k8s.
   * **[Трейсинг](tracing)** - Jaeger, Open telemetry, Opensearch Observability.
 * **k3s**
   * [Установка](k3s)
