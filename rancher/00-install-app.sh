@@ -22,7 +22,7 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 # Metallb
 cd ../02-metallb
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
-sleep 15
+sleep 45
 kubectl -n metallb-system apply -f mlb.yaml
 
 # Ingress controller
