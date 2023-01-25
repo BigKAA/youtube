@@ -1,0 +1,15 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: rancher
+  namespace: cattle-system
+spec:
+  chart: rancher
+  version: 2.7.0
+  repo: "https://releases.rancher.com/server-charts/stable"
+  targetNamespace: cattle-system
+  set:
+    hostname: "rancher.kryukov.local"
+    bootstrapPassword: admin
+    replicas: 1

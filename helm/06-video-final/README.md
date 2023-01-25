@@ -62,7 +62,7 @@ README.md - это основной файл документации по ча�
 
 В директории helm создадим директорию charts. Перенесём в неё файл
 openresty-art-0.1.0.tgz. Перейдём в эту директорию и создадим 
-файл index.jaml
+файл index.yaml
 
     helm repo index . --url https://raw.githubusercontent.com/BigKAA/youtube/master/helm/charts
 
