@@ -96,3 +96,11 @@ kubectl apply -f manifests/etcd-metrics.yaml
 
 Через некоторое время смотрим targets в prometheus. Еще через пару минут смотрим в web интерфесе раздела кластер
 метрики etcd.
+
+## Видео
+
+Youtube: https://youtu.be/bVzMOMJNb-s
+
+Плейлист цикла по rancher: 
+Youtube: https://www.youtube.com/playlist?list=PLmxqUDFl0XM5x96wHJbBGeqNB1vhKfVv9
+VK: https://vk.com/video/playlist/7111833_5
