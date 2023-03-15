@@ -93,13 +93,14 @@ kubectl -n test-app scale --replicas=0 deployment/test-app
 
 ## Видео
 
-Youtube: https://youtu.be/maWyJX7eEVs
-Telegramm: 
-VK:
-Rutube:
+* Youtube: https://youtu.be/maWyJX7eEVs
+* Telegramm: https://t.me/arturkryukov/180
+* VK: https://vk.com/video7111833_456239231
+* Rutube: https://rutube.ru/video/private/4d1871a8c39f770092f34778c8c64a33
 
 Плейлист цикла по rancher: 
-Youtube: https://www.youtube.com/playlist?list=PLmxqUDFl0XM5x96wHJbBGeqNB1vhKfVv9
-VK: https://vk.com/video/playlist/7111833_5
-Rutube: https://rutube.ru/plst/265514/
+
+* Youtube: https://www.youtube.com/playlist?list=PLmxqUDFl0XM5x96wHJbBGeqNB1vhKfVv9
+* VK: https://vk.com/video/playlist/7111833_5
+* Rutube: https://rutube.ru/plst/265514/
 

@@ -192,6 +192,6 @@ helm install rancher ./rancher \
 ## Видео
 
 Плейлист цикла по rancher: 
-Youtube: https://www.youtube.com/playlist?list=PLmxqUDFl0XM5x96wHJbBGeqNB1vhKfVv9
-VK: https://vk.com/video/playlist/7111833_5
-Rutube: https://rutube.ru/plst/265514/
+* Youtube: https://www.youtube.com/playlist?list=PLmxqUDFl0XM5x96wHJbBGeqNB1vhKfVv9
+* VK: https://vk.com/video/playlist/7111833_5
+* Rutube: https://rutube.ru/plst/265514/
