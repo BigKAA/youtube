@@ -91,4 +91,15 @@ kubectl -n test-app scale --replicas=0 deployment/test-app
 
 Продолжение смотрите в видео.
 
+## Видео
+
+Youtube: https://youtu.be/maWyJX7eEVs
+Telegramm: 
+VK:
+Rutube:
+
+Плейлист цикла по rancher: 
+Youtube: https://www.youtube.com/playlist?list=PLmxqUDFl0XM5x96wHJbBGeqNB1vhKfVv9
+VK: https://vk.com/video/playlist/7111833_5
+Rutube: https://rutube.ru/plst/265514/
 

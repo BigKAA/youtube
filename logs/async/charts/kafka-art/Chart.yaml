@@ -7,4 +7,4 @@ dependencies:
 - name: kafka
   condition: kafka.enabled
   repository: https://charts.bitnami.com/bitnami
-  version: 18.0.0
+  version: 21.1.1
