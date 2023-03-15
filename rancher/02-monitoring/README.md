@@ -56,12 +56,13 @@ metadata:
 
 ## Видео
 
-Youtube: https://youtu.be/GBEhtuTj5M0
-VK: https://vk.com/video7111833_456239230
-Telegramm: https://t.me/arturkryukov/173
-Rutube: https://rutube.ru/video/bc9187aa7ac8d4c14527ce55ace7375a/
+* Youtube: https://youtu.be/GBEhtuTj5M0
+* VK: https://vk.com/video7111833_456239230
+* Telegramm: https://t.me/arturkryukov/173
+* Rutube: https://rutube.ru/video/bc9187aa7ac8d4c14527ce55ace7375a/
 
 Плейлист цикла по rancher: 
-Youtube: https://www.youtube.com/playlist?list=PLmxqUDFl0XM5x96wHJbBGeqNB1vhKfVv9
-VK: https://vk.com/video/playlist/7111833_5
-Rutube: https://rutube.ru/plst/265514/
+
+* Youtube: https://www.youtube.com/playlist?list=PLmxqUDFl0XM5x96wHJbBGeqNB1vhKfVv9
+* VK: https://vk.com/video/playlist/7111833_5
+* Rutube: https://rutube.ru/plst/265514/
