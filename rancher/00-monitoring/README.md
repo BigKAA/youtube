@@ -100,7 +100,10 @@ kubectl apply -f manifests/etcd-metrics.yaml
 ## Видео
 
 Youtube: https://youtu.be/bVzMOMJNb-s
+VK: https://vk.com/video7111833_456239229
+Telegramm: https://t.me/arturkryukov/167
 
 Плейлист цикла по rancher: 
 Youtube: https://www.youtube.com/playlist?list=PLmxqUDFl0XM5x96wHJbBGeqNB1vhKfVv9
 VK: https://vk.com/video/playlist/7111833_5
+Rutube: https://rutube.ru/plst/265514/
