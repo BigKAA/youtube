@@ -36,3 +36,18 @@ spec:
   ports:
   - name: web
     port: 8080
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: &app test-app-np
+  labels:
+    service: *app
+spec:
+  type: NodePort
+  selector:
+    app: test-app
+  ports:
+  - name: web
+    port: 8080
+    nodePort: 32005
