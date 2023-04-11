@@ -1,0 +1,73 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sts-volume-test
+  namespace: default
+spec:
+  selector:
+    app: test-sts
+  clusterIP: None
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sts-volume-test
+  namespace: default
+  labels:
+    app: test-sts
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: test-sts
+  serviceName: sts-volume-test
+  template:
+    metadata:
+      labels:
+        app: test-sts
+    spec:
+      containers:
+        - name: volume-test
+          image: nginx:1.23.4-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: sts-volume
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - ws3.kryukov.local
+                      - ws4.kryukov.local
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - test-sts
+              topologyKey: "kubernetes.io/hostname"
+  volumeClaimTemplates:
+    - spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 200Mi
+      metadata:
+        name: sts-volume
