@@ -102,7 +102,7 @@ reclaimPolicy: Delete
   "nodePathMap":[
     {
       "node":"DEFAULT_PATH_FOR_NON_LISTED_NODES",
-      "paths":["/data/app1","/data/app1"]
+      "paths":["/data/app1","/data/app2"]
     }
   ]
 }
