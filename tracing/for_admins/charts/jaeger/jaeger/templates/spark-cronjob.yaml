@@ -83,6 +83,10 @@ spec:
                 subPath: {{ .subPath }}
                 readOnly: {{ .readOnly }}
             {{- end }}
+            {{- range .Values.spark.extraEmptyDirVolumes }}
+              - name: {{ .name }}
+                mountPath: {{ .mountPath }}
+            {{- end }}
           restartPolicy: OnFailure
           volumes:
           {{- range .Values.spark.extraConfigmapMounts }}
@@ -94,6 +98,15 @@ spec:
             - name: {{ .name }}
               secret:
                 secretName: {{ .secretName }}
+          {{- end }}
+          {{- range .Values.spark.extraEmptyDirVolumes }}
+            - name: {{ .name }}
+              {{- if eq .medium "Memory" }}
+              emptyDir:
+                medium: Memory
+              {{- else }}
+                emptyDir: {}
+              {{- end }}
           {{- end }}
         {{- with .Values.spark.nodeSelector }}
           nodeSelector:

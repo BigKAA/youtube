@@ -178,19 +178,25 @@ spark:
     create: false
   extraConfigmapMounts:
     - name: opensearch-tls
-      mountPath: /tls
+      mountPath: /tls2
       subPath: ""
       configMap: opensearch-tls
       readOnly: true
+  extraEmptyDirVolumes:
+    - name: conf
+      medium: Memory
+      mountPath: /tls
   initContainer:
     - name: init-configs
-      image: busybox:1.33.0
-      imagePullPolicy: "IfNotPresent"
       command:
         - sh
         - -c
         - |
-          base64 -d trust.store.b64 > trust.store
+          base64 -d /tls/trust.store.b64 > /tls2/trust.store
+      image: busybox:1.33.0
+      imagePullPolicy: IfNotPresent
       volumeMounts:
         - name: opensearch-tls
           mountPath: /tls
+        - name: conf
+          mountPath: /tls2
