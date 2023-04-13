@@ -171,8 +171,9 @@ spark:
   imagePullSecrets: []
   tag: latest
   pullPolicy: Always
-  cmdlineParams:
-    java.opts: "-Djavax.net.ssl.trustStore=/tls/trust.store -Djavax.net.ssl.trustStorePassword=changeit"
+  extraEnv:
+    - name: JAVA_OPTS
+      value: "-Djavax.net.ssl.trustStore=/tls/trust.store -Djavax.net.ssl.trustStorePassword=changeit"
   serviceAccount:
     create: false
   extraConfigmapMounts:
