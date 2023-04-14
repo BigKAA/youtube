@@ -6,7 +6,7 @@
 конкретную версию ArgoCD.
 
 ```shell
-curl https://raw.githubusercontent.com/argoproj/argo-cd/v2.5.5/manifests/install.yaml -o 01-argocd.yaml
+curl https://raw.githubusercontent.com/argoproj/argo-cd/v2.6.7/manifests/install.yaml -o 01-argocd.yaml
 ```
 
 В полученном файле исправим логирование и сервисы.
@@ -66,7 +66,7 @@ CLI можно ставить на любом компьютере. Как ва�
 control ноде.
 
 ```shell
-wget https://github.com/argoproj/argo-cd/releases/download/v2.5.5/argocd-linux-amd64
+wget https://github.com/argoproj/argo-cd/releases/download/v2.6.7/argocd-linux-amd64
 mv -f argocd-linux-amd64 /usr/local/bin/argocd
 chmod +x /usr/local/bin/argocd
 argocd version
@@ -97,7 +97,7 @@ argocd account update-password --grpc-web
 Добавим нового пользователя и rbac правила.
 
 ```shell
-kubectl -n argocd create -f 06-argo-cm.yaml -f 07-argo-rbac.yaml
+kubectl -n argocd apply -f 06-argo-cm.yaml -f 07-argo-rbac.yaml
 ```
 
 Получаем список пользователей:
