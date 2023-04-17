@@ -119,6 +119,9 @@ spec:
         - configMap:
             name: backup-script
           name: config
+        - persistentVolumeClaim:
+            claimName: zalandodemo01-backup
+          name: backup
   volumeClaimTemplates:
   - metadata:
       labels:
@@ -132,19 +135,30 @@ spec:
       resources:
         requests:
           storage: 2Gi
-  - metadata:
-      labels:
-        application: spilo
-        spilo-cluster: *cluster_name
-      name: backup
-    spec:
-      storageClassName: managed-nfs-storage
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 2Gi
-
+#  - metadata:
+#      labels:
+#        application: spilo
+#        spilo-cluster: *cluster_name
+#      name: backup
+#    spec:
+#      storageClassName: managed-nfs-storage
+#      accessModes:
+#        - ReadWriteOnce
+#      resources:
+#        requests:
+#          storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zalandodemo01-backup
+spec:
+  storageClassName: managed-nfs-storage
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
 ---
 apiVersion: v1
 kind: Endpoints
