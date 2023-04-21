@@ -1,0 +1,14 @@
+{{- if contains "NodePort" .Values.service.type }}
+IP адрес: kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}"
+Порт для подключения: kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "spilo-art.fullname" . }}
+{{- else if contains "LoadBalancer" .Values.service.type }}
+Получение IP адреса для сервиса типа LoadBalancer может занять несколько минут.
+Текущий статус можно посмотреть следующим образом:
+    'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "spilo-art.fullname" . }}'
+
+IP адрес: kubectl get svc --namespace {{ .Release.Namespace }} {{ include "spilo-art.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}"
+Порт: {{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+Доступ к сервису внутри кластера:
+{{ include "spilo-art.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.service.port }}
+{{- end }}
