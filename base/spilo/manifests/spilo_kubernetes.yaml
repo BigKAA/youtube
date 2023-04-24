@@ -60,7 +60,7 @@ spec:
             bootstrap:
               initdb:
                 - auth-host: md5
-                - auth-local: trust
+                - auth-local: md5
         - name: POD_IP
           valueFrom:
             fieldRef:
