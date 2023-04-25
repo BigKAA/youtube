@@ -46,12 +46,12 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "spilo-art.selectorLabels" -}}
-{{ .Values.spilo.env.kubernetesScopeLabel }}: {{ include "spilo-art.fullname" . }}
+app.kubernetes.io/name: {{ include "spilo-art.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- with .Values.spilo.env.kubernetesLabels }}
 {{ toYaml . }}
 {{- end }}
-app.kubernetes.io/name: {{ include "spilo-art.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{ .Values.spilo.env.kubernetesScopeLabel }}: {{ include "spilo-art.fullname" . }}
 {{- end }}
 
 {{/*

@@ -360,6 +360,17 @@ backup:
       {{- end }}
 ```
 
+Переменные среды окружения, отвечающие за резервное копирование.
+
+```yaml
+        {{- if .Values.backup.enable }}
+        - name: WALG_FILE_PREFIX
+          value: "/data/pg_wal"
+        - name: CRONTAB
+          value: "[\"{{ .Values.backup.crontabTime }} envdir /config /scripts/postgres_backup.sh /home/postgres/pgdata/pgroot/data\"]"
+        {{- end }}
+```
+
 Проверим правильность генерации шаблона. Сначала в файле `values.yaml` выключим бекап:
 
 ```yaml
@@ -440,7 +451,7 @@ metadata:
     {{- include "spilo-art.labels" . | nindent 4 }}
   {{- if not (empty .Values.service.annotations ) }}
   annotations:
-    {{- toYaml .Values.annotations }}
+    {{- toYaml .Values.service.annotations | nindent 4 }}
   {{- end}}
 spec:
   type: {{ .Values.service.type }}
@@ -448,7 +459,7 @@ spec:
   - name: {{ .Values.service.name }}
     port: {{ .Values.service.port}}
     targetPort: 5432
-    {{- if eq .Values.service.type "NodePort" }}
+    {{- if and (eq .Values.service.type "NodePort") (not ( empty .Values.service.nodePort )) }}
     nodePort: {{ .Values.service.nodePort}}
     {{- end }}
 ```
@@ -711,7 +722,7 @@ nodeAffinity:
 Так же поместим все определения affinity в оператор if:
 
 ```yaml
-{{- if not (empty .Values.affinity) }}
+{{- if not (empty .Values.nodeAffinity) }}
 
 {{- end }}
 ```
@@ -832,15 +843,21 @@ spilo:
 ## Проверка установки чарта
 
 ```shell
-helm install base spilo-art -n spilo
+rm -f spilo-art/values-old.yaml
+cp spilo-art/values.yaml valuest-art.yaml
+```
+
+
+```shell
+helm install base spilo-art -n spilo -f valuest-art.yaml --create-namespace 
 ```
 
 Подключитесь к базе с помощью текущих паролей из secret. Запомните текущий пароль в secret.
 
-Внесите изменение в файл `values.yaml`. Например, отключите пробы.
+Внесите изменение в файл `valuest-art.yaml`. Например, отключите пробы.
 
 ```shell
-helm upgrade base spilo-art -n spilo
+helm upgrade base spilo-art -n spilo -f valuest-art.yaml
 ```
 
 Проверьте, изменились ли пароли в secret.

@@ -2,35 +2,11 @@
 nameOverride: ""
 fullnameOverride: ""
 
-spilo:
-  env:
-    kubernetesRoleLabel: role
-    kubernetesScopeLabel: spilo-cluster
-    kubernetesLabels:
-      application: spilo
-    ## https://github.com/zalando/patroni#yaml-configuration
-    configuration: |
-      bootstrap:
-        initdb:
-          - auth-host: md5
-          - auth-local: md5
-
-serviceAccount:
-  name: ""
-
 image: registry.opensource.zalan.do/acid/spilo-15
 tag: 3.0-p1
 imagePullSecrets: IfNotPresent
-podManagementPolicy: Parallel
 replicas: 2
-
-annotations: {}
-#  annotation1: value
-#  annotation2: value
-
-podAnnotations: {}
-#  podAnnotation1: value
-#  podAnnotation2: value
+podManagementPolicy: Parallel
 
 probes: {}
 #  livenessProbe:
@@ -54,18 +30,54 @@ resources: {}
 #    cpu: 100m
 #    memory: 128Mi
 
-# Определение параметров хранилища для данных файлов базы данных.
+nodeAffinity: {}
+#  nodeSelectorTerms:
+#    - matchExpressions:
+#      - key: db
+#        operator: In
+#        values:
+#          - spilo
+
+tolerations: []
+#- key: "key1"
+#  operator: "Equal"
+#  value: "value1"
+#  effect: "NoSchedule"
+
+annotations: {}
+#  annotation1: value
+#  annotation2: value
+
+podAnnotations: {}
+#  podAnnotation1: value
+#  podAnnotation2: value
+
 data:
   storageClassName: ""
   storage: 2Gi
 
-# Определение раздела для резервного копирования
+spilo:
+  env:
+    kubernetesRoleLabel: role
+    kubernetesScopeLabel: spilo-cluster
+    kubernetesLabels:
+      application: spilo
+    ## https://github.com/zalando/patroni#yaml-configuration
+    configuration: |
+      bootstrap:
+        initdb:
+          - auth-host: md5
+          - auth-local: md5
+
+serviceAccount:
+  name: ""
+
 backup:
   enable: false
   # Время выполнения скрипта резервного копирования в формате crontab
   crontabTime: "00 01 * * *"
   PVC:
-    storageClassName: ""
+    storageClassName: "managed-nfs-storage"
     accessModes:
     - ReadWriteMany
     resources:
@@ -73,7 +85,7 @@ backup:
         storage: 2Gi
 
 service:
-  # ClusterIP, NodePort или LoadBalancer
+  # ClusterIP, NodePort или¸ LoadBalancer
   type: ClusterIP
   name: postgresql
   port: 5432
@@ -90,7 +102,7 @@ secret:
   # apiVersion: v1
   # kind: Secret
   # metadata:
-  #   name: password-secret
+  #   name: test-spilo-art
   # type: Opaque
   # stringData:
   #   admin-password: password
@@ -100,20 +112,6 @@ secret:
   # Если определен параметр externalSecretName, остальные переменные из раздела secret не используются.
   externalSecretName: ""
   defaultPasswords: {}
-  #  superuser: password
-  #  replication: password
-  #  admin: password
-
-nodeAffinity: {}
-#  nodeSelectorTerms:
-#    - matchExpressions:
-#      - key: db
-#        operator: In
-#        values:
-#          - spilo
-
-tolerations: []
-#- key: "key1"
-#  operator: "Equal"
-#  value: "value1"
-#  effect: "NoSchedule"
+#    superuser: password
+#    replication: password
+#    admin: password

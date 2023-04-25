@@ -38,6 +38,13 @@ spec:
           protocol: TCP
         - containerPort: 5432
           protocol: TCP
+        {{- if not (empty .Values.probes) }}
+        {{- toYaml .Values.probes | nindent 8 }}
+        {{- end }}
+        {{- if not (empty .Values.resources) }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- end }}
         volumeMounts:
         {{- if .Values.backup.enable }}
         - mountPath: /data/pg_wal
@@ -47,13 +54,6 @@ spec:
         {{- end }}
         - mountPath: /home/postgres/pgdata
           name: pgdata
-        {{- if not (empty .Values.probes) }}
-        {{- toYaml .Values.probes | nindent 8 }}
-        {{- end }}
-        {{- if not (empty .Values.resources) }}
-        resources:
-          {{- toYaml .Values.resources | nindent 10 }}
-        {{- end }}
         env:
         - name: DCS_ENABLE_KUBERNETES_API
           value: 'true'
@@ -70,9 +70,9 @@ spec:
         - name: KUBERNETES_ROLE_LABEL
           value: {{ .Values.spilo.env.kubernetesRoleLabel }}
         - name: KUBERNETES_LABELS
-          value: '{{ toJson .Values.spilo.env.kubernetesLabels  }}'
+          value: '{{ toJson .Values.spilo.env.kubernetesLabels }}'
         - name: SPILO_CONFIGURATION
-          value: |
+          value: | ## https://github.com/zalando/patroni#yaml-configuration
             {{- .Values.spilo.env.configuration | nindent 12 }}
         - name: POD_IP
           valueFrom:
@@ -112,10 +112,6 @@ spec:
           value: "[\"{{ .Values.backup.crontabTime }} envdir /config /scripts/postgres_backup.sh /home/postgres/pgdata/pgroot/data\"]"
         {{- end }}
       terminationGracePeriodSeconds: 0
-      {{- if not (empty .Values.tolerations) }}
-      tolerations:
-        {{- toYaml .Values.tolerations | nindent 8 }}
-      {{- end }}
       {{- if not (empty .Values.nodeAffinity) }}
       affinity:
         nodeAffinity:
@@ -131,6 +127,10 @@ spec:
                     values:
                       - *cluster_name
               topologyKey: "kubernetes.io/hostname"
+      {{- end }}
+      {{- if not (empty .Values.tolerations) }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
       {{- if .Values.backup.enable }}
       volumes:
@@ -155,3 +155,15 @@ spec:
       resources:
         requests:
           storage: {{ .Values.data.storage }}
+#  - metadata:
+#      labels:
+#        application: spilo
+#        spilo-cluster: *cluster_name
+#      name: backup
+#    spec:
+#      storageClassName: managed-nfs-storage
+#      accessModes:
+#        - ReadWriteOnce
+#      resources:
+#        requests:
+#          storage: 2Gi
