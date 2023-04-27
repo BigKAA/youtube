@@ -4,7 +4,7 @@ metadata:
   name: &cluster_name {{ include "spilo-art.fullname" . }}
   labels:
     {{- include "spilo-art.labels" . | nindent 4 }}
-  {{- if not (empty .Values.annotations ) }}
+  {{- if .Values.annotations }}
   annotations:
     {{- toYaml .Values.annotations | nindent 4 }}
   {{- end }}
@@ -19,7 +19,7 @@ spec:
     metadata:
       labels:
         {{- include "spilo-art.selectorLabels" . | nindent 8 }}
-      {{- if not (empty .Values.podAnnotations ) }}
+      {{- if .Values.podAnnotations }}
       annotations:
         {{- toYaml .Values.podAnnotations | nindent 8 }}
       {{- end }}
@@ -31,20 +31,13 @@ spec:
       serviceAccountName: {{ include "spilo-art.serviceAccountName" . }}
       containers:
       - name: {{ .Chart.Name }}
-        image: {{ .Values.image }}:{{ .Values.tag }}  # put the spilo image here
-        imagePullPolicy: {{ .Values.imagePullSecrets }}
+        image: {{ .Values.image.name }}:{{ .Values.image.tag }}  # put the spilo image here
+        imagePullPolicy: {{ .Values.image.imagePullSecrets }}
         ports:
         - containerPort: 8008
           protocol: TCP
         - containerPort: 5432
           protocol: TCP
-        {{- if not (empty .Values.probes) }}
-        {{- toYaml .Values.probes | nindent 8 }}
-        {{- end }}
-        {{- if not (empty .Values.resources) }}
-        resources:
-          {{- toYaml .Values.resources | nindent 10 }}
-        {{- end }}
         volumeMounts:
         {{- if .Values.backup.enable }}
         - mountPath: /data/pg_wal
@@ -54,6 +47,13 @@ spec:
         {{- end }}
         - mountPath: /home/postgres/pgdata
           name: pgdata
+        {{- if .Values.probes }}
+        {{- toYaml .Values.probes | nindent 8 }}
+        {{- end }}
+        {{- if .Values.resources }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- end }}
         env:
         - name: DCS_ENABLE_KUBERNETES_API
           value: 'true'
@@ -112,7 +112,7 @@ spec:
           value: "[\"{{ .Values.backup.crontabTime }} envdir /config /scripts/postgres_backup.sh /home/postgres/pgdata/pgroot/data\"]"
         {{- end }}
       terminationGracePeriodSeconds: 0
-      {{- if not (empty .Values.nodeAffinity) }}
+      {{- if .Values.nodeAffinity }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -128,17 +128,21 @@ spec:
                       - *cluster_name
               topologyKey: "kubernetes.io/hostname"
       {{- end }}
-      {{- if not (empty .Values.tolerations) }}
+      {{- if .Values.tolerations }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
       {{- if .Values.backup.enable }}
       volumes:
         - configMap:
-            name: {{ include "spilo-art.fullname" . }}-backup
+            name: backup-script
           name: config
         - persistentVolumeClaim:
+            {{- if empty .Values.backup.externalPvcName }}
             claimName: {{ include "spilo-art.fullname" . }}-backup
+            {{- else }}
+            claimName: {{ .Values.backup.externalPvcName }}
+            {{- end }}
           name: backup
       {{- end }}
   volumeClaimTemplates:
@@ -147,7 +151,7 @@ spec:
         {{- include "spilo-art.selectorLabels" . | nindent 8 }}
       name: pgdata
     spec:
-      {{- if not (empty .Values.data.storageClassName) }}
+      {{- if .Values.data.storageClassName }}
       storageClassName: {{ .Values.data.storageClassName }}
       {{- end }}
       accessModes:

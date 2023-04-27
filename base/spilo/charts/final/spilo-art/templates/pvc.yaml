@@ -1,4 +1,4 @@
-{{- if .Values.backup.enable }}
+{{- if and .Values.backup.enable (empty .Values.backup.externalPvcName) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

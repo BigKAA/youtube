@@ -46,13 +46,13 @@ bootstrap:
 * **serviceAccount.name**
   * Имя ServiceAccount. Если не определено, автоматически присваивается `spilo-art.serviceAccountName`
   * _Значение по умолчанию_: не определено
-* **image**
+* **image.name**
   * Контейнер spilo. 
   * _Значение по умолчанию_: `registry.opensource.zalan.do/acid/spilo-15`
-* **tag**
+* **image.tag**
   * Tag контейнера.
   * _Значение по умолчанию_: `3.0-p1`
-* **imagePullSecrets**
+* **image.imagePullSecrets**
   * 
   * _Значение по умолчанию_: IfNotPresent
 * **podManagementPolicy**
@@ -86,12 +86,15 @@ bootstrap:
 * **backup.crontabTime**
   * Время выполнения скрипта резервного копирования в формате crontab
   * _Значение по умолчанию_: `00 01 * * *`
+* **backup.externalPvcName**
+  * Если используется готовый PVC, укажите его имя.
+  * _Значение по умолчанию_: `""`
 * **backup.PVC**
   * Параметры PVC для разделов резервного копирования в YAML. Выделяется один PVC для всех контейнеров.
   * _Значение по умолчанию_:
 
 ```yaml
-storageClassName: ""
+# storageClassName: ""
 accessModes:
 - ReadWriteMany
 resources:
@@ -110,9 +113,30 @@ resources:
   * _Значение по умолчанию_: `5432`
 * **service.NodePort**
   * В случае сервиса типа NodePort. Если значение пустое, номер NodePort выбирается автоматически. Если значение 
-    установлено, NodePort присватвается указанное значение. 
+    установлено, NodePort присваивается указанное значение. 
   * _Значение по умолчанию_: `""`
 * **service.annotations**
+  * Дополнительные аннотации сервиса. _Поле .spec.loadBalancerIP для Service типа LoadBalancer устарело в Kubernetes версии v1.24.
+    Рекомендуется обратиться к документации поставщика услуг, для уточнения как использовать аннотации
+    для конфигурации сервиса типа LoadBalancer. Например: `metallb.universe.tf/loadBalancerIPs: 192.168.1.100`._  
+  * _Значение по умолчанию_: `{}`
+* **servicereplica.enable**
+  * Включает генерацию сервиса для доступа к replica базы данных.
+  * _Значение по умолчанию_: `false`
+* **servicereplica.type**
+  * Тип сервиса для доступа к мастеру кластера PostgreSQL. Возможные варианты: ClusterIP, NodePort или LoadBalancer.
+  * _Значение по умолчанию_: `ClusterIP`
+* **servicereplica.name**
+  * Имя сервиса.
+  * _Значение по умолчанию_: `postgresql`
+* **servicereplica.port**
+  * Порт сервиса.
+  * _Значение по умолчанию_: `5432`
+* **servicereplica.NodePort**
+  * В случае сервиса типа NodePort. Если значение пустое, номер NodePort выбирается автоматически. Если значение 
+    установлено, NodePort присваивается указанное значение. 
+  * _Значение по умолчанию_: `""`
+* **servicereplica.annotations**
   * Дополнительные аннотации сервиса. _Поле .spec.loadBalancerIP для Service типа LoadBalancer устарело в Kubernetes версии v1.24.
     Рекомендуется обратиться к документации поставщика услуг, для уточнения как использовать аннотации
     для конфигурации сервиса типа LoadBalancer. Например: `metallb.universe.tf/loadBalancerIPs: 192.168.1.100`._  

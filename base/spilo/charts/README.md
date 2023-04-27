@@ -28,7 +28,8 @@ touch spilo-art/templates/sts.yaml
 touch spilo-art/templates/pvc.yaml
 touch spilo-art/templates/endpoints.yaml
 touch spilo-art/templates/service.yaml
-touch spilo-art/templates/headlessservice.yaml
+touch spilo-art/templates/servicereplicas.yaml
+touch spilo-art/templates/serviceheadless.yaml
 touch spilo-art/templates/secret.yaml
 touch spilo-art/templates/sa.yaml
 touch spilo-art/templates/role.yaml
@@ -260,8 +261,10 @@ helm template test spilo-art > app.yaml
 ```yaml
 backup:
   enable: true
+  # Если используется готовый PVC, укажите его имя
+  externalPvcName: ""
   PVC:
-    storageClassName: "managed-nfs-storage"
+    # storageClassName: "managed-nfs-storage"
     accessModes:
     - ReadWriteMany
     resources:
@@ -279,7 +282,7 @@ _В дальнейшем мы еще раз пройдёмся по файлу �
 Шаблон PVC
 
 ```yaml
-{{- if .Values.backup.enable }}
+{{- if and .Values.backup.enable (empty .Values.backup.externalPvcName) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -355,20 +358,13 @@ backup:
             name: {{ include "spilo-art.fullname" . }}-backup
           name: config
         - persistentVolumeClaim:
+            {{- if empty .Values.backup.externalPvcName }}
             claimName: {{ include "spilo-art.fullname" . }}-backup
+            {{- else }}
+            claimName: {{ .Values.backup.externalPvcName }}
+            {{- end }}
           name: backup
       {{- end }}
-```
-
-Переменные среды окружения, отвечающие за резервное копирование.
-
-```yaml
-        {{- if .Values.backup.enable }}
-        - name: WALG_FILE_PREFIX
-          value: "/data/pg_wal"
-        - name: CRONTAB
-          value: "[\"{{ .Values.backup.crontabTime }} envdir /config /scripts/postgres_backup.sh /home/postgres/pgdata/pgroot/data\"]"
-        {{- end }}
 ```
 
 Проверим правильность генерации шаблона. Сначала в файле `values.yaml` выключим бекап:
@@ -449,7 +445,7 @@ metadata:
   name: {{ include "spilo-art.fullname" . }}
   labels:
     {{- include "spilo-art.labels" . | nindent 4 }}
-  {{- if not (empty .Values.service.annotations ) }}
+  {{- if .Values.service.annotations }}
   annotations:
     {{- toYaml .Values.service.annotations | nindent 4 }}
   {{- end}}
@@ -459,9 +455,83 @@ spec:
   - name: {{ .Values.service.name }}
     port: {{ .Values.service.port}}
     targetPort: 5432
-    {{- if and (eq .Values.service.type "NodePort") (not ( empty .Values.service.nodePort )) }}
+    {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort}}
     {{- end }}
+```
+
+### Service replica
+
+Сервис для доступа к репликам.
+
+Добавим в файл `values.yaml` раздел описания сервиса.
+
+```yaml
+servicereplica:
+  enable: true
+  # ClusterIP, NodePort или LoadBalancer
+  type: ClusterIP
+  name: postgresql
+  port: 5432
+  nodePort: 32345
+  # Поле .spec.loadBalancerIP для Service типа LoadBalancer устарело в Kubernetes версии v1.24.
+  # Рекомендуется обратиться к документации поставщика услуг, для уточнения как использовать аннотации
+  # для конфигурации сервиса типа LoadBalancer. 
+  annotations: {}
+  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
+```
+
+Подставим в шаблон сервиса соответствующие переменные.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "spilo-art.fullname" . }}-replica
+  labels:
+    {{- include "spilo-art.labels" . | nindent 4 }}
+  {{- if .Values.servicereplica.annotations }}
+  annotations:
+    {{- toYaml .Values.servicereplica.annotations | nindent 4 }}
+  {{- end}}
+spec:
+  type: {{ .Values.servicereplica.type }}
+  ports:
+  - name: {{ .Values.servicereplica.name }}
+    port: {{ .Values.servicereplica.port}}
+    targetPort: 5432
+    {{- if and (eq .Values.servicereplica.type "NodePort") .Values.servicereplica.nodePort }}
+    nodePort: {{ .Values.servicereplica.nodePort}}
+    {{- end }}
+  selector:
+    {{- include "spilo-art.selectorLabels" . | nindent 4 }}
+    role: replica
+```
+
+Для включения/выключения генерации сервиса будем использовать два условия:
+
+1. `servicereplica.enable: true`
+2. Если количество реплик > 1.
+
+В `values.yaml` добавим:
+
+```yaml
+replicas: 2
+```
+
+В шаблоне StatefulSet:
+
+```yaml
+spec:
+  replicas: {{ .Values.replicas }}
+```
+
+В шаблоне сервиса добавим соответствующие условия.
+
+```yaml
+{{- if and .Values.servicereplica.enable ( gt .Values.replicas 1.0 ) }}
+
+{{- end }}
 ```
 
 ### Endpoints
@@ -577,7 +647,9 @@ randAlphaNum 16 | nospace | b64enc | quote
 ```
 
 Но мы должны учитывать, что пароли необходимо генерировать только один раз - при первой установке чарта. Поэтому скрипт 
-будет "немного" сложнее. 
+будет "немного" сложнее.
+
+_[Документация по lookup](https://helm.sh/docs/chart_template_guide/functions_and_pipelines/#using-the-lookup-function)._
 
 ```yaml
   {{- if .Release.IsInstall }}
@@ -615,27 +687,27 @@ helm template test spilo-art > app.yaml
 В файле `values.yaml` добавим переменные определяющие image контейнера.
 
 ```yaml
-image: registry.opensource.zalan.do/acid/spilo-15
-tag: 3.0-p1
-imagePullSecrets: IfNotPresent
-replicas: 2
+image:
+  name: registry.opensource.zalan.do/acid/spilo-15
+  tag: 3.0-p1
+  imagePullSecrets: IfNotPresent
+
+podManagementPolicy: Parallel
 ```
 
 Соответственно внесём изменения в шаблон StatefulSet.
 
 ```yaml
 spec:
-  replicas: {{ .Values.replicas }}
+  podManagementPolicy: {{ .Values.podManagementPolicy }}
 ```
 
 ```yaml
       containers:
       - name: {{ .Chart.Name }}
-        image: {{ .Values.image }}:{{ .Values.tag }}  # put the spilo image here
-        imagePullPolicy: {{ .Values.imagePullSecrets }}
+        image: {{ .Values.image.name }}:{{ .Values.image.tag }}  # put the spilo image here
+        imagePullPolicy: {{ .Values.image.imagePullSecrets }}
 ```
-
-Добавим `podManagementPolicy: Parallel`.
 
 ### Пробы и ресурсы
 
@@ -644,25 +716,25 @@ spec:
 В файле `values.yaml` добавим секцию `probes`.
 
 ```yaml
-probes: 
-  livenessProbe:
-    # postgres check
-    exec:
-      command: [ "psql", "-U", "postgres", "-c", "SELECT 1" ]
-    initialDelaySeconds: 60
-    periodSeconds: 10
-  readinessProbe:
-    # patroni check
-    tcpSocket:
-      port: 8008
-    initialDelaySeconds: 20
-    periodSeconds: 20
+probes: {}
+#  livenessProbe:
+#    # postgres check
+#    exec:
+#      command: [ "psql", "-U", "postgres", "-c", "SELECT 1" ]
+#    initialDelaySeconds: 60
+#    periodSeconds: 10
+#  readinessProbe:
+#    # patroni check
+#    tcpSocket:
+#      port: 8008
+#    initialDelaySeconds: 20
+#    periodSeconds: 20
 ```
 
 В шаблоне в определении контейнера добавим.
 
 ```yaml
-        {{- if not (empty .Values.probes) }}
+        {{- if .Values.probes }}
         {{- toYaml .Values.probes | nindent 8 }}
         {{- end }}
 ```
@@ -684,7 +756,7 @@ resources: {}
 шаблон StatefulSet
 
 ```yaml
-        {{- if not (empty .Values.resources) }}
+        {{- if .Values.resources }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         {{- end }}
@@ -700,13 +772,13 @@ resources: {}
 values.yaml
 
 ```yaml
-nodeAffinity:
-  nodeSelectorTerms:
-    - matchExpressions:
-      - key: db
-        operator: In
-        values:
-          - spilo
+nodeAffinity: {}
+#  nodeSelectorTerms:
+#    - matchExpressions:
+#      - key: db
+#        operator: In
+#        values:
+#          - spilo
 ```
 
 Шаблон.
@@ -722,7 +794,7 @@ nodeAffinity:
 Так же поместим все определения affinity в оператор if:
 
 ```yaml
-{{- if not (empty .Values.nodeAffinity) }}
+{{- if .Values.nodeAffinity }}
 
 {{- end }}
 ```
@@ -742,7 +814,7 @@ tolerations: []
 В шаблоне добавляем секцию.
 
 ```yaml
-      {{- if not (empty .Values.tolerations) }}
+      {{- if .Values.tolerations }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
@@ -770,7 +842,7 @@ podAnnotations: {}
 ```yaml
 kind: StatefulSet
 metadata:
-  {{- if not (empty .Values.annotations ) }}
+  {{- if .Values.annotations }}
   annotations:
     {{- toYaml .Values.annotations | nindent 4 }}
   {{- end }}
@@ -780,7 +852,7 @@ metadata:
 spec:
   template:
     metadata:
-      {{- if not (empty .Values.podAnnotations ) }}
+      {{- if .Values.podAnnotations }}
       annotations:
         {{- toYaml .Values.podAnnotations | nindent 8 }}
       {{- end }}
@@ -793,6 +865,7 @@ spec:
 values.yaml
 
 ```yaml
+# Параметры PVC для хранения файлов базы данных.
 data:
   storageClassName: ""
   storage: 2Gi
@@ -807,7 +880,7 @@ volumeClaimTemplates:
         {{- include "spilo-art.selectorLabels" . | nindent 8 }}
       name: pgdata
     spec:
-      {{- if not (empty .Values.data.storageClassName) }}
+      {{- if .Values.data.storageClassName }}
       storageClassName: {{ .Values.data.storageClassName }}
       {{- end }}
       accessModes:
@@ -840,13 +913,19 @@ spilo:
             {{- .Values.spilo.env.configuration | nindent 12 }}
 ```
 
+## Документация
+
+Файл `NOTES.txt`. Содержимое файла выводится после установки чарта и должно содержать сообщение
+облегчающее дальнейшую эксплуатацию.
+
+Файл `README.md`. Основная документация по чарту.
+
 ## Проверка установки чарта
 
 ```shell
 rm -f spilo-art/values-old.yaml
 cp spilo-art/values.yaml valuest-art.yaml
 ```
-
 
 ```shell
 helm install base spilo-art -n spilo -f valuest-art.yaml --create-namespace 
@@ -871,11 +950,3 @@ helm uninstall base spilo-art -n spilo
 Протестируйте корректность работы других параметров.
 
 Если всё работает, пора переходить к самой сложной части создания чарта - написанию документации.
-
-## Документация
-
-Файл `NOTES.txt`. Содержимое файла выводится после установки чарта и должно содержать сообщение
-облегчающее дальнейшую эксплуатацию.
-
-Файл `README.md`. Основная документация по чарту.
-

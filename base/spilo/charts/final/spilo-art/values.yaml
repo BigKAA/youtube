@@ -2,10 +2,13 @@
 nameOverride: ""
 fullnameOverride: ""
 
-image: registry.opensource.zalan.do/acid/spilo-15
-tag: 3.0-p1
-imagePullSecrets: IfNotPresent
 replicas: 2
+
+image:
+  name: registry.opensource.zalan.do/acid/spilo-15
+  tag: 3.0-p1
+  imagePullSecrets: IfNotPresent
+
 podManagementPolicy: Parallel
 
 probes: {}
@@ -52,6 +55,7 @@ podAnnotations: {}
 #  podAnnotation1: value
 #  podAnnotation2: value
 
+# Параметры PVC для хранения файлов базы данных.
 data:
   storageClassName: ""
   storage: 2Gi
@@ -72,24 +76,25 @@ spilo:
 serviceAccount:
   name: ""
 
-backup:
-  enable: false
-  # Время выполнения скрипта резервного копирования в формате crontab
-  crontabTime: "00 01 * * *"
-  PVC:
-    storageClassName: "managed-nfs-storage"
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 2Gi
-
 service:
-  # ClusterIP, NodePort или¸ LoadBalancer
+  # ClusterIP, NodePort или LoadBalancer
   type: ClusterIP
   name: postgresql
   port: 5432
-  nodePort: ""
+  nodePort: 32345
+  # Поле .spec.loadBalancerIP для Service типа LoadBalancer устарело в Kubernetes версии v1.24.
+  # Рекомендуется обратиться к документации поставщика услуг, для уточнения как использовать аннотации
+  # для конфигурации сервиса типа LoadBalancer.
+  annotations: {}
+  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
+
+servicereplica:
+  enable: false
+  # ClusterIP, NodePort или LoadBalancer
+  type: ClusterIP
+  name: postgresql
+  port: 5432
+  nodePort: 32345
   # Поле .spec.loadBalancerIP для Service типа LoadBalancer устарело в Kubernetes версии v1.24.
   # Рекомендуется обратиться к документации поставщика услуг, для уточнения как использовать аннотации
   # для конфигурации сервиса типа LoadBalancer.
@@ -115,3 +120,17 @@ secret:
 #    superuser: password
 #    replication: password
 #    admin: password
+
+backup:
+  enable: false
+  # Если используется готовый PVC, укажите его имя
+  externalPvcName: ""
+  # Время выполнения скрипта резервного копирования в формате crontab
+  crontabTime: "00 01 * * *"
+  PVC:
+    # storageClassName: "managed-nfs-storage"
+    accessModes:
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: 2Gi
