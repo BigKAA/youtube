@@ -4,7 +4,8 @@ kind: Service
 metadata:
   name: {{ include "spilo-art.fullname" . }}-replica
   labels:
-    {{- include "spilo-art.labels" . | nindent 4 }}
+    {{- include "spilo-art.headerLabels" . | nindent 4 }}
+    {{- include "spilo-art.baseSelectorLabels" . | nindent 4 }}
   {{- if .Values.servicereplica.annotations }}
   annotations:
     {{- toYaml .Values.servicereplica.annotations | nindent 4 }}

@@ -2,14 +2,34 @@
 nameOverride: ""
 fullnameOverride: ""
 
-replicas: 2
-
 image:
   name: registry.opensource.zalan.do/acid/spilo-15
   tag: 3.0-p1
   imagePullSecrets: IfNotPresent
 
 podManagementPolicy: Parallel
+replicas: 2
+
+spilo:
+  env:
+    kubernetesRoleLabel: role
+    kubernetesScopeLabel: spilo-cluster
+    kubernetesLabels:
+      application: spilo
+    ## https://github.com/zalando/patroni#yaml-configuration
+    configuration: |
+      bootstrap:
+        initdb:
+          - auth-host: md5
+          - auth-local: md5
+
+serviceAccount:
+  name: ""
+
+# Параметры PVC для хранения файлов базы данных.
+data:
+  storageClassName: ""
+  storage: 2Gi
 
 probes: {}
 #  livenessProbe:
@@ -54,27 +74,6 @@ annotations: {}
 podAnnotations: {}
 #  podAnnotation1: value
 #  podAnnotation2: value
-
-# Параметры PVC для хранения файлов базы данных.
-data:
-  storageClassName: ""
-  storage: 2Gi
-
-spilo:
-  env:
-    kubernetesRoleLabel: role
-    kubernetesScopeLabel: spilo-cluster
-    kubernetesLabels:
-      application: spilo
-    ## https://github.com/zalando/patroni#yaml-configuration
-    configuration: |
-      bootstrap:
-        initdb:
-          - auth-host: md5
-          - auth-local: md5
-
-serviceAccount:
-  name: ""
 
 service:
   # ClusterIP, NodePort или LoadBalancer

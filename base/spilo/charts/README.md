@@ -91,14 +91,47 @@ spilo:
       application: spilo
 ```
 
-Добавим генерацию kubernetesLabels во все labels. Для этого отредактируем шаблон `spilo-art.selectorLabels` в файле
-`_helpers.tpl`.
+Внесём изменения в шаблоны генерации labels в файле `_helpers.tpl`.
 
 ```yaml
+{{/*
+Common labels - Включает в себя все возможные labels
+*/}}
+{{- define "spilo-art.labels" -}}
+{{ include "spilo-art.headerLabels" . }}
+{{ include "spilo-art.selectorLabels" . }}
+{{- end }}
+
+{{/*
+Base labels - Заголовочные labels.
+*/}}
+{{- define "spilo-art.headerLabels" -}}
+helm.sh/chart: {{ include "spilo-art.chart" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Selector labels - базовые labels, используемые для секции selectors. Включая специфические для 
+контейнеров spilo.
+*/}}
+{{- define "spilo-art.selectorLabels" -}}
+{{ include "spilo-art.baseSelectorLabels" . }}
 {{- with .Values.spilo.env.kubernetesLabels }}
 {{ toYaml . }}
 {{- end }}
 {{ .Values.spilo.env.kubernetesScopeLabel }}: {{ include "spilo-art.fullname" . }}
+{{- end }}
+
+{{/*
+Base Selector labels - базовые labels, используемые для секции selectors.
+*/}}
+{{- define "spilo-art.baseSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "spilo-art.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
 ```
 
 ### StatefulSet
@@ -261,8 +294,10 @@ helm template test spilo-art > app.yaml
 ```yaml
 backup:
   enable: true
-  # Если используется готовый PVC, укажите его имя
+  # Если используется готовый PVC, укажите его имя.
   externalPvcName: ""
+  # Не удалять PVC после удаления чарта.
+  dontDeletePvc: false
   PVC:
     # storageClassName: "managed-nfs-storage"
     accessModes:
@@ -289,6 +324,10 @@ metadata:
   name: {{ include "spilo-art.fullname" . }}-backup
   labels:
     {{- include "spilo-art.labels" . | nindent 4 }}
+  {{- if .Values.backup.dontDeletePvc }}
+  annotations:
+    "helm.sh/resource-policy": keep  
+  {{- end }}
 spec:
   {{- toYaml .Values.backup.PVC | nindent 2 }}
 {{- end }}
@@ -489,7 +528,8 @@ kind: Service
 metadata:
   name: {{ include "spilo-art.fullname" . }}-replica
   labels:
-    {{- include "spilo-art.labels" . | nindent 4 }}
+    {{- include "spilo-art.headerLabels" . | nindent 4 }}
+    {{- include "spilo-art.baseSelectorLabels" . | nindent 4 }}
   {{- if .Values.servicereplica.annotations }}
   annotations:
     {{- toYaml .Values.servicereplica.annotations | nindent 4 }}

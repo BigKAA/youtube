@@ -31,11 +31,18 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Common labels
+Common labels - Включает в себя все возможные labels
 */}}
 {{- define "spilo-art.labels" -}}
-helm.sh/chart: {{ include "spilo-art.chart" . }}
+{{ include "spilo-art.headerLabels" . }}
 {{ include "spilo-art.selectorLabels" . }}
+{{- end }}
+
+{{/*
+Base labels - Заголовочные labels.
+*/}}
+{{- define "spilo-art.headerLabels" -}}
+helm.sh/chart: {{ include "spilo-art.chart" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -43,15 +50,23 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Selector labels
+Selector labels - базовые labels, используемые для секции selectors. Включая специфические для
+контейнеров spilo.
 */}}
 {{- define "spilo-art.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "spilo-art.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{ include "spilo-art.baseSelectorLabels" . }}
 {{- with .Values.spilo.env.kubernetesLabels }}
 {{ toYaml . }}
 {{- end }}
 {{ .Values.spilo.env.kubernetesScopeLabel }}: {{ include "spilo-art.fullname" . }}
+{{- end }}
+
+{{/*
+Base Selector labels - базовые labels, используемые для секции selectors.
+*/}}
+{{- define "spilo-art.baseSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "spilo-art.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
