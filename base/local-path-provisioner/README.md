@@ -314,5 +314,5 @@ kubectl get pods
 
 * [VK](https://vk.com/video7111833_456239237)
 * [Telegramm](https://t.me/arturkryukov/210)
-* Rutube
+* [Rutube](https://rutube.ru/video/c87df7cf86fd25e273fdf9e17885ab30/)
 * [Youtube](https://youtu.be/9H0Wp1Xnbf4)
