@@ -1,0 +1,10 @@
+{{- if and .Values.backup.enable (empty .Values.backup.externalPvcName) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "spilo-art.fullname" . }}-backup
+  labels:
+    {{- include "spilo-art.labels" . | nindent 4 }}
+spec:
+  {{- toYaml .Values.backup.PVC | nindent 2 }}
+{{- end }}

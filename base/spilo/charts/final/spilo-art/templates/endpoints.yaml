@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: {{ include "spilo-art.fullname" . }}
+  labels:
+    {{- include "spilo-art.labels" . | nindent 4 }}
+subsets: []

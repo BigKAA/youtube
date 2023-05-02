@@ -1,0 +1,11 @@
+apiVersion: v2
+name: spilo-art
+description: A Helm chart of spilo
+type: application
+version: 1.0.1
+appVersion: "3.0-p1"
+sources:
+  - "https://github.com/zalando/spilo/blob/master/kubernetes/spilo_kubernetes.yaml"
+maintainers:
+  - name: Arthur Kryukov
+    url: "https://www.kryukov.biz"

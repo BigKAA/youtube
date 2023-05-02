@@ -1,0 +1,16 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: zalandodemo01-nodeport
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      nodePort: 32345
+      targetPort: 5432
+      name: postgresql
+  selector:
+    application: spilo
+    spilo-cluster: zalandodemo01
+    role: master

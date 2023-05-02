@@ -1,0 +1,9 @@
+# headless service to avoid deletion of patronidemo-config endpoint
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "spilo-art.fullname" . }}-config
+  labels:
+    {{- include "spilo-art.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
