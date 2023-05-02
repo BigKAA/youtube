@@ -309,3 +309,10 @@ kubectl get pods
 ```
 
 Посмотрите список PVC. Удалите не нужные.
+
+## Видео
+
+* [VK](https://vk.com/video7111833_456239237)
+* [Telegramm](https://t.me/arturkryukov/210)
+* Rutube
+* [Youtube](https://youtu.be/9H0Wp1Xnbf4)
