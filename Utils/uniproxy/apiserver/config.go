@@ -23,10 +23,12 @@ type Paths struct {
 
 // Config содержит конфигурационные параметры
 type Config struct {
-	Logger   *logrus.Logger
-	Router   *gin.Engine
-	BindAddr string
-	Paths    *Paths
+	Logger    *logrus.Logger
+	Router    *gin.Engine
+	BindAddr  string
+	Paths     *Paths
+	PodName   string
+	Namespace string
 }
 
 // NewConfig получает конфигурационные параметры из среды окружения.
@@ -38,10 +40,12 @@ func NewConfig() (*Config, error) {
 	}
 
 	return &Config{
-		Logger:   logger,
-		Router:   initGinEngine(),
-		BindAddr: getEnv("BIND_ADDR", "0.0.0.0:8080"),
-		Paths:    loadConfig(logger),
+		Logger:    logger,
+		Router:    initGinEngine(),
+		BindAddr:  getEnv("BIND_ADDR", "0.0.0.0:8080"),
+		Paths:     loadConfig(logger),
+		PodName:   getEnv("POD_NAME", ""),
+		Namespace: getEnv("NAMESPACE", ""),
 	}, nil
 }
 

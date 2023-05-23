@@ -21,6 +21,12 @@ func (conf Config) addContext(path Path) {
 		message["path"] = path.Path
 		message["proxyPath"] = path.ProxyPath
 		message["comment"] = path.Comment
+		if conf.PodName != "" {
+			message["podName"] = conf.PodName
+		}
+		if conf.Namespace != "" {
+			message["namespace"] = conf.Namespace
+		}
 		if path.ProxyPath != "" {
 			resp, err := http.Get(path.ProxyPath)
 			if err != nil {
