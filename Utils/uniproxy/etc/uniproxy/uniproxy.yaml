@@ -1,0 +1,10 @@
+paths:
+  - path: "/"
+    proxyPath: "http://some.namespace.srv:8080/"
+    comment: "Root"
+  - path: "/path"
+    proxyPath: "https://reqbin.com/echo/get/json"
+    comment: "Sample path"
+  - path: "/stub"
+    proxyPath: ""
+    comment: "Stub path"
