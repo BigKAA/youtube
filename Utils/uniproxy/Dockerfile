@@ -4,7 +4,7 @@ ENV COOS linux
 ADD . /go/src/uniproxy
 WORKDIR /go/src/uniproxy
 RUN apk add --no-cache git && \
-    go build cmd/apiserver/main.go
+    go build main.go
 
 # Final stage
 FROM alpine:3.18
