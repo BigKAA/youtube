@@ -82,3 +82,29 @@ curl -s http://127.0.0.1:8080/stub | jq
   "returnHeader": "Stub path"
 }
 ```
+
+## Build image
+
+На маке:
+
+```shell
+docker build -t bigkaa/uniproxy:0.1.0-arm64 .
+docker push bigkaa/uniproxy:0.1.0-arm64
+```
+
+На linux:
+
+```shell
+docker build -t bigkaa/uniproxy:0.1.0-amd64 .
+docker push bigkaa/uniproxy:0.1.0-amd64
+```
+
+Собираем в один образ:
+
+```shell
+docker manifest create bigkaa/uniproxy:0.1.0 \
+--amend bigkaa/uniproxy:0.1.0-arm64 \
+--amend bigkaa/uniproxy:0.1.0-amd64
+
+docker manifest push docker.io/bigkaa/uniproxy:0.1.0
+```ß
