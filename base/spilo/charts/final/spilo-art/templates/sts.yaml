@@ -159,3 +159,15 @@ spec:
       resources:
         requests:
           storage: {{ .Values.data.storage }}
+#  - metadata:
+#      labels:
+#        application: spilo
+#        spilo-cluster: *cluster_name
+#      name: backup
+#    spec:
+#      storageClassName: managed-nfs-storage
+#      accessModes:
+#        - ReadWriteOnce
+#      resources:
+#        requests:
+#          storage: 2Gi

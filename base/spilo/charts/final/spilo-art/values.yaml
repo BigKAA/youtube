@@ -26,10 +26,55 @@ spilo:
 serviceAccount:
   name: ""
 
+service:
+  # ClusterIP, NodePort или LoadBalancer
+  type: ClusterIP
+  name: postgresql
+  port: 5432
+  nodePort: 32345
+  # Поле .spec.loadBalancerIP для Service типа LoadBalancer устарело в Kubernetes версии v1.24.
+  # Рекомендуется обратиться к документации поставщика услуг, для уточнения как использовать аннотации
+  # для конфигурации сервиса типа LoadBalancer.
+  annotations: {}
+  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
+
+servicereplica:
+  enable: false
+  # ClusterIP, NodePort или LoadBalancer
+  type: ClusterIP
+  name: postgresql
+  port: 5432
+  nodePort: 32345
+  # Поле .spec.loadBalancerIP для Service типа LoadBalancer устарело в Kubernetes версии v1.24.
+  # Рекомендуется обратиться к документации поставщика услуг, для уточнения как использовать аннотации
+  # для конфигурации сервиса типа LoadBalancer.
+  annotations: {}
+  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
+
 # Параметры PVC для хранения файлов базы данных.
 data:
   storageClassName: ""
   storage: 2Gi
+
+secret:
+  # Secret создаваемый в ручную.
+  # ---
+  # apiVersion: v1
+  # kind: Secret
+  # metadata:
+  #   name: test-spilo-art
+  # type: Opaque
+  # stringData:
+  #   admin-password: password
+  #   replication-password: password
+  #   superuser-password: password
+  # ...
+  # Если определен параметр externalSecretName, остальные переменные из раздела secret не используются.
+  externalSecretName: ""
+  defaultPasswords: {}
+  #  superuser: password
+  #  replication: password
+  #  admin: password
 
 probes: {}
 #  livenessProbe:
@@ -75,55 +120,12 @@ podAnnotations: {}
 #  podAnnotation1: value
 #  podAnnotation2: value
 
-service:
-  # ClusterIP, NodePort или LoadBalancer
-  type: ClusterIP
-  name: postgresql
-  port: 5432
-  nodePort: 32345
-  # Поле .spec.loadBalancerIP для Service типа LoadBalancer устарело в Kubernetes версии v1.24.
-  # Рекомендуется обратиться к документации поставщика услуг, для уточнения как использовать аннотации
-  # для конфигурации сервиса типа LoadBalancer.
-  annotations: {}
-  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
-
-servicereplica:
-  enable: false
-  # ClusterIP, NodePort или LoadBalancer
-  type: ClusterIP
-  name: postgresql
-  port: 5432
-  nodePort: 32345
-  # Поле .spec.loadBalancerIP для Service типа LoadBalancer устарело в Kubernetes версии v1.24.
-  # Рекомендуется обратиться к документации поставщика услуг, для уточнения как использовать аннотации
-  # для конфигурации сервиса типа LoadBalancer.
-  annotations: {}
-  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
-
-secret:
-  # Secret создаваемый в ручную.
-  # ---
-  # apiVersion: v1
-  # kind: Secret
-  # metadata:
-  #   name: test-spilo-art
-  # type: Opaque
-  # stringData:
-  #   admin-password: password
-  #   replication-password: password
-  #   superuser-password: password
-  # ...
-  # Если определен параметр externalSecretName, остальные переменные из раздела secret не используются.
-  externalSecretName: ""
-  defaultPasswords: {}
-#    superuser: password
-#    replication: password
-#    admin: password
-
 backup:
   enable: false
-  # Если используется готовый PVC, укажите его имя
+  # Если используется готовый PVC, укажите его имя.
   externalPvcName: ""
+  # Не удалять PVC после удаления чарта.
+  dontDeletePvc: false
   # Время выполнения скрипта резервного копирования в формате crontab
   crontabTime: "00 01 * * *"
   PVC:

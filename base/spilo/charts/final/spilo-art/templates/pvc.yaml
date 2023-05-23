@@ -5,6 +5,10 @@ metadata:
   name: {{ include "spilo-art.fullname" . }}-backup
   labels:
     {{- include "spilo-art.labels" . | nindent 4 }}
+  {{- if .Values.backup.dontDeletePvc }}
+  annotations:
+    "helm.sh/resource-policy": keep
+  {{- end }}
 spec:
   {{- toYaml .Values.backup.PVC | nindent 2 }}
 {{- end }}

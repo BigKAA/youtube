@@ -5,10 +5,11 @@
 replicaCount: 1
 
 image:
-  repository: nginx
+  repository: bigkaa/uniproxy
+  tag: "0.1.0"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+
 
 imagePullSecrets: []
 nameOverride: ""
