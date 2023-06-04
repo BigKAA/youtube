@@ -30,7 +30,9 @@ spec:
     spec:
       containers:
         - name: console
-          image: minio/console:v0.7.5
+          # image: minio/console:v0.7.5
+          ## Fix to new container version
+          image: minio/console:v0.29.0
           imagePullPolicy: "IfNotPresent"
           args:
             - server

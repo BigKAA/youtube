@@ -24,9 +24,12 @@ global:
 ## ref: https://hub.docker.com/r/bitnami/minio/tags/
 ##
 image:
-  registry: quay.io
+  # registry: quay.io
+  registry: docker.io
   repository: bitnami/minio
-  tag: 2021.6.17-debian-10-r14
+  # tag: 2021.6.17-debian-10-r14
+  ## Fix to newest container version
+  tag: 2023.5.4-debian-11-r1
   pullPolicy: IfNotPresent
   pullSecrets: []
   debug: false

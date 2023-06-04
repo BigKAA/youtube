@@ -4,9 +4,12 @@ kind: Ingress
 metadata:
   name: minioconsole
   namespace: minio
-  annotations:
-    kubernetes.io/ingress.class: "system-ingress"
+  # ## Fix to new versions of ingress controllers
+  # annotations:
+  #   kubernetes.io/ingress.class: "system-ingress"
 spec:
+  ## Fix to new versions of ingress controllers
+  ingressClassName: "system-ingress"
   rules:
     - host: "minio.kryukov.local"
       http:
