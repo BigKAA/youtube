@@ -23,4 +23,11 @@ kubectl apply -f argocd/postgre-app.yaml
 kubectl apply -f argocd/redis-app.yaml
 ```
 
+### minio
+
+```shell
+kubectl apply -f argocd/minio-app.yaml
+kubectl apply -f argocd/minio-console-app.yaml
+```
+
 helm show values postgres-operator-charts/postgres-operator > operator/postgres-operator-values.yaml

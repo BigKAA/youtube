@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab-minio
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    chart: minio
+    targetRevision: 12.6.4
+    helm:
+      parameters:
+        - name: mode
+          value: distributed
+        - name: auth.rootUser
+          value: admin
+        - name: auth.rootPassword
+          value: password
+        - name: disableWebUI
+          value: "true"
+        - name: statefulset.replicaCount
+          value: "2"
+        - name: statefulset.zones
+          value: "1"
+        - name: statefulset.drivesPerNode
+          value: "2"
+        - name: persistence.enabled
+          value: "true"
+        - name: persistence.storageClass
+          value: managed-nfs-storage
+        - name: persistence.size
+          value: 2Gi
+        - name: volumePermissions.enabled
+          value: "true"
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: gitlab
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
