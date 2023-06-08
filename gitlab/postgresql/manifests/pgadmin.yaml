@@ -1,0 +1,104 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pgadmin-pvc
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+spec:
+  storageClassName: "managed-nfs-storage"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: pgadmin-svc
+  labels:
+    name: postgres-operator
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      name: http
+      targetPort: 80
+      nodePort: 30861
+  selector:
+    app: pgadmin
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+  labels:
+    app: pgadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      initContainers:
+      - name: busibox
+        image: busybox:1.34.1
+        imagePullPolicy: IfNotPresent
+        command:
+          - 'sh'
+          - '-c'
+          - 'chown 5050:5050 /tmp/mount'
+        volumeMounts:
+          - mountPath: /tmp/mount
+            name: state
+      containers:
+      - name: pgadmin
+        image: dpage/pgadmin4:7.2
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
+        env:
+          - name: PGADMIN_DEFAULT_EMAIL
+            value: "artur@kryukov.biz"
+          - name: PGADMIN_DEFAULT_PASSWORD
+            value: "password"
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "0.2"
+          limits:
+            memory: "800Mi"
+            cpu: "0.8"
+        volumeMounts:
+          - mountPath: /var/lib/pgadmin
+            name: state
+      volumes:
+        - name: state
+          persistentVolumeClaim:
+            claimName: pgadmin-pvc
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pgadmin
+spec:
+  ingressClassName: system-ingress
+  rules:
+    - host: pg.kryukov.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: pgadmin-svc
+                port:
+                  name: http

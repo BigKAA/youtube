@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-headless
+  labels:
+    app: postgres
+spec:
+  ports:
+  - port: 5432
+    name: postgres-port
+    targetPort: postgres-port
+  clusterIP: None
+  selector:
+    app: postgres
+    version: "15.3"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-np
+  labels:
+    app: postgres
+spec:
+  ports:
+  - port: 5432
+    name: postgres-port
+    targetPort: postgres-port
+  type: ClusterIP
+  selector:
+    app: postgres
+    version: "15.3"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: Opaque
+stringData:
+  POSTGRES_USER: artur
+  POSTGRES_PASSWORD: password
+--- 
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres 
+      version: "15.3"
+  serviceName: postgres-headless
+  replicas: 1 
+  minReadySeconds: 10 
+  
+  template:
+    metadata:
+      labels:
+        app: postgres
+        version: "15.3"
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: postgres
+          image: postgres:15.3
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+              name: postgres-port
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgresdata
+  volumeClaimTemplates:
+  - metadata:
+      name: postgresdata
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "managed-nfs-storage"
+      resources:
+        requests:
+          storage: 10Gi 
+ 
