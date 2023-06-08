@@ -1,6 +1,8 @@
 # Zalando postgres-operator
 
-https://opensource.zalando.com/postgres-operator/
+* https://opensource.zalando.com/postgres-operator/
+* https://postgres-operator.readthedocs.io/en/latest/
+* https://github.com/zalando/postgres-operator
 
 ```shell
 helm repo add postgres-operator-charts https://opensource.zalando.com/postgres-operator/charts/postgres-operator
@@ -36,6 +38,42 @@ image:
 configGeneral:
   # Spilo docker image
   docker_image: registry.opensource.zalan.do/acid/spilo-15:3.0-p1
+
+configKubernetes:
+  # toggles pod anti affinity on the Postgres pods
+  enable_pod_antiaffinity: true
+  # toogles readiness probe for database pods
+  enable_readiness_probe: true
+  # operator watches for postgres objects in the given namespace
+  watched_namespace: "*"  # listen to all namespaces
+
+configLoadBalancer:
+  # DNS zone for cluster DNS name when load balancer is configured for cluster
+  db_hosted_zone: kryukov.local
+```
+
+Пользователи. Мы не будем включать `PostgresTeam CR`.
+
+```yaml
+# automate creation of human users with teams API service
+configTeamsApi:
+  # team_admin_role will have the rights to grant roles coming from PG manifests
+  enable_admin_role_for_users: true
+  # operator watches for PostgresTeam CRs to assign additional teams and members to clusters
+  enable_postgres_team_crd: false
+```
+
+Планируем только один оператор в кластере.
+
+```yaml
+controllerID:
+  # Specifies whether a controller ID should be defined for the operator
+  # Note, all postgres manifest must then contain the following annotation to be found by this operator
+  # "acid.zalan.do/controller": <controller-ID-of-the-operator>
+  create: false
+  # The name of the controller ID to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
 ```
 
 Установим оператор
@@ -95,4 +133,13 @@ ingress:
 helm install postgres-operator-ui postgres-operator-ui-charts/postgres-operator-ui \
 -f operator/postgres-operator-ui-values.yaml \
 -n postgres-operator
+```
+
+## Тестовый кластер
+
+Попытаемся запустить кластер, аналогичный тому, что мы делали при помощи манифестов.
+
+```shell
+kubectl -n postgres-operator apply -f operator/01-config-map.yaml \
+-f operator/02-pvc.yaml -f operator/03-test1-db.yaml
 ```

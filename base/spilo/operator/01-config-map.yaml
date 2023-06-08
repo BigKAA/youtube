@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-script
+data:
+  PGHOST: "/var/run/postgresql"
+  PGUSER: "postgres"
+  PGROOT: "/home/postgres/pgdata/pgroot"
+  PGLOG: "/home/postgres/pgdata/pgroot/pg_log"
+  PGDATA: "/home/postgres/pgdata/pgroot/data"
+  BACKUP_NUM_TO_RETAIN: "5"
+  USE_WALG_BACKUP: "true"
+  USE_WALG_RESTORE: "true"
+  WALG_ALIVE_CHECK_INTERVAL: "5m"
+  WALE_BINARY: "wal-g"
+  WALG_FILE_PREFIX: "/data/pg_wal"
+  WALE_ENV_DIR: "/config"

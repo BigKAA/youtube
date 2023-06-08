@@ -1,0 +1,79 @@
+kind: "postgresql"
+apiVersion: "acid.zalan.do/v1"
+
+metadata:
+  name: "test1"
+  namespace: "postgres-operator"
+  labels:
+    team: test1
+
+spec:
+  teamId: "test1"
+
+  postgresql:
+    version: "15"
+
+  numberOfInstances: 3
+  enableMasterLoadBalancer: true
+
+  volume:
+    size: "2Gi"
+    storageClass: "local-path"
+
+  additionalVolumes:
+    - name: backup-script
+      mountPath: /config
+      targetContainers:
+        - postgres
+      volumeSource:
+        configMap:
+          name: backup-script
+    - name: backup
+      mountPath: /data/pg_wal
+      targetContainers:
+        - postgres
+      volumeSource:
+        PersistentVolumeClaim:
+          claimName: test1-backup
+          readyOnly: false
+
+  env:
+    - name: WALG_FILE_PREFIX
+      value: "/data/pg_wal"
+    - name: CRONTAB
+      value: "[\"00 01 * * * envdir /config /scripts/postgres_backup.sh /home/postgres/pgdata/pgroot/data\"]"
+
+  users:
+    artur: []
+    #- superuser
+    #- createdb
+
+  databases:
+    test: artur
+
+  patroni:
+    initdb:
+      encoding: "UTF8"
+      locale: "en_US.UTF-8"
+      data-checksums: "true"
+
+  allowedSourceRanges:
+    - 192.168.218.0/24
+
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: db
+          operator: In
+          values:
+            - spilo
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+
