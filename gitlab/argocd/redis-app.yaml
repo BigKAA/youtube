@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: gitlab
+  project: default
   source:
     repoURL: 'https://charts.bitnami.com/bitnami'
     chart: redis
@@ -43,7 +43,7 @@ spec:
 #          value: "0.5"
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: redis
+    namespace: gitlab
   syncPolicy:
     automated:
       prune: true
