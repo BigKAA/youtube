@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/BigKAA/youtube'
     path: gitlab/postfix/manifests
-    targetRevision: gitlab
+    targetRevision: master
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: gitlab
