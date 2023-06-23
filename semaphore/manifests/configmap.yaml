@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: semaphore-env
+data:
+  SEMAPHORE_DB_USER: "semaphore"
+  SEMAPHORE_DB_HOST: "postgres"
+  SEMAPHORE_DB_PORT: "5432"
+  SEMAPHORE_DB_DIALECT: "postgres"
+  SEMAPHORE_DB: "semaphore"
+  SEMAPHORE_ADMIN_NAME: "admin"
+  SEMAPHORE_ADMIN_EMAIL: "artur@kryukov.local"
+  SEMAPHORE_ADMIN: admin
+  SEMAPHORE_LDAP_ACTIVATED: 'no'
+  # SEMAPHORE_LDAP_HOST: dc01.local.example.com
+  # SEMAPHORE_LDAP_PORT: '636'
+  # SEMAPHORE_LDAP_NEEDTLS: 'yes'
+  # SEMAPHORE_LDAP_DN_BIND: 'uid=bind_user,cn=users,cn=accounts,dc=local,dc=shiftsystems,dc=net'
+  # SEMAPHORE_LDAP_DN_SEARCH: 'dc=local,dc=example,dc=com'
+  # SEMAPHORE_LDAP_SEARCH_FILTER: "(\u0026(uid=%s)(memberOf=cn=ipausers,cn=groups,cn=accounts,dc=local,dc=example,dc=com))"

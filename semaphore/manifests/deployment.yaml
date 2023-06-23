@@ -1,0 +1,63 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &application semaphore
+  namespace: semaphore
+  labels:
+    app: *application
+    version: &version v2.8.90
+spec:
+  selector:
+    matchLabels:
+      app: *application
+      version: *version
+  template:
+    metadata:
+      labels:
+        app: *application
+        version: *version
+    spec:
+      volumes:
+        - name: playbook
+          persistentVolumeClaim:
+            claimName: semaphore
+      containers:
+        - name: semaphore
+          imagePullPolicy: IfNotPresent
+          image: semaphoreui/semaphore:v2.8.90
+          envFrom:
+            - secretRef:
+                name: semaphore-env
+            - configMapRef:
+                name: semaphore-env
+          env:
+            - name: SEMAPHORE_PLAYBOOK_PATH
+              value: "/tmp/semaphore/"
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            httpGet:
+              port: 3000
+              path: /ping
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              port: 3000
+              path: /
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 3
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1024Mi"
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+          volumeMounts:
+            - mountPath: /tmp/semaphore/
+              name: playbook

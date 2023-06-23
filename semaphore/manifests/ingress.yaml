@@ -1,0 +1,18 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: semaphore
+spec:
+  ingressClassName: system-ingress
+  rules:
+    - host: "semaphore.kryukov.local"
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: semaphore
+                port:
+                  number: 3000
