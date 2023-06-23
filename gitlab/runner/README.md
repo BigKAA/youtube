@@ -89,13 +89,13 @@ variables:
 application1: 
   <<: *build_def
   variables:
-    CONTAINER_NAME: bigkaa/gitlab-application1:v0.0.1
+    CONTAINER_NAME: bigkaa/gitlab-application1:${VERSION}
     PROJECT_DIR: ${CI_PROJECT_DIR}/application1
 
 application2: 
   <<: *build_def
   variables:
-    CONTAINER_NAME: bigkaa/gitlab-application2:v0.0.1
+    CONTAINER_NAME: bigkaa/gitlab-application2:${VERSION}
     PROJECT_DIR: ${CI_PROJECT_DIR}/application2
 
 step1:
