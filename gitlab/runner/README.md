@@ -56,6 +56,9 @@ stages:
 
 variables:
   REGISTRY: "https://index.docker.io/v1/"
+  VERSION:
+    value: ""
+    description: "Введите tag (версию) контейнера. Пример: v0.0.1"
 
 .build: &build_def
   stage: build
@@ -63,6 +66,11 @@ variables:
     name: gcr.io/kaniko-project/executor:v1.11.0-debug
     entrypoint: [""]
   before_script:
+    - |
+      if [ -z $VERSION ]; then
+        echo "Please select a container version"
+        exit 1 
+      fi
     - echo ${PROJECT_DIR}
     - echo ${CONTAINER_NAME}
     - echo "{\"auths\":{\"${REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${REGISTRY_USER}" "${REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -76,7 +84,7 @@ variables:
     - stage
   when: manual
   only:
-   - schedules
+    - web
 
 application1: 
   <<: *build_def
@@ -103,7 +111,7 @@ step1:
     - stage
   when: manual
   only:
-    - schedules
+    - web
 
 step2:
   stage: step2 
@@ -117,7 +125,7 @@ step2:
     - stage
   when: manual
   only:
-    - schedules
+    - web
 ```
 
 ```shell
