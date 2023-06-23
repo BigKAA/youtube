@@ -15,12 +15,18 @@ stringData:
   runner-registration-token: ""
   
   # тут подставляем полученный в WEB интерфейсе токен
-  runner-token: "glrt-VcNNuWY1Fds7Twy7Ey4_"
+  runner-token: "glrt-haAD9no41YLEnJfNEdJu"
   
   # S3 cache parameters
   accesskey: "admin"
   secretkey: "password"
 EOF
+```
+
+```shell
+helm repo add gitlab https://charts.gitlab.io/
+helm repo update
+helm search repo gitlab/gitlab
 ```
 
 ```shell

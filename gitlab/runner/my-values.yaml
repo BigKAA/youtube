@@ -44,7 +44,7 @@ runners:
         Shared = true
         [runners.cache.s3]
           ServerAddress = "gitlab-minio:9000"
-          BucketName = "runner-cache"
+          BucketName = "dev-runner-cache"
           BucketLocation = "us-east-1"
           Insecure = true
           AuthenticationType = "access-key"
