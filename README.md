@@ -22,6 +22,7 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **[Всякое разное](notclassified)** - разные полезные мелочи.
   * **[Resourcequota](resourcequota)** - Накладываем ограничения на namespace.
   * **[PriorityClass](PriorityClass)** - Приориеты. Больше вопросов, чем ответов.
+  * **[Semaphore](semaphore)** - Ansible UI  
 * **[Hashicorp vault](vault)**
 * **Observability**
   * **[Мониторинг](monitoring)**
