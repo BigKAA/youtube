@@ -18,10 +18,12 @@ kubectl -n semaphore apply -f manifests
 kubectl -n semaphore delete -f manifests
 ```
 
+База данных.
+
 ```shell
-kubectl -n semaphore apply -f postgres
+kubectl -n semaphore apply -f postgres/postgreesql.yaml
 ```
 
 ```shell
-kubectl -n semaphore delete -f postgres
+kubectl -n semaphore delete -f postgres/postgreesql.yaml
 ```

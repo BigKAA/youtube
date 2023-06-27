@@ -9,7 +9,7 @@ data:
   SEMAPHORE_DB_DIALECT: "postgres"
   SEMAPHORE_DB: "semaphore"
   SEMAPHORE_ADMIN_NAME: "admin"
-  SEMAPHORE_ADMIN_EMAIL: "artur@kryukov.local"
+  SEMAPHORE_ADMIN_EMAIL: "artur@kryukov.biz"
   SEMAPHORE_ADMIN: admin
   SEMAPHORE_LDAP_ACTIVATED: 'no'
   # SEMAPHORE_LDAP_HOST: dc01.local.example.com
