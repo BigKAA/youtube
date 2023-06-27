@@ -8,6 +8,7 @@ metadata:
     app: *application
     version: &version v2.8.90
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: *application
