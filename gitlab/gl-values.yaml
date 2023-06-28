@@ -16,8 +16,8 @@ nginx-ingress:
 #registry:
 #  enabled: false
 
-#gitlab-runner:
-#  install: false
+gitlab-runner:
+  install: false
 
 global:
   minio:

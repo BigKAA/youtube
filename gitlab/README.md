@@ -173,6 +173,21 @@ Redis установлен в том же кластере kubernetes, в том
 
 Пароль доступа храниться в Secret `gitlab-redis` в поле `redis-password`.
 
+```shell
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitlab-redis
+  namespace: gitlab
+  labels:
+    manual: "yes"
+type: Opaque
+stringData:
+  redis-password: 'qUwTt8g9it'
+EOF
+```
+
 Доступ к Redis будем осуществлять при помощи Service `gitlab-redis-master`.
 
 Соответствущие параметры будем определять в разделе `global.redis`:
