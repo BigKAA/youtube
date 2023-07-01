@@ -50,6 +50,8 @@ envs:
     - "acid"
     - "test1"
     - "test2"
+  # Fix для версии v1.10.0
+  appUrl: "http://operator.kryukov.local"
 
 # Extra pod annotations
 podAnnotations:
