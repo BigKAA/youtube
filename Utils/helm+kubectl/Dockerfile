@@ -1,12 +1,20 @@
-FROM alpine:3.14.2
+FROM alpine:3.18.2
 
-RUN apk --no-cache add curl && \
-    curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.22.3/bin/linux/amd64/kubectl && \
+ENV KUBE_VERSION=v1.27.3
+ENV HELM_VERSION=v3.12.1
+ENV REGCLIENT_VERSION=v0.5.0
+
+RUN apk --no-cache add curl jq && \
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBE_VERSION}/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
-    mv ./kubectl /usr/local/bin/kubect && \
-    curl -LO https://get.helm.sh/helm-v3.6.2-linux-amd64.tar.gz && \
-    tar -zxvf helm-v3.6.2-linux-amd64.tar.gz && \
-    mv linux-amd64/helm /usr/local/bin/helm && \
+    mv ./kubectl /usr/bin/kubectl && \
+    curl -LO https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz && \
+    tar -zxvf helm-${HELM_VERSION}-linux-amd64.tar.gz && \
+    mv linux-amd64/helm /usr/bin/helm && \
     rm -rf linux-amd64
 
-CMD ["/bin/sh"]
+RUN curl -LO https://github.com/regclient/regclient/releases/download/${REGCLIENT_VERSION}/regctl-linux-amd64 && \
+    chmod +x regctl-linux-amd64 && \
+    mv regctl-linux-amd64 /usr/local/bin/regctl
+
+CMD ["/bin/sh", "-c"]
