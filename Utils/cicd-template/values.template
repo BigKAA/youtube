@@ -1,5 +1,7 @@
 description:
 {{ .Description | indent 2 }}
+image: {{ .Image }}
+fullnameOverride: {{ .FullnameOverride }}
 resources:
 {{ .Resources | indent 2 }}
 readinessProbe:

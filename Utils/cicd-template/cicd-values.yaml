@@ -1,5 +1,7 @@
 # Файл описания приложения
 description: "Тестовое приложение"
+image: ""
+fullnameOverride: ""
 resources:
   limits:
     cpu: "0.5"
