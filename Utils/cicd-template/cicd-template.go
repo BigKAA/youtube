@@ -28,8 +28,8 @@ type OutStruct struct {
 }
 
 func main() {
-	inputFile := flag.String("in", "", "-in file-name.yaml")
-	templateFile := flag.String("template", "", "-template file.template")
+	inputFile := flag.String("in", "", "Data file yaml")
+	templateFile := flag.String("template", "", "Template file yaml")
 	flag.Parse()
 
 	// Читаем файл с данными
