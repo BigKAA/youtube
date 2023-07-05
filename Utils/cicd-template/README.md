@@ -6,6 +6,10 @@
 cicd-template -in cicd-values.yaml -template values.template
 ```
 
+```shell
+CGO_ENABLED=0 go build
+```
+
 Приложение читает заранее определенные данные из файла данных `cicd-values.yaml`. Читает файл шаблона `values.template`.
 Подставляет секции из файла данных в файл шаблона. Результат выводит на стандартный вывод.
 
