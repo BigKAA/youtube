@@ -1,0 +1,8 @@
+description:
+{{ .Description | indent 2 }}
+resources:
+{{ .Resources | indent 2 }}
+readinessProbe:
+{{ .ReadinessProbe | indent 2 }}
+livenessProbe:
+{{ .LivenessProbe | indent 2 }}

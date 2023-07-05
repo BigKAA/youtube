@@ -1,0 +1,23 @@
+# Файл описания приложения
+description: "Тестовое приложение"
+resources:
+  limits:
+    cpu: "0.5"
+    memory: "500Mi"
+  requests:
+    cpu: "0.2"
+    memory: "200Mi"
+readinessProbe:
+  httpGet:
+    port: 3000
+    path: /ping
+    scheme: HTTP
+  initialDelaySeconds: 5
+  periodSeconds: 3
+livenessProbe:
+  httpGet:
+    port: 3000
+    path: /
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 3
