@@ -16,6 +16,8 @@ CGO_ENABLED=0 go build
 Обязательные поля в файле данных:
 
 * description
+* image
+* fullnameOverride
 * resources
 * readinessProbe
 * livenessProbe
@@ -25,6 +27,8 @@ CGO_ENABLED=0 go build
 ```yaml
 # Файл описания приложения
 description: "Тестовое приложение" # <- обязательное поле
+iamge: ""
+fullnameOverride: ""
 resources: # <- обязательное поле
   limits:
     cpu: "0.5"
