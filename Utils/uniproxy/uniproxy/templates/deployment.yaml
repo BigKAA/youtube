@@ -38,7 +38,7 @@ spec:
                   fieldPath: metadata.namespace
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: 8080
               protocol: TCP
           {{- if .Values.probes }}
           {{- toYaml .Values.probes | nindent 10 }}
