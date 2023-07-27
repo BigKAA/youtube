@@ -438,3 +438,11 @@ helm upgrade gitlab gitlab/gitlab -n gitlab -f gl-values.yaml
 ```
 
 Добавится сервис registry и проекты, стоящие в очереди на удаление будут удалены.
+
+## Видео
+
+* [VK](https://vk.com/video7111833_456239246)
+* [Telegramm](https://t.me/arturkryukov/279)
+* [Rutube](https://rutube.ru/video/c1c366f5bf2430541041838f009f0594/)
+* [Zen](https://dzen.ru/video/watch/64be1959dff44977f6bf675e)
+* [Youtube](https://youtu.be/mQAdGy9YOBg)

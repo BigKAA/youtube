@@ -12,6 +12,12 @@ Nexus внутри kubernetes, делаем свой docker registry.
 * **[Jenkins](jenkins)** - Как установить Jenkins в kubernetes, руками без хелмчартов.
 Как заставить kubernetes (docker) работать с частным хранилищем docker 
 образов по https с "левым" сертификатом.
+* **PostgreSQL в kubernetes**
+  * **[Zalando Spilo](base/spilo)**
+  * **[Crunchy PostgreSQL Operator](base/Crunchy%20PostgreSQL%20Operator)**
+* **Gitlab**
+  * **[Установка Gitlab в kubernetes](gitlab)**
+  * **[Gitlab runner в kubernetes](gitlab/runner)**
 * **[Harbor](harbor/README.md)** - хранилище образов контейнеров и много 
 дополнительных плюшек.
 * **[Keycloak](keycloak/README.md)** - кластер Keycloak.
@@ -23,6 +29,9 @@ Nexus внутри kubernetes, делаем свой docker registry.
   * **[Resourcequota](resourcequota)** - Накладываем ограничения на namespace.
   * **[PriorityClass](PriorityClass)** - Приориеты. Больше вопросов, чем ответов.
   * **[Semaphore](semaphore)** - Ansible UI  
+  * **[Local Path Provisioner](base/local-path-provisioner)** - Доступ к локальным 
+    дискам кластера при помощи Local Path Provisioner.
+  * **[Longhorn](longhorn)** - Highly available persistent storage for Kubernetes.
 * **[Hashicorp vault](vault)**
 * **Observability**
   * **[Мониторинг](monitoring)**

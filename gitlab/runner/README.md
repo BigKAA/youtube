@@ -144,3 +144,11 @@ git push
 ```
 
 [Про использование кеш](https://docs.gitlab.com/ee/ci/caching/#cache-python-dependencies).
+
+## Видео
+
+* [VK](https://vk.com/video7111833_456239247)
+* [Telegram](https://t.me/arturkryukov/282)
+* [Rutube]() 
+* [Zen](https://dzen.ru/video/watch/64c2051a2fe792267219e1db)
+* [Youtube](https://youtu.be/LjIzdnJGgVA)
