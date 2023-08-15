@@ -7,7 +7,7 @@ metadata:
   {{- with .Values.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
-  {{-end }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
@@ -22,7 +22,7 @@ spec:
         {{- include "uniproxy.selectorLabels" . | nindent 8 }}
         {{- with .Values.podAdditionalLabels }}
         {{- toYaml . | nindent 8 }}
-        {{-end }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
