@@ -15,7 +15,11 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+annotations: {}
+
 podAnnotations: {}
+
+podAdditionalLabels: {}
 
 service:
   type: ClusterIP

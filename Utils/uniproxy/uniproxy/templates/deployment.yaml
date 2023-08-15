@@ -4,6 +4,10 @@ metadata:
   name: {{ include "uniproxy.fullname" . }}
   labels:
     {{- include "uniproxy.labels" . | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{-end }}
 spec:
   selector:
     matchLabels:
@@ -16,6 +20,9 @@ spec:
       {{- end }}
       labels:
         {{- include "uniproxy.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podAdditionalLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{-end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
