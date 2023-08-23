@@ -36,9 +36,9 @@ Egress в исходном поде, так и в политике Ingress в ц
 
 Для демонстрации работы сетевых политик будет использовано приложение [uniproxy](../../Utils/uniproxy).
 
-## Ingress
-
 ![Ограничение доступа к поду](images/np-01.jpg)
+
+## Ingress
 
 ```shell
 kubectl apply -f argoapp/01.yaml -f argoapp/02.yaml
