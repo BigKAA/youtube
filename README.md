@@ -5,6 +5,7 @@
   * **[kubeadm](kubeadm)** - управление кластером при помощи kubeadm.
 * **[Helm](helm)** - всякое про Helm
 * **[Net](net)** - Про сеть в kubernetes.
+  * **[Network Polices](net/04-NetworkPolicies)** - Встроенный firewall.
 * **[ArgoCD](argocd/README.md)** - приложение для CD в k8s.
 * **[Nexus](nexus)** - хороший пример для объяснения зачем нужен StatefulSet.
 Начало серии видео по devops инструментам в кубернетес.
