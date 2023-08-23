@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app2
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/BigKAA/youtube'
+    path: Utils/uniproxy/uniproxy
+    targetRevision: master
+    helm:
+      values: |-
+        annotations:
+          reloader.stakater.com/auto: "true"
+        config:
+          paths:
+            - path: "/"
+              proxyPath: ""
+              comment: "App2 Stub"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: app2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
