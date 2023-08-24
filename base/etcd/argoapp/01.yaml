@@ -1,0 +1,105 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: etcd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    targetRevision: 9.3.0
+    helm:
+      values: |
+        global:
+          imageRegistry: ""
+          imagePullSecrets: []
+          storageClass: "managed-nfs-storage"
+
+        commonLabels:
+          purpose: db-etcd
+
+        image:
+          registry: docker.io
+          repository: bitnami/etcd
+          tag: 3.5.9-debian-11-r100
+          digest: ""
+          pullPolicy: IfNotPresent
+          debug: false
+        auth:
+          rbac:
+            create: true
+            allowNoneAuthentication: false
+            rootPassword: ""
+            existingSecret: "etcd-root-password"
+            existingSecretPasswordKey: "PASSWORD"
+        autoCompactionMode: "periodic"
+
+        initialClusterToken: "etcd-cluster-test"
+
+        logLevel: "info"
+
+        replicaCount: 3
+
+        podManagementPolicy: Parallel
+
+        containerPorts:
+          client: 2379
+          peer: 2380
+
+        resources:
+          limits:
+            cpu: "2000m"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+
+        podAntiAffinityPreset: soft
+
+        priorityClassName: ""
+
+        service:
+          type: NodePort
+          ports:
+            client: 2379
+            peer: 2380
+          nodePorts:
+            client: "32397"
+            peer: "32380"
+
+        persistence:
+          enabled: true
+          storageClass: "managed-nfs-storage"
+          accessModes:
+            - ReadWriteMany
+          size: 8Gi
+
+        volumePermissions:
+          enabled: true
+          image:
+            registry: docker.io
+            repository: bitnami/os-shell
+            tag: 11-debian-11-r40
+            pullPolicy: IfNotPresent
+            pullSecrets: []
+
+        metrics:
+          enabled: true
+          podAnnotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "{{ .Values.containerPorts.client }}"
+          podMonitor:
+            enabled: false
+
+        disasterRecovery:
+          enabled: false
+    chart: etcd
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: etcd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

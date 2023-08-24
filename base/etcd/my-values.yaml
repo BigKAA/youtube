@@ -1,0 +1,136 @@
+global:
+  imageRegistry: ""
+  ## E.g.
+  ## imagePullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  imagePullSecrets: []
+  storageClass: "managed-nfs-storage"
+
+commonLabels:
+  purpose: db-etcd
+
+image:
+  registry: docker.io
+  repository: bitnami/etcd
+  tag: 3.5.9-debian-11-r100
+  digest: ""
+  pullPolicy: IfNotPresent
+  debug: false
+## Authentication parameters
+##
+auth:
+  ## Role-based access control parameters
+  ## ref: https://etcd.io/docs/current/op-guide/authentication/
+  ##
+  rbac:
+    create: true
+    allowNoneAuthentication: false
+    rootPassword: ""
+    existingSecret: "etcd-root-password"
+    existingSecretPasswordKey: "PASSWORD"
+
+  token:
+    enabled: true
+
+## @param autoCompactionMode Auto compaction mode, by default periodic. Valid values: "periodic", "revision".
+## - 'periodic' for duration based retention, defaulting to hours if no time unit is provided (e.g. 5m).
+## - 'revision' for revision number based retention.
+##
+autoCompactionMode: "periodic"
+
+## @param initialClusterToken Initial cluster token. Can be used to protect etcd from cross-cluster-interaction, which might corrupt the clusters.
+## If spinning up multiple clusters (or creating and destroying a single cluster)
+## with same configuration for testing purpose, it is highly recommended that each cluster is given a unique initial-cluster-token.
+## By doing this, etcd can generate unique cluster IDs and member IDs for the clusters even if they otherwise have the exact same configuration.
+##
+initialClusterToken: "etcd-cluster-test"
+## @param logLevel Sets the log level for the etcd process. Allowed values: 'debug', 'info', 'warn', 'error', 'panic', 'fatal'
+##
+logLevel: "info"
+
+## @param replicaCount Number of etcd replicas to deploy
+##
+replicaCount: 3
+
+## @param podManagementPolicy Pod management policy for the etcd statefulset
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+##
+podManagementPolicy: Parallel
+
+## etcd container ports to open
+## @param containerPorts.client Client port to expose at container level
+## @param containerPorts.peer Peer port to expose at container level
+##
+containerPorts:
+  client: 2379
+  peer: 2380
+
+resources:
+  ## Example:
+  ## limits:
+  ##    cpu: 500m
+  ##    memory: 1Gi
+  ##
+  limits:
+    cpu: "2000m"
+    memory: "1Gi"
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+
+## @param podAntiAffinityPreset Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`
+## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+##
+podAntiAffinityPreset: soft
+
+## @param priorityClassName Name of the priority class to be used by etcd pods
+## Priority class needs to be created beforehand
+## Ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
+
+service:
+  ## @param service.type Kubernetes Service type
+  ##
+  type: nodePort
+  ## @param service.ports.client etcd client port
+  ## @param service.ports.peer etcd peer port
+  ##
+  ports:
+    client: 2379
+    peer: 2380
+  ## @param service.nodePorts.client Specify the nodePort client value for the LoadBalancer and NodePort service types.
+  ## @param service.nodePorts.peer Specify the nodePort peer value for the LoadBalancer and NodePort service types.
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+  ##
+  nodePorts:
+    client: "32397"
+    peer: "32380"
+
+persistence:
+  enabled: true
+  storageClass: "managed-nfs-storage"
+  accessModes:
+    - ReadWriteMany
+  size: 8Gi
+
+volumePermissions:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/os-shell
+    tag: 11-debian-11-r40
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+
+metrics:
+  enabled: true
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "{{ .Values.containerPorts.client }}"
+  podMonitor:
+    enabled: false
+
+disasterRecovery:
+  enabled: false
