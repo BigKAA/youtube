@@ -53,7 +53,7 @@ EOF
 ### ArgoCD
 
 ```shell
-helm install -f argoapp/01.yaml
+kubectl apply -f argoapp/01.yaml
 ```
 
 ### Helm chart
