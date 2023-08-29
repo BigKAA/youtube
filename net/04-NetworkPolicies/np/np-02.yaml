@@ -8,7 +8,7 @@ spec:
     - Ingress
   podSelector:
     matchLabels:
-      kubernetes.io/metadata.name: app2
+      app.kubernetes.io/instance: app2
   ingress:
     - from:
         - namespaceSelector:

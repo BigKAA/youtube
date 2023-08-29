@@ -38,11 +38,11 @@ Egress в исходном поде, так и в политике Ingress в ц
 
 ![Ограничение доступа к поду](images/np-01.jpg)
 
-## Ingress
-
 ```shell
-kubectl apply -f argoapp/01.yaml -f argoapp/02.yaml
+kubectl apply -f argoapp/01.yaml -f argoapp/02.yaml -f argoapp/03.yaml
 ```
+
+## Ingress
 
 По умолчанию доступ к приложению открыт:
 
@@ -133,7 +133,9 @@ metadata:
 spec:
   policyTypes:
   - Ingress
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: app1
   ingress:
     - from:
       - namespaceSelector:
@@ -203,9 +205,17 @@ kubectl run -it --rm --restart=Never --image=infoblox/dnstools:latest dnstools
 
 >    curl -s http://app1-uniproxy.app1.svc
 
+К app1 но по контексту `/app2`:
+
+>    curl -s http://app1-uniproxy.app1.svc/app2
+
 Затем пошлем запрос к приложению app2.
 
 >    curl http://app2-uniproxy.app2.svc --connect-timeout 5
+
+Потом к nginx.
+
+>    curl -s http://nginx.app2.svc --connect-timeout 5
 
 Таким образом мы убедились, что наши политики работают.
 
@@ -219,7 +229,18 @@ kubectl delete -f np/np-01.yaml
 
 >    curl http://app2-uniproxy.app2.svc --connect-timeout 5
 
-Таким образом мы понимаем, что политики `allow-from-ns-app1` достаточно для определения ограничения доступа.
+Теперь к nginx:
+
+>    curl -s http://nginx.app2.svc --connect-timeout 5
+
+Можно сделать вывод: Если к поду подключена какая-либо сетевая политика, доступ к нему становится по умолчанию: "всё
+запрещено, разрешено только то, что разрешено".
+
+Вернем обратно политику по умолчанию для namespace app2:
+
+```shell
+kubectl apply -f np/np-01.yaml
+```
 
 ### Две сетевых политики
 
@@ -249,9 +270,11 @@ kubectl apply -f np/np-03.yaml
 
 Затем пошлем запрос к приложению app2 напрямую и через app1.
 
->    curl http://app2-uniproxy.app2.svc
+>    curl -s http://app2-uniproxy.app2.svc
 
->    curl http://app1-uniproxy.app1.svc/app2
+>    curl -s http://app1-uniproxy.app1.svc/app2
+
+>    curl -s http://nginx.app2.svc
 
 Удалим политику `allow-from-ns-app1`
 
@@ -261,9 +284,11 @@ kubectl delete -f np/np-02.yaml
 
 Повторим запросы:
 
->    curl http://app2-uniproxy.app2.svc
+>    curl -s http://app2-uniproxy.app2.svc
 
->    curl http://app1-uniproxy.app1.svc/app2
+>    curl -s http://app1-uniproxy.app1.svc/app2
+
+>    curl -s http://nginx.app2.svc
 
 В результате удаления политики приложение app1 из namespace app1 потеряло доступ к подам namespace app2. А приложение
 из namespace default доступ сохранило.
@@ -304,7 +329,9 @@ spec:
 
 В `from` при указываем два правила. Поскольку это два элемента массива, они объединяются логическим OR.
 
-Убедимся, что в namespace app2 нет ни одно сетевой политики:
+Но тут придется пожертвовать `podSelector`. В этом варианте политика будет применяться ко всем подам в namespace app2. 
+
+Убедимся, что в namespace app2 осталась только политика `default-deny-all`:
 
 ```shell
 kubectl -n app2 get networkpolicies
@@ -318,9 +345,11 @@ kubectl apply -f np/np-04.yaml
 
 Повторим запросы:
 
->    curl http://app2-uniproxy.app2.svc
+>    curl -s http://app2-uniproxy.app2.svc
 
->    curl http://app1-uniproxy.app1.svc/app2
+>    curl -s http://app1-uniproxy.app1.svc/app2
+
+>    curl -s http://nginx.app2.svc
 
 ### Разрешение доступа на конкретный порт пода
 
@@ -355,7 +384,8 @@ spec:
 
 В ней в секции `ingress` был добавлен раздел `ports`, в котором мы можем перечислять порты пода.
  
-**Обратите внимание, что мы управляем портами пода, а не сервиса!**
+**Обратите внимание, что мы управляем портами пода, а не сервиса!** В NetworkPolices мы не можем использовать сервисы
+для описания правил!
  
 В политиках при помощи `endPort` можно указывать диапазон портов:
 
@@ -398,6 +428,8 @@ spec:
 ```shell
 kubectl apply -f np/np-06.yaml
 ```
+
+Удалим все сетевые политики из namespace app2. Если они там остались.
 
 Попробуем подключиться из приложения app1 к app2:
 

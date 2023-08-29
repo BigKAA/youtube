@@ -29,6 +29,9 @@ spec:
             - path: "/app2"
               proxyPath: "http://app2-uniproxy.app2.svc"
               comment: "App2"
+            - path: "/nginx"
+              proxyPath: "http://nginx.app2.svc"
+              comment: "Nginx"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: app1
