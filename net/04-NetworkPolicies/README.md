@@ -54,6 +54,10 @@ curl -s http://example.kryukov.local | jq
 curl -s http://example.kryukov.local/app2 | jq
 ```
 
+```shell
+curl -s http://example.kryukov.local/nginx | jq
+```
+
 ### Deny All
 
 В namespace app2 запретим весь входящий трафик.
