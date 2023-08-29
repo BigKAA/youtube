@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/BigKAA/youtube'
+    path: net/04-NetworkPolicies/manifests
+    targetRevision: master
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: app2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

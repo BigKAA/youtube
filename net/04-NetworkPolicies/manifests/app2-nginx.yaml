@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: app2
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25.2-alpine3.18-slim
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources: {}
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: app2
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: nginx
+  type: ClusterIP

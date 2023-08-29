@@ -6,7 +6,9 @@ metadata:
 spec:
   policyTypes:
     - Ingress
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: app2
   ingress:
     - from:
         - namespaceSelector:
