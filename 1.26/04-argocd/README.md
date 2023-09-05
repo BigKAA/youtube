@@ -115,3 +115,15 @@ argocd account list --grpc-web
     Password updated
 
 Заходим в WEB интерфейс https://argocd.kryukov.local
+
+## Helm
+
+```shell
+helm repo add https://argoproj.github.io/argo-helm
+```
+
+```shell
+helm install argocd argocd/argo-cd -f argo-values.yaml -n argocd --create-namespace
+```
+
+Как генерировать пароль для админа написано в комментариях к secret в файле `argo-values.yaml`.
