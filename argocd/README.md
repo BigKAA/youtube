@@ -89,3 +89,20 @@ Namespace cert-manager создаётся автоматически.
 [<img src="https://img.youtube.com/vi/96K9ui-phE0/maxresdefault.jpg" width="50%">](https://youtu.be/96K9ui-phE0)
 
 [<img src="https://img.youtube.com/vi/jIMF5CQaW7c/maxresdefault.jpg" width="50%">](https://youtu.be/jIMF5CQaW7c)
+
+## Helm
+
+Про это способ установки в видео не говорилось. Но, по сути, это самый правильный метод установки. :)
+Рекомендую использовать именно его, после того как попробуете ставить Арго руками.
+
+[Helm chart argo-cd](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd).
+
+```shell
+helm repo add https://argoproj.github.io/argo-helm
+```
+
+```shell
+helm install argocd argocd/argo-cd -f argo-values.yaml -n argocd --create-namespace
+```
+
+Как генерировать пароль для админа написано в комментариях к secret в файле `argo-values.yaml`.

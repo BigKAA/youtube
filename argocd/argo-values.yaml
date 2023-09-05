@@ -1,0 +1,55 @@
+crds:
+  keep: false
+
+global:
+  logging:
+    format: json
+    # -- Set the global logging level. One of: `debug`, `info`, `warn` or `error`
+    level: info
+
+controller:
+  replicas: 1
+
+configs:
+  params:
+    server.insecure: true
+
+  repositories:
+    artur-repo:
+      url: https://github.com/BigKAA/youtube
+      name: bigkaa
+      type: git
+
+  secret:
+    # -- Bcrypt hashed admin password
+    ## Argo expects the password in the secret to be bcrypt hashed. You can create this hash with
+    ## `htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'`
+    argocdServerAdminPassword: "$2a$10$L8OqGEFh3a0yxwfIha4DLuyq6GIYP119hlFM5wlSEsI.nviVAv/zq"
+
+## Redis
+redis:
+  enabled: true
+
+## Server
+server:
+  name: server
+  replicas: 1
+
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: "argocd-issuer"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    ingressClassName: "system-ingress"
+    hosts:
+      - argocd.kryukov.local
+    paths:
+      - /
+    pathType: Prefix
+    tls:
+      - hosts:
+          - argocd.kryukov.local
+        secretName: argocd-tls
+
+    https: true
+
