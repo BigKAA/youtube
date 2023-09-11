@@ -42,8 +42,7 @@
 
 ## calicoctl
 
-Самый большой минус сетевых политик calico - это управление этими политиками. Стандартный kubectl не позволяет управлять
-политиками calico. Необходимо использовать специализированную утилиту calicoctl.
+Для управления сетевыми политиками calico рекомендуется использовать утилиту calicoctl.
 
 Смотрите какая версия calico установлена в вашем кластере и скачиваете calicoctl соответствующей версии:
 
@@ -52,6 +51,16 @@ curl -Os -L https://github.com/projectcalico/calico/releases/download/v3.25.0/ca
 mv calicoctl-linux-amd64 calicoctl
 chmod +x calicoctl
 sudo mv -f calicoctl /usr/local/bin
+calicoctl version
+```
+
+Для мака на М1:
+
+```shell
+curl -Os -L https://github.com/projectcalico/calico/releases/download/v3.25.0/calicoctl-darwin-arm64
+mv calicoctl-darwin-arm64 calicoctl
+chmod +x calicoctl
+sudo mv calicoctl /usr/local/bin/calicoctl
 calicoctl version
 ```
 
@@ -373,12 +382,6 @@ calicoctl delete -f np/np-05.yaml
 
 Достаточно распространённая ситуация - выделение набора namespaces в кластере для разработчиков. В этом случае нам 
 потребуется разрешить беспрепятственное хождение пакетов между этими namespaces, но запретить исходящий трафик.
-
-Если в работе используется только один namespace, то особых проблем нет. Можно использовать стандартные сетевые политики
-kubernetes. Но если namespace несколько. При использовании стандартных политик придется добавлять отдельную политику в 
-каждый namespace.
-
-Сетевые политики сalico облегчают решение этой задачи добавляя глобальные сетевые политики: `kind: GlobalNetworkPolicy`.
 
 В calico сетевые политики применяются к различным Endpoints (термин calico). Эти endpoints в политках выбираются 
 стандартным для kubernetes методом - при помощи labels. Соответственно, если мы хотим в политиках использовать
