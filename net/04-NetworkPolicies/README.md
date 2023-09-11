@@ -430,7 +430,7 @@ spec:
 Применим сетевую политику:
 
 ```shell
-kubectl apply -f np/np-06.yaml
+kubectl apply -f np/np-05.yaml
 ```
 
 Удалим все сетевые политики из namespace app2. Если они там остались.
@@ -475,7 +475,7 @@ spec:
 Применим сетевую политику:
 
 ```shell
-kubectl apply -f np/np-07.yaml
+kubectl apply -f np/np-06.yaml
 ```
 
 Попробуем подключиться из приложения app1 к app2:

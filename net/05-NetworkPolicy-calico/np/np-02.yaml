@@ -1,0 +1,16 @@
+kind: NetworkPolicy
+apiVersion: projectcalico.org/v3
+metadata:
+  name: allow-from-ns-app1
+  namespace: app2
+spec:
+  types:
+    - Ingress
+  selector: app.kubernetes.io/instance == 'app2'
+  ingress:
+    - action: Allow
+      protocol: TCP
+      destination: {} # Не обязательно. Это значение по умолчанию.
+      source:
+        namespaceSelector: kubernetes.io/metadata.name == 'app1'
+        selector: app.kubernetes.io/instance == 'app1'

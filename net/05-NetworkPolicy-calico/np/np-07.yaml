@@ -1,0 +1,28 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: access-company1-to-dns
+spec:
+  types:
+    - Egress
+  namespaceSelector: 'developer == "company1"'
+  egress:
+    - action: Allow
+      protocol: UDP
+      destination:
+        nets:
+          - 169.254.25.10/32
+        ports:
+          - 53
+    - action: Allow
+      protocol: TCP
+      destination:
+        nets:
+          - 169.254.25.10/32
+        ports:
+          - 53
+    - action: Allow
+      destination:
+        services:
+          name: kubernetes
+          namespace: default

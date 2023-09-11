@@ -22,3 +22,15 @@ helm version
 helm list
 rm -rf helm-v3.10.0-linux-amd64.tar.gz linux-amd64
 ```
+
+## Metrics server
+
+```shell
+kubectl apply -f metrics-server.yaml
+```
+
+Через некоторое время:
+
+```shell
+kubectl top node
+```
