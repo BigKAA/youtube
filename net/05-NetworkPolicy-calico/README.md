@@ -34,7 +34,7 @@
     * Endpoint selectors (на базе kubernetes labels).
     * Namespace selectors.
     * Service account selectors.
-* **Дополнительные элементы управления обработкой пакетов**:
+* **Дополнительные элементы управления обработкой пакетов** (*подробнее будет рассказано в одном из следующих видео*):
   * отключение connection tracking, 
   * применение перед DNAT,
   * применение к переадресованному трафику (forwarded traffic) и/или локально завершенному трафику (locally terminated 
