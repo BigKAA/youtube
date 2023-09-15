@@ -483,3 +483,11 @@ kubectl apply -f np/np-06.yaml
 ```shell
 curl -s http://example.kryukov.local/app2 | jq
 ```
+
+## Видео
+
+* [VK](https://vk.com/video7111833_456239248)
+* [Telegramm](https://t.me/arturkryukov/325)
+* [Rutube](https://rutube.ru/video/5e50f983f13ddc987ee04f8e595de971/)
+* [Zen](https://dzen.ru/video/watch/6503f46ecf85cb3a1cfda3a1)
+* [Youtube](https://youtu.be/1ACDqnfGdIQ)
