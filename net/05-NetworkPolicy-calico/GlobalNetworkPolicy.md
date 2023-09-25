@@ -108,6 +108,10 @@ spec:
 calicoctl apply -f np/np-03.yaml
 ```
 
+```shell
+kubectl run -it --rm --restart=Never --image=infoblox/dnstools:latest dnstools
+```
+
 Проверим возможность подключения к приложениям и сервисам.
 
 > curl -s http://nginx.app2.svc --connect-timeout 5
@@ -123,7 +127,7 @@ calicoctl apply -f np/np-03.yaml
 Проверим:
 
 ```shell
-curl -s http://example.kryukov.local/app2 | jq
+curl -s http://example.kryukov.local/
 ```
 
 ```yaml
@@ -162,6 +166,10 @@ calicoctl apply -f np/np-04.yaml
 Проверяем:
 
 ```shell
+curl -s http://example.kryukov.local/ | jq
+```
+
+```shell
 curl -s http://example.kryukov.local/app2 | jq
 ```
 
@@ -171,7 +179,7 @@ curl -s http://example.kryukov.local/app2 | jq
 curl -s http://example.kryukov.local/nginx | jq
 ```
 
-Исправим политику Ingress в namespaces app2:
+Добавим политику Ingress в namespaces app2:
 
 ```yaml
 kind: NetworkPolicy
