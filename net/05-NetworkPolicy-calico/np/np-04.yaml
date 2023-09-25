@@ -14,7 +14,7 @@ spec:
 kind: NetworkPolicy
 apiVersion: projectcalico.org/v3
 metadata:
-  name: allow-to-ns-app1
+  name: allow-to-ns-app2
   namespace: app1
 spec:
   types:
