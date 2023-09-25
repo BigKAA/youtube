@@ -1,0 +1,12 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: access-to-company1-from-inet
+spec:
+  types:
+    - Ingress
+  namespaceSelector: 'developer == "company1"'
+  ingress:
+    - action: Allow
+      source:
+        selector: 'app.kubernetes.io/name == "ingress-nginx"'

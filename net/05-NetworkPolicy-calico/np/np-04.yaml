@@ -1,0 +1,26 @@
+---
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: allow-to-app1
+  namespace: app1
+spec:
+  types:
+    - Ingress
+  selector: app.kubernetes.io/instance == 'app1'
+  ingress:
+    - action: Allow
+---
+kind: NetworkPolicy
+apiVersion: projectcalico.org/v3
+metadata:
+  name: allow-to-ns-app1
+  namespace: app1
+spec:
+  types:
+    - Egress
+  selector: app.kubernetes.io/instance == 'app1'
+  egress:
+    - action: Allow
+      destination:
+        namespaceSelector: kubernetes.io/metadata.name == 'app2'

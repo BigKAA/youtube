@@ -1,0 +1,39 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: access-company1
+spec:
+  types:
+    - Ingress
+    - Egress
+  namespaceSelector: 'developer == "company1"'
+  ingress:
+    - action: Allow
+      source:
+        namespaceSelector: 'developer == "company1"'
+    - action: Allow
+      source:
+        selector: 'app.kubernetes.io/name == "ingress-nginx"'
+  egress:
+    - action: Allow
+      destination:
+        namespaceSelector: 'developer == "company1"'
+    - action: Allow
+      protocol: UDP
+      destination:
+        nets:
+          - 169.254.25.10/32
+        ports:
+          - 53
+    - action: Allow
+      protocol: TCP
+      destination:
+        nets:
+          - 169.254.25.10/32
+        ports:
+          - 53
+    - action: Allow
+      destination:
+        services:
+          name: kubernetes
+          namespace: default

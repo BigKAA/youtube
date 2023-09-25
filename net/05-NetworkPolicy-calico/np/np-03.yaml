@@ -1,0 +1,36 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: deny-policy-user
+spec:
+  namespaceSelector: policy == 'user'
+  types:
+    - Ingress
+    - Egress
+# Вот это я не понял... Но работает и без ingress
+#  ingress:
+#    - action: Allow
+#      destination:
+#        services:
+#          name: kubernetes
+#          namespace: default
+  egress:
+    - action: Allow
+      protocol: UDP
+      destination:
+        nets:
+          - 169.254.25.10/32
+        ports:
+        - 53
+    - action: Allow
+      protocol: TCP
+      destination:
+        nets:
+          - 169.254.25.10/32
+        ports:
+          - 53
+    - action: Allow
+      destination:
+        services:
+          name: kubernetes
+          namespace: default

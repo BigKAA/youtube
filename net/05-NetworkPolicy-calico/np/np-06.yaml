@@ -1,0 +1,17 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: access-company1
+spec:
+  types:
+    - Egress
+    - Ingress
+  namespaceSelector: 'developer == "company1"'
+  ingress:
+    - action: Allow
+      source:
+        namespaceSelector: 'developer == "company1"'
+  egress:
+    - action: Allow
+      destination:
+        namespaceSelector: 'developer == "company1"'
