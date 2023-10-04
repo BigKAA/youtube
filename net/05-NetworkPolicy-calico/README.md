@@ -176,3 +176,11 @@ calicoctl delete -f np/np-01.yaml
 
 По аналогии со стандартными сетевыми политиками kubernetes: Если к поду подключена какая-либо сетевая политика, доступ к
 нему становится по умолчанию: "всё запрещено, разрешено только то, что разрешено".
+
+## Видео
+
+* [VK](https://vk.com/video7111833_456239249)
+* [Telegramm](https://t.me/arturkryukov/334)
+* [Rutube](https://rutube.ru/video/e77b546ce0c360a53e13413fe6b1cf87/)
+* [Zen](https://dzen.ru/video/watch/651b25f151b4a948e55c67e8)
+* [Youtube](https://youtu.be/iz6IwqvHblA)
