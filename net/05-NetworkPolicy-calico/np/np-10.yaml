@@ -1,5 +1,5 @@
 ---
-apiVersion: crd.projectcalico.org/v1
+apiVersion: projectcalico.org/v3
 kind: GlobalNetworkPolicy
 metadata:
   name: default-rules
@@ -29,7 +29,7 @@ spec:
           - 127.0.0.0/8
     - action: Deny
 ---
-apiVersion: crd.projectcalico.org/v1
+apiVersion: projectcalico.org/v3
 kind: GlobalNetworkPolicy
 metadata:
   name: allow-outbound-external
@@ -43,7 +43,7 @@ spec:
       destination: {}
       source: {}
 ---
-apiVersion: crd.projectcalico.org/v1
+apiVersion: projectcalico.org/v3
 kind: GlobalNetworkPolicy
 metadata:
   name: allow-rules

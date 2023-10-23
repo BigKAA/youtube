@@ -1,5 +1,5 @@
 ---
-apiVersion: crd.projectcalico.org/v1
+apiVersion: projectcalico.org/v3
 kind: HostEndpoint
 metadata:
   name: control1-ens160
@@ -12,7 +12,7 @@ spec:
   expectedIPs:
     - 192.168.218.171
 ---
-apiVersion: crd.projectcalico.org/v1
+apiVersion: projectcalico.org/v3
 kind: HostEndpoint
 metadata:
   name: ws1-ens160
@@ -25,7 +25,7 @@ spec:
   expectedIPs:
     - 192.168.218.174
 ---
-apiVersion: crd.projectcalico.org/v1
+apiVersion: projectcalico.org/v3
 kind: HostEndpoint
 metadata:
   name: ws2-ens160
@@ -38,7 +38,7 @@ spec:
   expectedIPs:
     - 192.168.218.175
 ---
-apiVersion: crd.projectcalico.org/v1
+apiVersion: projectcalico.org/v3
 kind: HostEndpoint
 metadata:
   name: ws3-ens160
@@ -51,7 +51,7 @@ spec:
   expectedIPs:
     - 192.168.218.176
 ---
-apiVersion: crd.projectcalico.org/v1
+apiVersion: projectcalico.org/v3
 kind: HostEndpoint
 metadata:
   name: ws4-ens160
