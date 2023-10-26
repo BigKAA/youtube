@@ -391,3 +391,11 @@ calicoctl delete -f np/np-08.yaml
 ```shell
 calicoctl apply -f np/np-09.yaml
 ```
+
+## Видео
+
+* [VK](https://vk.com/video7111833_456239250)
+* [Telegramm](https://t.me/arturkryukov/352)
+* [Rutube](https://rutube.ru/video/26796bcc25f2318896be889b4500eda8/)
+* [Zen](https://dzen.ru/video/watch/653a2d150a33be73310f254a)
+* [Youtube](https://youtu.be/MeXxYrNHHVg)
