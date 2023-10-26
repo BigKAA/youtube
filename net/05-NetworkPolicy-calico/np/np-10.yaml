@@ -34,14 +34,12 @@ kind: GlobalNetworkPolicy
 metadata:
   name: allow-outbound-external
 spec:
-  order: 10
+  order: 20
   selector: node-endpoint == 'home'
   types:
     - Egress
   egress:
     - action: Allow
-      destination: {}
-      source: {}
 ---
 apiVersion: projectcalico.org/v3
 kind: GlobalNetworkPolicy
@@ -63,7 +61,6 @@ spec:
           - 80
           - 443
       protocol: TCP
-      source: {}
     - action: Allow
       destination:
         nets:
@@ -71,4 +68,3 @@ spec:
         ports:
           - 7443
       protocol: TCP
-      source: {}
