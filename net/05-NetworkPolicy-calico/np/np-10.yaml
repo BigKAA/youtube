@@ -1,0 +1,70 @@
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: default-rules
+spec:
+  selector: node-endpoint == 'home'
+  order: 20
+  preDNAT: true
+  applyOnForward: true
+  types:
+    - Ingress
+  ingress:
+    - action: Allow
+      source:
+        nets:
+          - 10.233.0.0/16
+#          - 192.168.218.171/32
+#          - 192.168.218.174/32
+#          - 192.168.218.175/32
+#          - 192.168.218.176/32
+#          - 192.168.218.177/32
+    - action: Allow
+      source:
+        selector: node-endpoint == 'home'
+    - action: Allow
+      destination:
+        nets:
+          - 127.0.0.0/8
+    - action: Deny
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-outbound-external
+spec:
+  order: 20
+  selector: node-endpoint == 'home'
+  types:
+    - Egress
+  egress:
+    - action: Allow
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-rules
+spec:
+  selector: node-endpoint == 'home'
+  order: 10
+  preDNAT: true
+  applyOnForward: true
+  types:
+    - Ingress
+  ingress:
+    - action: Allow
+      destination:
+        nets:
+          - 192.168.218.180/32
+        ports:
+          - 80
+          - 443
+      protocol: TCP
+    - action: Allow
+      destination:
+        nets:
+          - 192.168.218.189/32
+        ports:
+          - 7443
+      protocol: TCP

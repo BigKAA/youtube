@@ -1,0 +1,65 @@
+---
+apiVersion: projectcalico.org/v3
+kind: HostEndpoint
+metadata:
+  name: control1-ens160
+  labels:
+    node-endpoint: home
+    node-role: control
+spec:
+  interfaceName: ens160
+  node: control1.kryukov.local
+  expectedIPs:
+    - 192.168.218.171
+---
+apiVersion: projectcalico.org/v3
+kind: HostEndpoint
+metadata:
+  name: ws1-ens160
+  labels:
+    node-endpoint: home
+    node-role: ws
+spec:
+  interfaceName: ens160
+  node: ws1.kryukov.local
+  expectedIPs:
+    - 192.168.218.174
+---
+apiVersion: projectcalico.org/v3
+kind: HostEndpoint
+metadata:
+  name: ws2-ens160
+  labels:
+    node-endpoint: home
+    node-role: ws
+spec:
+  interfaceName: ens160
+  node: ws2.kryukov.local
+  expectedIPs:
+    - 192.168.218.175
+---
+apiVersion: projectcalico.org/v3
+kind: HostEndpoint
+metadata:
+  name: ws3-ens160
+  labels:
+    node-endpoint: home
+    node-role: ws
+spec:
+  interfaceName: ens160
+  node: ws3.kryukov.local
+  expectedIPs:
+    - 192.168.218.176
+---
+apiVersion: projectcalico.org/v3
+kind: HostEndpoint
+metadata:
+  name: ws4-ens160
+  labels:
+    node-endpoint: home
+    node-role: ws
+spec:
+  interfaceName: ens160
+  node: ws4.kryukov.local
+  expectedIPs:
+    - 192.168.218.177
