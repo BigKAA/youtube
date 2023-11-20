@@ -3,8 +3,8 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: pgadmin-pvc
-  annotations:
-    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+#  annotations:
+#    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
 spec:
   storageClassName: "managed-nfs-storage"
   accessModes:
@@ -80,13 +80,6 @@ spec:
         volumeMounts:
           - mountPath: /var/lib/pgadmin
             name: state
-      nodeSelector: 
-        kubernetes.io/hostname: db1.kryukov.local
-      tolerations:
-        - key: "db"
-          operator: "Equal"
-          value: "pgsql"
-          effect: "NoSchedule"
       volumes:
         - name: state
           persistentVolumeClaim:

@@ -5,10 +5,10 @@ metadata:
 spec:
   destination:
     name: ''
-    namespace: pgo
+    namespace: pg
     server: 'https://kubernetes.default.svc'
   source:
-    path: 1.25/07-postgresql/postgresql/manifests
+    path: 1.26/05-postgresql/postgresql/manifests
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: master
   project: system
