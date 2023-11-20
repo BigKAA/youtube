@@ -5,13 +5,14 @@ metadata:
 spec:
   destination:
     name: ''
-    namespace: pgo
+    namespace: pg
     server: 'https://kubernetes.default.svc'
   source:
-    path: 1.25/07-postgresql/pgadmin/manifests
+    path: 1.26/05-postgresql/pgadmin/manifests
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: master
-  project: system
+
+  project: default
   syncPolicy:
     automated:
       prune: true
