@@ -1,0 +1,146 @@
+# Default values for gitflic.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  # Внимание! Этого контейнера не существует!!! Подставьте свой!!!
+  repository: bigkaa/gitflic
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+serviceHeadless:
+  port: 80
+
+serviceSSH:
+  enable: false
+  port: 2222
+  # Services type: NodePort or LoadBalancer
+  type: NodePort
+  # Для сервиса типа NodePort - это обязательный параметр
+  nodePort: "31222"
+  name: ""
+  # TODO: add LoadBalancer parameters
+
+service:
+  # Services type: ClusterIP, NodePort or LoadBalancer
+  type: ClusterIP
+  port: 80
+  name: ""
+  nodePort: ""
+  # TODO: add LoadBalancer parameters
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+javaOptions: "-Xmx1g -Xms1g"
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 1000m
+  #   memory: 1Gi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+#configPostgres:
+#  POSTGRES_DB: ${POSTGRES_DB}
+#  POSTGRES_USER: ${POSTGRES_USER}
+#  POSTGRES_PASS: ${POSTGRES_PASS}
+#
+#configRedis:
+#  REDIS_HOST: ${REDIS_HOST}
+#  REDIS_PORT: ${REDIS_PORT}
+#
+#config:
+#  SSH_SERVER_PORT: ${SSH_SERVER_PORT}
+#
+#  EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
+#  EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
+#  EMAIL_USER: ${EMAIL_USER}
+#  EMAIL_PASS: ${EMAIL_PASS}
+#  SENDER_NAME: ${SENDER_NAME}
+#  SENDER_EMAIL: ${SENDER_EMAIL}
+#
+
+volumes:
+  repoDir:
+    storageClassName: ""
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  imageDir:
+    storageClassName: ""
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  releasesDir:
+    storageClassName: ""
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  cicdDir:
+    storageClassName: ""
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  registryDir:
+    storageClassName: ""
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  sshKey:
+    # ssh key Должен находиться в заранее созданном secret
+    # ssh-keygen -t ed25519 -f key.pem
+    # kubectl -n NAMESPACE create secret generic sshKey --from-file=key.pem --from-file=key.pem.pub
+    secretName: sshKey
+  certsDir:
+    storageClassName: ""
+    accessModes: "ReadWriteOnce"
+    storage: 50Mi
+      

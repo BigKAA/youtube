@@ -1,0 +1,29 @@
+{{- if and .Values.serviceSSH.enable
+           ( or
+             ( eq .Values.serviceSSH.type "LoadBalancer" )
+             ( and
+                ( eq .Values.serviceSSH.type "NodePort" )
+                .Values.serviceSSH.nodePort
+             )
+           ) -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "gitflic.fullname" . }}-ssh
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.serviceSSH.type }}
+  ports:
+    - port: {{ .Values.serviceSSH.port }}
+      targetPort: ssh
+      protocol: TCP
+      {{- if .Values.serviceSSH.name }}
+      name: {{ .Values.serviceSSH.name }}
+      {{- end }}
+      {{- if and (eq .Values.serviceSSH.type "NodePort") .Values.serviceSSH.nodePort }}
+      nodePort: {{ .Values.serviceSSH.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "gitflic.selectorLabels" . | nindent 4 }}
+{{- end }}

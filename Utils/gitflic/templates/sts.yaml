@@ -1,0 +1,183 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "gitflic.fullname" . }}
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "gitflic.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "gitflic.fullname" . }}-headless
+  replicas: 1
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gitflic.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gitflic.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: JAVA_OPTS
+            value: "{{ .Values.javaOptions }}"
+          - name: SERVER_PORT
+            value: "8080"
+          - name: SSH_SERVER_PORT
+            value: "22"
+          # директория, где должны хранится репозитории git
+          - name: REPO_DIR
+            value: "/opt/gitflic/var/repo/"
+          # директория, где должны хранится аватары и иные медиафайлы
+          - name: IMG_DIR
+            value: "/opt/gitflic/var/img/"
+          # директория, где должны хранится файлы, которые приложены к релизу на основе тегов git
+          - name: RELEASES_DIR
+            value: "/opt/gitflic/var/releases/"
+          # путь к сертификату, который используется для ssh транспорта
+          - name: SSH_CERT_DIR
+            value: "/opt/gitflic/var/cert/"
+          - name: SSH_CERT
+            value: "/opt/gitflic/var/cert/key.pem"
+          # путь для файлов конвейеров
+          - name: CICD_DIR
+            value: "/opt/gitflic/var/cicd/"
+          # Параметр gitflic.registry.package.dir отвечает за путь для файлов реестра пакетов
+          - name: REG_PACK_DIR
+            value: "/opt/gitflic/var/registry/"
+          # Ну вот такие они разработчики :)
+          - name: LOG_NAME
+            value: /dev/
+          - name: LOG_PATH
+            value: stdout
+          #  TODO:
+          #  GITFLIC_BASE_URL: http://${GITFLIC_BASE_URL}:${SERVER_PORT}
+          #  GITFLIC_TRANSPORT_URL: http://${GITFLIC_TRANSPORT_URL}:${SERVER_PORT}
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          - name: ssh
+            containerPort: 22
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
+        - name: repoDir
+          mountPath: "/opt/gitflic/var/repo/"
+        - name: imageDir
+          mountPath: "/opt/gitflic/var/img/"
+        - name: releasesDir
+          mountPath: "/opt/gitflic/var/releases/"
+        - name: cicdDir
+          mountPath: "/opt/gitflic/var/cicd/"
+        - name: registryDir
+          mountPath: "/opt/gitflic/var/registry/"
+        - name: certsDir
+          mountPath: "/opt/gitflic/var/cert/"
+        - name: sshKey
+          mountPath: "/opt/gitflic/var/cert/"
+          subPath: key.pem
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: sshKey
+          secret:
+            secretName: {{ .Values.volumes.sshKey.secretName }}
+  volumeClaimTemplates:
+  - metadata:
+      name: repoDir
+    spec:
+      accessModes:
+      - {{ .Values.volumes.repoDir.accessModes }}
+      {{- if .Values.volumes.repoDir.storageClassName }}
+      storageClassName: {{ .Values.volumes.repoDir.storageClassName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.volumes.repoDir.storage }}
+  - metadata:
+      name: imageDir
+    spec:
+      accessModes:
+        - {{ .Values.volumes.imageDir.accessModes }}
+      {{- if .Values.volumes.imageDir.storageClassName }}
+      storageClassName: {{ .Values.volumes.imageDir.storageClassName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.volumes.imageDir.storage }}
+  - metadata:
+      name: releasesDir
+    spec:
+      accessModes:
+        - {{ .Values.volumes.releasesDir.accessModes }}
+      {{- if .Values.volumes.releasesDir.storageClassName }}
+      storageClassName: {{ .Values.volumes.releasesDir.storageClassName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.volumes.releasesDir.storage }}
+  - metadata:
+      name: certsDir
+    spec:
+      accessModes:
+        - {{ .Values.volumes.certsDir.accessModes }}
+      {{- if .Values.volumes.certsDir.storageClassName }}
+      storageClassName: {{ .Values.volumes.certsDir.storageClassName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.volumes.certsDir.storage }}
+  - metadata:
+      name: cicdDir
+    spec:
+      accessModes:
+        - {{ .Values.volumes.cicdDir.accessModes }}
+      {{- if .Values.volumes.cicdDir.storageClassName }}
+      storageClassName: {{ .Values.volumes.cicdDir.storageClassName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.volumes.cicdDir.storage }}
+  - metadata:
+      name: registryDir
+    spec:
+      accessModes:
+        - {{ .Values.volumes.registryDir.accessModes }}
+      {{- if .Values.volumes.registryDir.storageClassName }}
+      storageClassName: {{ .Values.volumes.registryDir.storageClassName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.volumes.registryDir.storage }}
