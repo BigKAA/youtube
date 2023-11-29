@@ -8,3 +8,7 @@ maintainers:
   - name: Artur Kryukov
     email: artur@kryukov.moscow
     url: "https://www.kryukov.biz"
+dependencies:
+  - name: redis
+    version: 18.4.0
+    repository: https://charts.bitnami.com/bitnami

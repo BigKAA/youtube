@@ -93,26 +93,6 @@ tolerations: []
 
 affinity: {}
 
-#configPostgres:
-#  POSTGRES_DB: ${POSTGRES_DB}
-#  POSTGRES_USER: ${POSTGRES_USER}
-#  POSTGRES_PASS: ${POSTGRES_PASS}
-#
-#configRedis:
-#  REDIS_HOST: ${REDIS_HOST}
-#  REDIS_PORT: ${REDIS_PORT}
-#
-#config:
-#  SSH_SERVER_PORT: ${SSH_SERVER_PORT}
-#
-#  EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
-#  EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
-#  EMAIL_USER: ${EMAIL_USER}
-#  EMAIL_PASS: ${EMAIL_PASS}
-#  SENDER_NAME: ${SENDER_NAME}
-#  SENDER_EMAIL: ${SENDER_EMAIL}
-#
-
 volumes:
   repoDir:
     storageClassName: ""
@@ -143,4 +123,50 @@ volumes:
     storageClassName: ""
     accessModes: "ReadWriteOnce"
     storage: 50Mi
-      
+
+config:
+  # С помощью свойств spring.servlet.multipart.maxFileSize и spring.servlet.multipart.maxRequestSize можно ограничить
+  # как размер загружаемых файлов в формах и запросах api, так и размер самого запроса.
+  # Стандартное значение для обоих свойств 500MB
+  multipart:
+    maxFileSize: 500MB
+    maxRequestSize: 500Mb
+  database:
+    secretName: ""
+    url: ""
+    username: ""
+    password: ""
+  email:
+    secretName: ""
+    host: ""
+    port: ""
+    username: ""
+    password: ""
+    sslEnable: false
+    auth: false
+  # Параметр gitflic.defaultPackSize ограничивает максимальный размер пакета, который гит может отправить во время пуша в
+  # репозиторий. Стандартное значение 100MB. Данное поле имеет тип String. Возможны следующие суффиксы KB, MB, GB, TB.
+  defaultPackSize: 100MB
+  # Свойство gitflic.limitPackSize используется для включения и отключения механизма ограничения максимального размера
+  # пакета при пуше. Если данный параметр имеет значение true, то настройка конкретного проекта происходит через настройки
+  # компании в администраторской панели. Стандартное значение false.
+  limitPackSize: false
+  # Свойство gitflic.limitProjectSize используется для включения и отключения механизма ограничения максимального размера
+  # репозитория. Если данное значение имеет значение true, то настройка конкретного проекта происходит через настройки проекта
+  # в панеле администрирования. Стандартное значение false.
+  limitProjectSize: false
+  log:
+    # Настройки название и пути файла логов
+    # Свойство logging.file.name должно содержать в себе название файла. Стандартное значение server.log.
+    # Название файла может содержать в себе как относительный путь к директории из которой происходит запуска приложения
+    # так и точный путь, если он начинается с /
+    # Обратите внимание, что на каждый запущенный инстанс можно указать свой файл логов, в ином случае будет использован один
+    # файл для всех инстансов
+    fileName: /dev/stdout
+    level: INFO
+
+redis:
+  global:
+    storageClass: ""
+  auth:
+    enabled: false

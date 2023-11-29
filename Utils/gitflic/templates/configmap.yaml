@@ -1,0 +1,156 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "gitflic.fullname" . }}
+  labels:
+      {{- include "gitflic.labels" . | nindent 4 }}
+data:
+  application.properties: |
+    # ======= Конфигурация сервера =======
+    # Дефолтное значение порта 8080
+    server.port=8080
+    # Дефолтное значение адреса localhost
+    server.address=0.0.0.0
+    # При необходимости также можно указать порт, на котором будет запущен SSH сервер для работы
+    # SSH транспорта git. Дефолтное значение порта 22
+    ssh.server.port=22
+    # С помощью свойств spring.servlet.multipart.maxFileSize и spring.servlet.multipart.maxRequestSize можно ограничить
+    # как размер загружаемых файлов в формах и запросах api, так и размер самого запроса.
+    # Стандартное значение для обоих свойств 500MB
+    spring.servlet.multipart.maxFileSize={{ .Values.config.multipart.maxFileSize }}
+    spring.servlet.multipart.maxRequestSize={{ .Values.config.multipart.maxRequestSize }}
+    # ======= Конфигурация базы данных =======
+    # Обязательный параметр.
+    # Необходимо указать url для подключения к базе данных и пользователя с паролем
+    # TODO:
+    spring.datasource.url=jdbc:postgresql://localhost/gitflic
+    spring.datasource.username=postgres
+    spring.datasource.password=postgres
+    # ======= Настройки директорий, используемых для работы приложения =======
+    # Обязательный параметр. Раскомментируйте все параметры и создайте для них директории. Пример команд, для создания необходимых директорий
+    # mkdir -p /opt/gitflic/var/cert; cd /opt/gitflic/var; mkdir repo img releases cicd registry
+    # Свойство repository.dir указывает папку, где должны храниться репозитории git,путь к директории должен заканчиваться на /
+    repository.dir=/opt/gitflic/var/repo/
+    # Свойство image.upload.dir указывает папку, где должны храниться аватары и иные медиафайлы
+    image.upload.dir=/opt/gitflic/var/img/
+    # Свойство releases.upload.dir указывает папку, где должны хранится файлы, которые приложены к релизу на основе тегов git
+    releases.upload.dir=/opt/gitflic/var/releases/
+    # Параметр ssh.server.cert отвечает за путь к сертификату, который используется для ssh транспорта
+    # Создайте key.pem самостоятельно по инструкции на сайте https://docs.gitflic.space/setup/ раздел Генерация key.pem
+    ssh.server.cert=/opt/gitflic/var/cert/key.pem
+    # Параметр cicd.pipeline.dir отвечает за путь для файлов конвейеров
+    cicd.pipeline.dir=/opt/gitflic/var/cicd/
+    # Параметр gitflic.registry.package.dir отвечает за путь для файлов реестра пакетов
+    gitflic.registry.package.dir=/opt/gitflic/var/registry/
+    # ======= Настройка SMTP сервера =======
+    # Обязательный параметр. Вы можете указать некорректные параметры на время теста.
+    # Без настройки smtp сервера приложение не сможет отправлять письма как минимум для регистрации пользователей.
+    # TODO:
+    spring.mail.host=smtp.test.net
+    spring.mail.port=587
+    spring.mail.username=test@test.net
+    spring.mail.password=Superp@$$word
+    # Ниже указаны дополнительные настройки для почты, раскоментируйте их при необходимости.
+    {{- if .Values.config.email.sslEnable }}
+    spring.mail.properties.mail.smtp.ssl.enable=true
+    {{- end }}
+    {{- if .Values.config.email.auth }}
+    spring.mail.properties.mail.smtp.auth=true
+    {{- end }}
+    # ======= Конфигурация Redis =======
+    # Если Redis настроен по умолчанию, то можно не переопределять параметры.
+    # Используется в onpremise и enterprise сборках.
+    # Необходимо указать хост, порт (если редис запущен не на стандартном порте 6379),
+    # юзернейм и пароль
+    # TODO:
+    #spring.redis.host=localhost
+    #spring.redis.port=6379
+    #spring.redis.username=
+    #spring.redis.password=
+    # При необходимости можно указать номер базы данных.
+    # Если вы запускаете несколько инстансов то у всех инстансов должен быть один и тот же номер базы.
+    #spring.redis.database=0
+    # Если редис находится не в локальном контуре, а обращаться к нему необходимо через https протокол,
+    # то возможно указать свойство spring.redis.ssl. Стандартное значение данного параметра false
+    #spring.redis.ssl=true
+    # Так же возможно указать полный URL для соединения с редисом.
+    # Если указан URL для соединения, то параметры host, port, и password будут перезаписаны из URL.
+    # Параметр user будет проигнорирован. Пример URL: redis://user:password@example.com:6379
+    #spring.redis.url=redis://user:password@example.com:6379
+    # ======= Конфигурация Elasticsearch =======
+    # Если Elasticsearch настроен по умолчанию, то можно не переопределять параметры.
+    # Используется в enterprise full сборке.
+    #Необходимо указать URI для соединения с Elasticsearch. URI может быть как полный, так и без некоторых его частей, например:
+    # http://myhost.org:9200
+    # https://myhost.org:9200
+    # https://myhost.org
+    # localhost:9200
+    # localhost
+    #
+    #Если протокол, который используется для соединения использует SSL сертификат,
+    #то необходимо явно указать настройку elasticsearch.rest.useSsl=true. В ином случае применится стандартное значение false
+    #elasticsearch.rest.uri=localhost:9200
+    #elasticsearch.rest.useSsl=false
+    #elasticsearch.rest.username=
+    #elasticsearch.rest.password=
+    #elasticsearch.rest.connection-timeout=1
+    #elasticsearch.rest.read-timeout=30
+    # ======= Конфигурация RabbitMQ =======
+    # Если RabbitMQ настроен по умолчанию, то можно не переопределять параметры.
+    # Используется в enterprise medium сборке.
+    #spring.rabbitmq.host=localhost
+    #spring.rabbitmq.port=5672
+    #spring.rabbitmq.username=
+    #spring.rabbitmq.password=
+    #Дополнительные настройки для соединения с RabbitMq можно посмотреть по ссылке
+    # https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#application-properties.integration.spring.rabbitmq.addresses
+    # ======= Общие свойства приложения =======
+    # Обязательный параметр.
+    # Свойство gitflic.base.url должно содержать в себе домен или хост, на котором запущено приложение.
+    # Данное свойство используется при генерации ссылок для внешних источников, например для ссылок в письмах.
+    # Стандартное значение для данного свойства localhost.
+    # Например данное свойство для SaaS варианта нашего сервиса имеет значение gitflic.base.url=https://gitflic.ru
+    # При отсутствии протокола передачи данных в gitflic.base.url по умолчанию будет использоваться https://
+    # Для 443 или 80 порта, порт указывать не нужно, например gitflic.base.url=https://gitflic.ru
+    # TODO:
+    gitflic.base.url=http://localhost:8080
+    # Обязательный параметр.
+    # Свойство gitflic.transport.url должно содержать в себе домен или хост, по которому осуществляется транспорт данных
+    # в git репозиторий. Стандартное значение для данного параметра localhost.
+    # Данный параметр используется для генерации урла, который отображается на странице каждого проекта и приходит в данных
+    # в из методов API и в данных вебхуков.
+    # Есть некоторые нюансы в генерации урлов для ssh транспорта, так как порт, по которому осуществляется биндинг ssh сервера
+    # стандартный (22), но может быть изменен, то вариант урла (например) git@gitflic.ru:vault/zookeeper.git с нестандартными
+    # настройками работать не будет. В таком случае необходимо настроить прокси сервер (например HaProxy), для того
+    #  чтобы внешние обращения были перенаправлены на указанный в приложении порт.
+    # Плюс если указать в значении урла порт (например localhost:8080), то для ssh транспорта будет сгенерирован
+    # урл git@localhost:vault/zookeeper.git без указанного порта
+    # Для 443 или 80 порта, порт указывать не нужно, например gitflic.transport.url=https://gitflic.ru
+    # TODO:
+    gitflic.transport.url=http://localhost:8080
+    # Параметр gitflic.defaultPackSize ограничивает максимальный размер пакета, который гит может отправить во время пуша в
+    # репозиторий. Стандартное значение 100MB. Данное поле имеет тип String. Возможны следующие суффиксы KB, MB, GB, TB.
+    gitflic.defaultPackSize={{ .Values.config.defaultPackSize }}
+    # Свойство gitflic.limitPackSize используется для включения и отключения механизма ограничения максимального размера
+    # пакета при пуше. Если данный параметр имеет значение true, то настройка конкретного проекта происходит через настройки
+    # компании в администраторской панели. Стандартное значение false.
+    {{- if .Values.config.limitPackSize }}
+    gitflic.limitPackSize=true
+    {{- end }}
+    # Свойство gitflic.limitProjectSize используется для включения и отключения механизма ограничения максимального размера
+    # репозитория. Если данное значение имеет значение true, то настройка конкретного проекта происходит через настройки проекта
+    # в панеле администрирования. Стандартное значение false.
+    {{- if .Values.config.limitProjectSize}}
+    gitflic.limitProjectSize=true
+    {{- end }}
+    # ======= Настройки логирования =======
+    # Настройки название и пути файла логов
+    # Свойство logging.file.name должно содержать в себе название файла. Стандартное значение server.log.
+    # Название файла может содержать в себе как относительный путь к директории из которой происходит запуска приложения
+    # так и точный путь, если он начинается с /
+    # Обратите внимание, что на каждый запущенный инстанс можно указать свой файл логов, в ином случае будет использован один
+    # файл для всех инстансов
+    logging.file.name={{ .Values.config.log.fileName }}
+    # Настройки уровня логирования
+    # Дефолтное значение INFO
+    logging.level.root={{ .Values.config.log.level }}

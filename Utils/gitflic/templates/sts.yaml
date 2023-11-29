@@ -12,10 +12,11 @@ spec:
   replicas: 1
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        confChecksum: {{ include (print $.Template.BasePath "/configmap.yaml") .  | sha256sum }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "gitflic.selectorLabels" . | nindent 8 }}
     spec:
@@ -32,39 +33,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
           - name: JAVA_OPTS
-            value: "{{ .Values.javaOptions }}"
-          - name: SERVER_PORT
-            value: "8080"
-          - name: SSH_SERVER_PORT
-            value: "22"
-          # директория, где должны хранится репозитории git
-          - name: REPO_DIR
-            value: "/opt/gitflic/var/repo/"
-          # директория, где должны хранится аватары и иные медиафайлы
-          - name: IMG_DIR
-            value: "/opt/gitflic/var/img/"
-          # директория, где должны хранится файлы, которые приложены к релизу на основе тегов git
-          - name: RELEASES_DIR
-            value: "/opt/gitflic/var/releases/"
-          # путь к сертификату, который используется для ssh транспорта
-          - name: SSH_CERT_DIR
-            value: "/opt/gitflic/var/cert/"
-          - name: SSH_CERT
-            value: "/opt/gitflic/var/cert/key.pem"
-          # путь для файлов конвейеров
-          - name: CICD_DIR
-            value: "/opt/gitflic/var/cicd/"
-          # Параметр gitflic.registry.package.dir отвечает за путь для файлов реестра пакетов
-          - name: REG_PACK_DIR
-            value: "/opt/gitflic/var/registry/"
-          # Ну вот такие они разработчики :)
-          - name: LOG_NAME
-            value: /dev/
-          - name: LOG_PATH
-            value: stdout
-          #  TODO:
-          #  GITFLIC_BASE_URL: http://${GITFLIC_BASE_URL}:${SERVER_PORT}
-          #  GITFLIC_TRANSPORT_URL: http://${GITFLIC_TRANSPORT_URL}:${SERVER_PORT}
+            value: "{{ .Values.javaOptions }} -Dspring.config.additional-location=/opt/gitflic/config/application.properties"
         ports:
           - name: http
             containerPort: 8080
@@ -72,14 +41,14 @@ spec:
           - name: ssh
             containerPort: 22
             protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /
-            port: http
-        readinessProbe:
-          httpGet:
-            path: /
-            port: http
+        #livenessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: http
+        #readinessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: http
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
@@ -96,8 +65,11 @@ spec:
         - name: certsDir
           mountPath: "/opt/gitflic/var/cert/"
         - name: sshKey
-          mountPath: "/opt/gitflic/var/cert/"
-          subPath: key.pem
+          mountPath: "/opt/gitflic/var/cert/key.pem"
+          subPath: "key.pem"
+        - name: configFile
+          mountPath: "/opt/gitflic/config/application.properties"
+          subPath: "application.properties"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -114,6 +86,9 @@ spec:
         - name: sshKey
           secret:
             secretName: {{ .Values.volumes.sshKey.secretName }}
+        - name: configFile
+          configMap:
+            name: {{ include "gitflic.fullname" . }}
   volumeClaimTemplates:
   - metadata:
       name: repoDir
