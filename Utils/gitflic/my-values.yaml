@@ -40,9 +40,6 @@ securityContext: {}
 serviceHeadless:
   port: 80
 
-# Если ingress не используется - имя хоста, передаваемое приложением клиентам
-# по ссылкам все равно должно определяться в ingress.hosts[0].host
-# Протокол http или https определяется из наличия значений в массиве ingress.tls
 serviceSSH:
   enable: false
   port: 2222
@@ -53,9 +50,6 @@ serviceSSH:
   name: ""
   # TODO: add LoadBalancer parameters
 
-# Если ingress не используется - имя хоста, передаваемое приложением клиентам
-# по ссылкам все равно должно определяться в ingress.hosts[0].host
-# Протокол http или https определяется из наличия значений в массиве ingress.tls
 service:
   # Services type: ClusterIP, NodePort or LoadBalancer
   type: ClusterIP
@@ -65,13 +59,13 @@ service:
   # TODO: add LoadBalancer parameters
 
 ingress:
-  enabled: false
-  className: ""
+  enabled: true
+  className: "system-ingress"
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: chart-example.local
+    - host: gitflic.kryukov.local
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -90,7 +84,6 @@ resources:
     cpu: 2000m
     memory: 4Gi
 
-
 nodeSelector: {}
 
 tolerations: []
@@ -99,32 +92,32 @@ affinity: {}
 
 volumes:
   repoDir:
-    storageClassName: ""
+    storageClassName: "managed-nfs-storage"
     accessModes: "ReadWriteOnce"
     storage: 1Gi
   imageDir:
-    storageClassName: ""
+    storageClassName: "managed-nfs-storage"
     accessModes: "ReadWriteOnce"
     storage: 1Gi
   releasesDir:
-    storageClassName: ""
+    storageClassName: "managed-nfs-storage"
     accessModes: "ReadWriteOnce"
     storage: 1Gi
   cicdDir:
-    storageClassName: ""
+    storageClassName: "managed-nfs-storage"
     accessModes: "ReadWriteOnce"
     storage: 1Gi
   registryDir:
-    storageClassName: ""
+    storageClassName: "managed-nfs-storage"
     accessModes: "ReadWriteOnce"
     storage: 1Gi
   sshKey:
     # ssh key Должен находиться в заранее созданном secret
     # ssh-keygen -t ed25519 -f key.pem
-    # kubectl -n NAMESPACE create secret generic sshKey --from-file=key.pem --from-file=key.pem.pub
-    secretName: sshKey
+    # kubectl -n NAMESPACE create secret generic ssh-key --from-file=key.pem --from-file=key.pem.pub
+    secretName: ssh-key
   certsDir:
-    storageClassName: ""
+    storageClassName: "managed-nfs-storage"
     accessModes: "ReadWriteOnce"
     storage: 50Mi
 
@@ -167,7 +160,7 @@ config:
 
 # Почтовый сервер для пересылки почты.
 mailRelay:
-  builtin: false
+  builtin: true
   image: "bigkaa/mail-relay:0.0.1"
   imagePullPolicy: IfNotPresent
   imagePullSecrets: []
@@ -211,13 +204,11 @@ db:
   # Если Secret не определён, и пароль явно не задан в следующем параметре,
   # Secret с паролем генерируется автоматически.
   postgresPassword: ""
-  # Первоначальная инициализация базы данных. Только для строенного postgresql!!!
   initJob:
     image: postgres
     tag: 15.5-alpine3.18
     imagePullPolicy: IfNotPresent
 
-# Buildin Postgresql cluster
 postgresql:
   buildin: true
   image:
@@ -271,7 +262,7 @@ redis:
     password: ""
   # Параметры встроенного чарта redis
   global:
-    storageClass: ""
+    storageClass: "managed-nfs-storage"
   auth:
     enabled: false
     password: "PASSWO5RD"

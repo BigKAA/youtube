@@ -12,3 +12,11 @@ dependencies:
   - name: redis
     version: 18.4.0
     repository: https://charts.bitnami.com/bitnami
+    condition: redis.buildin
+  - name: postgresql
+    version: 13.2.24
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.buildin
+#  - name: spiloart
+#    version: 1.0.1
+#    condition: spilo-art.buildin

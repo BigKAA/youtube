@@ -9,7 +9,7 @@ spec:
     matchLabels:
       {{- include "gitflic.selectorLabels" . | nindent 6 }}
   serviceName: {{ include "gitflic.fullname" . }}-headless
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   template:
     metadata:
       annotations:
@@ -28,12 +28,25 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      - name: {{ .Chart.Name }}
+      - name: {{ include "gitflic.fullname" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
           - name: JAVA_OPTS
             value: "{{ .Values.javaOptions }} -Dspring.config.additional-location=/opt/gitflic/config/application.properties"
+          {{- if .Values.db.secretName }}
+          - name: POSTGRES_PASS
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.db.secretName }}
+                key: "postgres-user-password"
+          {{- else }}
+          - name: POSTGRES_PASS
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "gitflic.fullname" . }}-db-user
+                key: "postgres-user-password"
+          {{- end }}
         ports:
           - name: http
             containerPort: 8080
@@ -52,22 +65,22 @@ spec:
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
-        - name: repoDir
+        - name: repo-dir
           mountPath: "/opt/gitflic/var/repo/"
-        - name: imageDir
+        - name: image-dir
           mountPath: "/opt/gitflic/var/img/"
-        - name: releasesDir
+        - name: releases-dir
           mountPath: "/opt/gitflic/var/releases/"
-        - name: cicdDir
+        - name: cicd-dir
           mountPath: "/opt/gitflic/var/cicd/"
-        - name: registryDir
+        - name: registry-dir
           mountPath: "/opt/gitflic/var/registry/"
-        - name: certsDir
+        - name: certs-dir
           mountPath: "/opt/gitflic/var/cert/"
-        - name: sshKey
+        - name: ssh-key
           mountPath: "/opt/gitflic/var/cert/key.pem"
           subPath: "key.pem"
-        - name: configFile
+        - name: config-file
           mountPath: "/opt/gitflic/config/application.properties"
           subPath: "application.properties"
       {{- with .Values.nodeSelector }}
@@ -83,15 +96,15 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: sshKey
+        - name: ssh-key
           secret:
             secretName: {{ .Values.volumes.sshKey.secretName }}
-        - name: configFile
+        - name: config-file
           configMap:
             name: {{ include "gitflic.fullname" . }}
   volumeClaimTemplates:
   - metadata:
-      name: repoDir
+      name: repo-dir
     spec:
       accessModes:
       - {{ .Values.volumes.repoDir.accessModes }}
@@ -102,7 +115,7 @@ spec:
         requests:
           storage: {{ .Values.volumes.repoDir.storage }}
   - metadata:
-      name: imageDir
+      name: image-dir
     spec:
       accessModes:
         - {{ .Values.volumes.imageDir.accessModes }}
@@ -113,7 +126,7 @@ spec:
         requests:
           storage: {{ .Values.volumes.imageDir.storage }}
   - metadata:
-      name: releasesDir
+      name: releases-dir
     spec:
       accessModes:
         - {{ .Values.volumes.releasesDir.accessModes }}
@@ -124,7 +137,7 @@ spec:
         requests:
           storage: {{ .Values.volumes.releasesDir.storage }}
   - metadata:
-      name: certsDir
+      name: certs-dir
     spec:
       accessModes:
         - {{ .Values.volumes.certsDir.accessModes }}
@@ -135,7 +148,7 @@ spec:
         requests:
           storage: {{ .Values.volumes.certsDir.storage }}
   - metadata:
-      name: cicdDir
+      name: cicd-dir
     spec:
       accessModes:
         - {{ .Values.volumes.cicdDir.accessModes }}
@@ -146,7 +159,7 @@ spec:
         requests:
           storage: {{ .Values.volumes.cicdDir.storage }}
   - metadata:
-      name: registryDir
+      name: registry-dir
     spec:
       accessModes:
         - {{ .Values.volumes.registryDir.accessModes }}

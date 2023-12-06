@@ -22,10 +22,16 @@ data:
     # ======= Конфигурация базы данных =======
     # Обязательный параметр.
     # Необходимо указать url для подключения к базе данных и пользователя с паролем
-    # TODO:
-    spring.datasource.url=jdbc:postgresql://localhost/gitflic
-    spring.datasource.username=postgres
-    spring.datasource.password=postgres
+    {{- if .Values.postgresql.buildin }}
+    # Builtin postgresql
+    spring.datasource.url=jdbc:postgresql://{{ .Release.Name }}-postgresql-primary/{{ .Values.db.postgresDb }}
+    {{- else }}
+    # External postgresql
+    spring.datasource.url=jdbc:postgresql://{{ .Values.db.postgresHost }}:{{ .Values.db.postgresPort }}/{{ .Values.db.postgresDb }}
+    {{- end }}
+    spring.datasource.username={{ .Values.db.postgresUser }}
+    # Пароль передается через переменные среды окружения контейнера
+    spring.datasource.password=${POSTGRES_PASS}
     # ======= Настройки директорий, используемых для работы приложения =======
     # Обязательный параметр. Раскомментируйте все параметры и создайте для них директории. Пример команд, для создания необходимых директорий
     # mkdir -p /opt/gitflic/var/cert; cd /opt/gitflic/var; mkdir repo img releases cicd registry
@@ -45,7 +51,16 @@ data:
     # ======= Настройка SMTP сервера =======
     # Обязательный параметр. Вы можете указать некорректные параметры на время теста.
     # Без настройки smtp сервера приложение не сможет отправлять письма как минимум для регистрации пользователей.
-    # TODO:
+    {{- if .Values.mailRelay.builtin }}
+    # Конфигурация встроенного почтового ralay
+    spring.mail.host={{ include "gitflic.fullname" . }}-mr
+    spring.mail.port=25
+    spring.mail.properties.mail.smtp.auth=false
+    spring.mail.properties.mail.smtp.ssl.enable=false
+    spring.mail.username=test@test.net
+    spring.mail.password=Superp@$$word
+    {{- else }}
+    # Конфигурация внешнего почтового relay
     spring.mail.host=smtp.test.net
     spring.mail.port=587
     spring.mail.username=test@test.net
@@ -57,16 +72,29 @@ data:
     {{- if .Values.config.email.auth }}
     spring.mail.properties.mail.smtp.auth=true
     {{- end }}
+    {{- end }}
     # ======= Конфигурация Redis =======
     # Если Redis настроен по умолчанию, то можно не переопределять параметры.
     # Используется в onpremise и enterprise сборках.
     # Необходимо указать хост, порт (если редис запущен не на стандартном порте 6379),
     # юзернейм и пароль
-    # TODO:
-    #spring.redis.host=localhost
-    #spring.redis.port=6379
+    {{- if .Values.redis.buildin }}
+    spring.redis.host={{ .Release.Name }}-redis-master
+    spring.redis.port=6379
     #spring.redis.username=
-    #spring.redis.password=
+    {{- if and .Values.redis.auth.enabled .Values.redis.auth.password }}
+    spring.redis.password={{ .Values.redis.auth.password }}
+    {{- end }}
+    {{- else }}
+    spring.redis.host={{ .Values.redis.externalRedis.host }}
+    spring.redis.port={{ .Values.redis.externalRedis.port }}
+    {{- if .Values.redis.externalRedis.username }}
+    spring.redis.username={{ .Values.redis.externalRedis.username }}
+    {{- end }}
+    {{- if .Values.redis.externalRedis.password }}
+    spring.redis.password={{ .Values.redis.externalRedis.password }}
+    {{- end }}
+    {{- end }}
     # При необходимости можно указать номер базы данных.
     # Если вы запускаете несколько инстансов то у всех инстансов должен быть один и тот же номер базы.
     #spring.redis.database=0
@@ -112,8 +140,15 @@ data:
     # Например данное свойство для SaaS варианта нашего сервиса имеет значение gitflic.base.url=https://gitflic.ru
     # При отсутствии протокола передачи данных в gitflic.base.url по умолчанию будет использоваться https://
     # Для 443 или 80 порта, порт указывать не нужно, например gitflic.base.url=https://gitflic.ru
-    # TODO:
-    gitflic.base.url=http://localhost:8080
+    {{- $proto := "" -}}
+    {{- if .Values.ingress.tls }}
+    {{- $proto = "https" }}
+    {{- else }}
+    {{- $proto = "http" }}
+    {{- end }}
+    {{- with (first .Values.ingress.hosts) }}
+    gitflic.base.url={{ $proto }}://{{ .host }}
+    {{- end }}
     # Обязательный параметр.
     # Свойство gitflic.transport.url должно содержать в себе домен или хост, по которому осуществляется транспорт данных
     # в git репозиторий. Стандартное значение для данного параметра localhost.
@@ -126,8 +161,9 @@ data:
     # Плюс если указать в значении урла порт (например localhost:8080), то для ssh транспорта будет сгенерирован
     # урл git@localhost:vault/zookeeper.git без указанного порта
     # Для 443 или 80 порта, порт указывать не нужно, например gitflic.transport.url=https://gitflic.ru
-    # TODO:
-    gitflic.transport.url=http://localhost:8080
+    {{- with (first .Values.ingress.hosts) }}
+    gitflic.transport.url={{ $proto }}://{{ .host }}
+    {{- end }}
     # Параметр gitflic.defaultPackSize ограничивает максимальный размер пакета, который гит может отправить во время пуша в
     # репозиторий. Стандартное значение 100MB. Данное поле имеет тип String. Возможны следующие суффиксы KB, MB, GB, TB.
     gitflic.defaultPackSize={{ .Values.config.defaultPackSize }}

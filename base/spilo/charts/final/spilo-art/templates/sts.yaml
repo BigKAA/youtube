@@ -70,7 +70,8 @@ spec:
         - name: KUBERNETES_ROLE_LABEL
           value: {{ .Values.spilo.env.kubernetesRoleLabel }}
         - name: KUBERNETES_LABELS
-          value: '{{ toJson .Values.spilo.env.kubernetesLabels }}'
+          value: '{{ include "spilo-art.labels" . | fromYaml | toJson }}'
+{{/*          value: '{{ toJson .Values.spilo.env.kubernetesLabels }}'*/}}
         - name: SPILO_CONFIGURATION
           value: | ## https://github.com/zalando/patroni#yaml-configuration
             {{- .Values.spilo.env.configuration | nindent 12 }}

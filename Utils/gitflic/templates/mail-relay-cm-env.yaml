@@ -1,0 +1,12 @@
+{{- if .Values.mailRelay.builtin }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "gitflic.fullname" . }}-mr-env
+data:
+  POSTFIX_SMTP_HELO_NAME: "{{ .Values.mailRelay.config.smtpHelloName }}"
+  POSTFIX_MYORIGIN: "{{ .Values.mailRelay.config.myOrigin }}"
+  POSTFIX_MYHOSTNAME: "{{ .Values.mailRelay.config.myHostName }}"
+  KUBER_NETWORK: "{{ .Values.mailRelay.config.kubernetesNetwork }}"
+{{- end }}
