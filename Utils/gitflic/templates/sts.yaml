@@ -77,9 +77,11 @@ spec:
           mountPath: "/opt/gitflic/var/registry/"
         - name: certs-dir
           mountPath: "/opt/gitflic/var/cert/"
+        {{- if .Values.serviceSSH.enable }}
         - name: ssh-key
           mountPath: "/opt/gitflic/var/cert/key.pem"
           subPath: "key.pem"
+        {{- end }}
         - name: config-file
           mountPath: "/opt/gitflic/config/application.properties"
           subPath: "application.properties"
@@ -96,9 +98,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if .Values.serviceSSH.enable }}
         - name: ssh-key
           secret:
             secretName: {{ .Values.volumes.sshKey.secretName }}
+        {{- end }}
         - name: config-file
           configMap:
             name: {{ include "gitflic.fullname" . }}
