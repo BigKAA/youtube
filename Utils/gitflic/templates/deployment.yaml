@@ -1,6 +1,6 @@
 {{- if eq .Values.type "StatefullSet" -}}
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: {{ include "gitflic.fullname" . }}
   labels:
@@ -9,7 +9,6 @@ spec:
   selector:
     matchLabels:
       {{- include "gitflic.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "gitflic.fullname" . }}-headless
   replicas: {{ .Values.replicas }}
   template:
     metadata:
@@ -107,71 +106,22 @@ spec:
         - name: config-file
           configMap:
             name: {{ include "gitflic.fullname" . }}
-  volumeClaimTemplates:
-  - metadata:
-      name: repo-dir
-    spec:
-      accessModes:
-      - {{ .Values.volumes.repoDir.accessModes }}
-      {{- if .Values.volumes.repoDir.storageClassName }}
-      storageClassName: {{ .Values.volumes.repoDir.storageClassName }}
-      {{- end }}
-      resources:
-        requests:
-          storage: {{ .Values.volumes.repoDir.storage }}
-  - metadata:
-      name: image-dir
-    spec:
-      accessModes:
-        - {{ .Values.volumes.imageDir.accessModes }}
-      {{- if .Values.volumes.imageDir.storageClassName }}
-      storageClassName: {{ .Values.volumes.imageDir.storageClassName }}
-      {{- end }}
-      resources:
-        requests:
-          storage: {{ .Values.volumes.imageDir.storage }}
-  - metadata:
-      name: releases-dir
-    spec:
-      accessModes:
-        - {{ .Values.volumes.releasesDir.accessModes }}
-      {{- if .Values.volumes.releasesDir.storageClassName }}
-      storageClassName: {{ .Values.volumes.releasesDir.storageClassName }}
-      {{- end }}
-      resources:
-        requests:
-          storage: {{ .Values.volumes.releasesDir.storage }}
-  - metadata:
-      name: certs-dir
-    spec:
-      accessModes:
-        - {{ .Values.volumes.certsDir.accessModes }}
-      {{- if .Values.volumes.certsDir.storageClassName }}
-      storageClassName: {{ .Values.volumes.certsDir.storageClassName }}
-      {{- end }}
-      resources:
-        requests:
-          storage: {{ .Values.volumes.certsDir.storage }}
-  - metadata:
-      name: cicd-dir
-    spec:
-      accessModes:
-        - {{ .Values.volumes.cicdDir.accessModes }}
-      {{- if .Values.volumes.cicdDir.storageClassName }}
-      storageClassName: {{ .Values.volumes.cicdDir.storageClassName }}
-      {{- end }}
-      resources:
-        requests:
-          storage: {{ .Values.volumes.cicdDir.storage }}
-  - metadata:
-      name: registry-dir
-    spec:
-      accessModes:
-        - {{ .Values.volumes.registryDir.accessModes }}
-      {{- if .Values.volumes.registryDir.storageClassName }}
-      storageClassName: {{ .Values.volumes.registryDir.storageClassName }}
-      {{- end }}
-      resources:
-        requests:
-          storage: {{ .Values.volumes.registryDir.storage }}
-{{- end -}}
+        - name: repo-dir
+          persistentVolumeClaim: 
+            claimName: {{ include "gitflic.fullname" . }}-repo
+        - name: image-dir
+          persistentVolumeClaim: 
+            claimName: {{ include "gitflic.fullname" . }}-image
+        - name: releases-dir
+          persistentVolumeClaim: 
+            claimName: {{ include "gitflic.fullname" . }}-releases
+        - name: certs-dir
+          persistentVolumeClaim: 
+            claimName: {{ include "gitflic.fullname" . }}-certs
+        - name: cicd-dir
+          persistentVolumeClaim: 
+            claimName: {{ include "gitflic.fullname" . }}-cicd
+        - name: registry-dir
+          persistentVolumeClaim: 
+            claimName: {{ include "gitflic.fullname" . }}-registry
+{{- end }}
