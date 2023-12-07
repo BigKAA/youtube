@@ -13,7 +13,43 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+# Тип деплоя
+# Все зависит от типа диска, который будет подключаться к контейнеру.
+# Если диск не поддерживает режим ReadWriteMany, тогда только одна replica и StatefullSet
+# Если поддерживает - то Deployment
+type: StatefullSet
 replicas: 1
+
+volumes:
+  repoDir:
+    storageClassName: "managed-nfs-storage"
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  imageDir:
+    storageClassName: "managed-nfs-storage"
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  releasesDir:
+    storageClassName: "managed-nfs-storage"
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  cicdDir:
+    storageClassName: "managed-nfs-storage"
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  registryDir:
+    storageClassName: "managed-nfs-storage"
+    accessModes: "ReadWriteOnce"
+    storage: 1Gi
+  sshKey:
+    # ssh key Должен находиться в заранее созданном secret
+    # ssh-keygen -t ed25519 -f key.pem
+    # kubectl -n NAMESPACE create secret generic ssh-key --from-file=key.pem --from-file=key.pem.pub
+    secretName: ssh-key
+  certsDir:
+    storageClassName: "managed-nfs-storage"
+    accessModes: "ReadWriteOnce"
+    storage: 50Mi
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -89,37 +125,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-volumes:
-  repoDir:
-    storageClassName: "managed-nfs-storage"
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  imageDir:
-    storageClassName: "managed-nfs-storage"
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  releasesDir:
-    storageClassName: "managed-nfs-storage"
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  cicdDir:
-    storageClassName: "managed-nfs-storage"
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  registryDir:
-    storageClassName: "managed-nfs-storage"
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  sshKey:
-    # ssh key Должен находиться в заранее созданном secret
-    # ssh-keygen -t ed25519 -f key.pem
-    # kubectl -n NAMESPACE create secret generic ssh-key --from-file=key.pem --from-file=key.pem.pub
-    secretName: ssh-key
-  certsDir:
-    storageClassName: "managed-nfs-storage"
-    accessModes: "ReadWriteOnce"
-    storage: 50Mi
 
 config:
   # С помощью свойств spring.servlet.multipart.maxFileSize и spring.servlet.multipart.maxRequestSize можно ограничить
