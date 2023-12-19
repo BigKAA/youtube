@@ -1,17 +1,15 @@
-{{- if eq .Values.type "StatefullSet" -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "gitflic.fullname" . }}-headless
+  name: {{ include "gitflic.fullname" . }}
   labels:
     {{- include "gitflic.labels" . | nindent 4 }}
 spec:
-  clusterIP: "None"
+  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.serviceHeadless.port }}
+    - port: {{ .Values.service.port }}
       targetPort: http
       protocol: TCP
       name: http
   selector:
     {{- include "gitflic.selectorLabels" . | nindent 4 }}
-{{- end }}

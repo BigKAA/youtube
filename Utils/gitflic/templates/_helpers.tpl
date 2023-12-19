@@ -51,7 +51,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Mail Relay common labels
+Common mail relay labels
 */}}
 {{- define "gitflic.mailRelayLabels" -}}
 helm.sh/chart: {{ include "gitflic.chart" . }}
@@ -63,10 +63,10 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Mail relay selector labels
+Selector mail relay labels
 */}}
 {{- define "gitflic.mailRelaySelectorLabels" -}}
-app.kubernetes.io/name: {{ include "gitflic.name" . }}-mail-relay
+app.kubernetes.io/name: {{ include "gitflic.name" . }}-mr
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 

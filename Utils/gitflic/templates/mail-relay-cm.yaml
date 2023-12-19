@@ -3,7 +3,21 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: {{ include "gitflic.fullname" . }}-mr-env
+  labels:
+    {{- include "gitflic.mailRelayLabels" . | nindent 4 }}
+data:
+  POSTFIX_SMTP_HELO_NAME: {{ .Values.mailRelay.postfix.smtpHeloName }}
+  POSTFIX_MYORIGIN: {{ .Values.mailRelay.postfix.myOrigin }}
+  POSTFIX_MYHOSTNAME: {{ .Values.mailRelay.postfix.myHostname }}
+  KUBER_NETWORK: {{ .Values.mailRelay.postfix.kuberNetwork }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: {{ include "gitflic.fullname" . }}-mr
+  labels:
+    {{- include "gitflic.mailRelayLabels" . | nindent 4 }}
 data:
   main.cf.tmpl: |
     maillog_file = /dev/stdout

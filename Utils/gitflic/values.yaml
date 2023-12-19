@@ -2,204 +2,174 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-image:
-  # Внимание! Этого контейнера не существует!!! Подставьте свой!!!
-  repository: bigkaa/gitflic
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
-# Тип деплоя
-# Все зависит от типа диска, который будет подключаться к контейнеру.
-# Если диск не поддерживает режим ReadWriteMany, тогда только одна replica и StatefullSet
-# Если поддерживает - то Deployment
-type: StatefullSet
-replicas: 1
-
-volumes:
-  repoDir:
-    storageClassName: ""
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  imageDir:
-    storageClassName: ""
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  releasesDir:
-    storageClassName: ""
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  cicdDir:
-    storageClassName: ""
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  registryDir:
-    storageClassName: ""
-    accessModes: "ReadWriteOnce"
-    storage: 1Gi
-  sshKey:
-    # ssh key Должен находиться в заранее созданном secret
-    # ssh-keygen -t ed25519 -f key.pem
-    # kubectl -n NAMESPACE create secret generic sshKey --from-file=key.pem --from-file=key.pem.pub
-    secretName: sshKey
-  certsDir:
-    storageClassName: ""
-    accessModes: "ReadWriteOnce"
-    storage: 50Mi
-
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: false
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-serviceHeadless:
-  port: 80
-
-# Если ingress не используется - имя хоста, передаваемое приложением клиентам
-# по ссылкам все равно должно определяться в ingress.hosts[0].host
-# Протокол http или https определяется из наличия значений в массиве ingress.tls
-serviceSSH:
-  enable: false
-  port: 2222
-  # Services type: NodePort or LoadBalancer
-  type: NodePort
-  # Для сервиса типа NodePort - это обязательный параметр
-  nodePort: "31222"
-  name: ""
-  # TODO: add LoadBalancer parameters
-
-# Если ingress не используется - имя хоста, передаваемое приложением клиентам
-# по ссылкам все равно должно определяться в ingress.hosts[0].host
-# Протокол http или https определяется из наличия значений в массиве ingress.tls
-service:
-  # Services type: ClusterIP, NodePort or LoadBalancer
-  type: ClusterIP
-  port: 80
-  name: ""
-  nodePort: ""
-  # TODO: add LoadBalancer parameters
-
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
-javaOptions: "-Xmx4g -Xms4g"
-
-resources:
-  limits:
-    cpu: 2000m
-    memory: 4Gi
-  requests:
-    cpu: 2000m
-    memory: 4Gi
-
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+#replicaCount: 1
+#
+#image:
+#  repository: nginx
+#  pullPolicy: IfNotPresent
+#  # Overrides the image tag whose default is the chart appVersion.
+#  tag: ""
+#
+#imagePullSecrets: []
+#nameOverride: ""
+#fullnameOverride: ""
+#
+#serviceAccount:
+#  # Specifies whether a service account should be created
+#  create: true
+#  # Annotations to add to the service account
+#  annotations: {}
+#  # The name of the service account to use.
+#  # If not set and create is true, a name is generated using the fullname template
+#  name: ""
+#
+#podAnnotations: {}
+#
+#podSecurityContext: {}
+#  # fsGroup: 2000
+#
+#securityContext: {}
+#  # capabilities:
+#  #   drop:
+#  #   - ALL
+#  # readOnlyRootFilesystem: true
+#  # runAsNonRoot: true
+#  # runAsUser: 1000
+#
+#service:
+#  type: ClusterIP
+#  port: 80
+#
+#ingress:
+#  enabled: false
+#  className: ""
+#  annotations: {}
+#    # kubernetes.io/ingress.class: nginx
+#    # kubernetes.io/tls-acme: "true"
+#  hosts:
+#    - host: chart-example.local
+#      paths:
+#        - path: /
+#          pathType: ImplementationSpecific
+#  tls: []
+#  #  - secretName: chart-example-tls
+#  #    hosts:
+#  #      - chart-example.local
+#
+#resources: {}
+#  # We usually recommend not to specify default resources and to leave this as a conscious
+#  # choice for the user. This also increases chances charts run on environments with little
+#  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+#  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+#  # limits:
+#  #   cpu: 100m
+#  #   memory: 128Mi
+#  # requests:
+#  #   cpu: 100m
+#  #   memory: 128Mi
+#
+#autoscaling:
+#  enabled: false
+#  minReplicas: 1
+#  maxReplicas: 100
+#  targetCPUUtilizationPercentage: 80
+#  # targetMemoryUtilizationPercentage: 80
+#
+#nodeSelector: {}
+#
+#tolerations: []
+#
+#affinity: {}
 
 config:
-  # С помощью свойств spring.servlet.multipart.maxFileSize и spring.servlet.multipart.maxRequestSize можно ограничить
-  # как размер загружаемых файлов в формах и запросах api, так и размер самого запроса.
-  # Стандартное значение для обоих свойств 500MB
   multipart:
-    maxFileSize: 500MB
-    maxRequestSize: 500MB
-  email:
-    # TODO: secret
-    secretName: ""
-    host: "smtp.test.net"
-    port: "587"
-    username: "test@test.net"
-    password: "Superp@$$word"
-    sslEnable: false
-    auth: false
-  # Параметр gitflic.defaultPackSize ограничивает максимальный размер пакета, который гит может отправить во время пуша в
-  # репозиторий. Стандартное значение 100MB. Данное поле имеет тип String. Возможны следующие суффиксы KB, MB, GB, TB.
-  defaultPackSize: 100MB
-  # Свойство gitflic.limitPackSize используется для включения и отключения механизма ограничения максимального размера
-  # пакета при пуше. Если данный параметр имеет значение true, то настройка конкретного проекта происходит через настройки
-  # компании в администраторской панели. Стандартное значение false.
+    maxFileSize: "500MB"
+    maxRequestSize: "500MB"
+  defaultPackSize: "100MB"
   limitPackSize: false
-  # Свойство gitflic.limitProjectSize используется для включения и отключения механизма ограничения максимального размера
-  # репозитория. Если данное значение имеет значение true, то настройка конкретного проекта происходит через настройки проекта
-  # в панеле администрирования. Стандартное значение false.
   limitProjectSize: false
-  log:
-    # Настройки название и пути файла логов
-    # Свойство logging.file.name должно содержать в себе название файла. Стандартное значение server.log.
-    # Название файла может содержать в себе как относительный путь к директории из которой происходит запуска приложения
-    # так и точный путь, если он начинается с /
-    # Обратите внимание, что на каждый запущенный инстанс можно указать свой файл логов, в ином случае будет использован один
-    # файл для всех инстансов
-    fileName: /dev/stdout
+  logging:
+    file:
+      name: "stdout"
+      path: "/dev/"
     level: INFO
 
-# Почтовый сервер для пересылки почты.
 mailRelay:
-  builtin: false
-  image: "bigkaa/mail-relay:0.0.1"
+  builtin: true
+  # global parameters
+  sender:
+    name: "Gitflic Admin"
+    email: "admin@gitflic.kryukov.local"
+  mailDebug: false
+  # external mail relay
+  external:
+    host: "mail.local"
+    port: "25"
+    smtp:
+      auth: true
+      ssl: false
+    user: "user@mail.local"
+    password: "passw0rd"
+  # TODO: добавить работу с Secrets
+  # built in mail relay parameters
+  postfix:
+    smtpHeloName: "gitflic.kryukov.local"
+    myOrigin: "gitflic.kryukov.local"
+    myHostname: "gitflic.kryukov.local"
+    kuberNetwork: "10.233.0.0/16"
+  enableNetworkPolicy: true
+  image: "bigkaa/mail-relay"
+  tag: "0.0.1"
   imagePullPolicy: IfNotPresent
-  imagePullSecrets: []
-  config:
-    smtpHelloName: "gitlab.kryukov.local"
-    myOrigin: "gitlab.kryukov.local"
-    myHostName: "gitlab.kryukov.local"
-    kubernetesNetwork: "10.233.0.0/16"
-  resources:
-    limits:
-      cpu: "0.5"
-      memory: "500Mi"
-    requests:
-      cpu: "0.2"
-      memory: "200Mi"
+  resources: {}
+  #  limits:
+  #    cpu: "0.5"
+  #    memory: "500Mi"
+  #  requests:
+  #    cpu: "0.2"
+  #    memory: "200Mi"
   nodeSelector: {}
   tolerations: []
   affinity: {}
-  enableNetworkPolicy: true
 
-# Конфигурация базы данных
-db:
-  # Host & Port только для внешней базы
-  postgresHost: "192.168.0.1"
-  postgresPort: "5432"
+redis:
+  builtin: true
+  # Конфигурация внешнего Redis
+  externalRedis:
+    host: "192.168.0.1"
+    port: "6379"
+    # user: "gitflic"
+    user: ""
+    # password: "passw0rd"
+    password: ""
+    # database: "0"
+    database: ""
+    ssl: false
+  # Конфигурация встроенного Redis
+  global:
+    storageClass: ""
+  auth:
+    enabled: false
+    password: "PASSW0RD"
+  master:
+    count: 1
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 1Gi
+  replica:
+    replicaCount: 1
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 1Gi
+  volumePermissions:
+    enabled: true
 
-  postgresDb: "gitflic"
+postgresql:
+  builtin: true
+  # Общие параметры.
+  postgresDBName: "gitflic"
   postgresUser: "gitflic"
   # Secret создаваемый в ручную.
   # ---
@@ -216,75 +186,46 @@ db:
   # Если Secret не определён, и пароль явно не задан в следующем параметре,
   # Secret с паролем генерируется автоматически.
   postgresPassword: ""
-  # Первоначальная инициализация базы данных. Только для строенного postgresql!!!
-  initJob:
+  # Параметры внешней базы данных.
+  externalDB:
+    postgresHost: "192.168.0.1"
+    postgresPort: "5432"
+  # Параметры встроенной базы данных.
+  jobInitDB:
     image: postgres
-    tag: 15.5-alpine3.18
+    tag: 12.17-alpine3.19
     imagePullPolicy: IfNotPresent
-
-# Buildin Postgresql cluster
-postgresql:
-  buildin: true
+  global:
+    storageClass: ""
+  clusterDomain: "cluster.local"
   image:
     tag: 12.17.0-debian-11-r16
-  clusterDomain: cluster.local
-  global:
-    storageClass: "managed-nfs-storage"
   auth:
     postgresPassword: "password"
   architecture: replication
-  volumePermissions:
-    enabled: true
-  replication:
-    applicationName: art_base
   shmVolume:
     sizeLimit: "1Gi"
   primary:
     resources:
       limits:
-        memory: 1Gi
-        cpu: 1000m
+        memory: "1Gi"
+        cpu: "1000m"
       requests:
-        memory: 256Mi
-        cpu: 250m
+        memory: "1Gi"
+        cpu: "1000m"
     persistence:
       enabled: true
-      storageClass: "managed-nfs-storage"
-      size: 2Gi
+      storageClass: ""
+      size: "1Gi"
   readReplicas:
-    replicaCount: 1
     resources:
       limits:
-        memory: 1Gi
-        cpu: 1000m
+        memory: "1Gi"
+        cpu: "1000m"
       requests:
-        memory: 256Mi
-        cpu: 250m
+        memory: "1Gi"
+        cpu: "1000m"
     persistence:
       enabled: true
-      storageClass: "managed-nfs-storage"
-      size: 2Gi
-
-redis:
-  # Включает или выключает встроенный чарт редис
-  buildin: true
-  # Если используется внешний редис, то следует указать параметры подключения тут:
-  externalRedis:
-    host: "192.168.0.1"
-    port: "6379"
-    username: ""
-    password: ""
-  # Параметры встроенного чарта redis
-  global:
-    storageClass: ""
-  auth:
-    enabled: false
-    password: "PASSWO5RD"
-  master:
-    count: 1
-  replica:
-    replicaCount: 1
-  metrics:
-    enabled: false
-  volumePermissions:
-    enabled: true
+      storageClass: ""
+      size: "1Gi"

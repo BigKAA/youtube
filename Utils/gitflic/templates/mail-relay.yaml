@@ -18,7 +18,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "gitflic.fullname" . }}-mr
+  name: &application {{ include "gitflic.fullname" . }}-mr
   labels:
     {{- include "gitflic.mailRelayLabels" . | nindent 4 }}
 spec:
@@ -31,16 +31,11 @@ spec:
       labels:
         {{- include "gitflic.mailRelaySelectorLabels" . | nindent 8 }}
       annotations:
-        confChecksum: {{ include (print $.Template.BasePath "/mail-relay-cm.yaml") .  | sha256sum }}
-        confEnvChecksum: {{ include (print $.Template.BasePath "/mail-relay-cm-env.yaml") .  | sha256sum }}
+        confChecksumm: "{{ include ( print $.Template.BasePath "/mail-relay-cm.yaml") . | sha256sum }}"
     spec:
-      {{- with .Values.mailRelay.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       containers:
-        - name: {{ .Chart.Name }}-mr
-          image: {{ .Values.mailRelay.image }}
+        - name: *application
+          image: "{{ .Values.mailRelay.image }}:{{ .Values.mailRelay.tag }}"
           imagePullPolicy: {{ .Values.mailRelay.imagePullPolicy }}
           ports:
             - containerPort: 25
@@ -48,8 +43,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "gitflic.fullname" . }}-mr-env
+          {{- with .Values.mailRelay.resources }}
           resources:
-            {{- toYaml .Values.mailRelay.resources | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: template
               mountPath: /etc/postfix/main.cf.tmpl
@@ -58,16 +55,16 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.mailRelay.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       {{- with .Values.mailRelay.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mailRelay.affinity }}
+      affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
         - name: template
           configMap:
             name: {{ include "gitflic.fullname" . }}-mr
-  {{- end }}
+{{- end }}

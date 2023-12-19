@@ -1,4 +1,4 @@
-{{- if .Values.postgresql.buildin }}
+{{- if .Values.postgresql.builtin }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -15,17 +15,17 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: *job_name
-          image: "{{ .Values.db.initJob.image }}:{{ .Values.db.initJob.tag }}"
-          imagePullPolicy: {{ .Values.db.initJob.imagePullPolicy }}
+          image: {{ .Values.postgresql.jobInitDB.image }}:{{ .Values.postgresql.jobInitDB.tag }}
+          imagePullPolicy: {{ .Values.postgresql.jobInitDB.imagePullPolicy }}
           env:
             - name: PG_HOST
               value: "{{ .Release.Name }}-postgresql-primary"
             - name: PG_PORT
               value: "5432"
             - name: PG_DB
-              value: {{ .Values.db.postgresDb }}
+              value: {{ .Values.postgresql.postgresDBName }}
             - name: PG_USER
-              value: {{ .Values.db.postgresUser }}
+              value: {{ .Values.postgresql.postgresUser }}
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
@@ -59,6 +59,4 @@ spec:
               export PSQL_COMMAND="psql -w -U postgres -d $PG_DB -h $PG_HOST -p $PG_PORT"
               $PSQL_COMMAND -c '\dx' | grep -qw pgcrypto || \
               $PSQL_COMMAND -c "CREATE EXTENSION pgcrypto"
-              exit 0
-
 {{- end }}
