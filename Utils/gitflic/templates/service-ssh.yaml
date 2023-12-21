@@ -1,0 +1,24 @@
+{{- if .Values.serviceSSH.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "gitflic.fullname" . }}-ssh
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+  {{- with .Values.serviceSSH.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.serviceSSH.type }}
+  ports:
+    - port: {{ .Values.serviceSSH.port }}
+      targetPort: ssh
+      protocol: TCP
+      name: ssh
+      {{- if and (eq .Values.serviceSSH.type "NodePort") .Values.serviceSSH.nodePort }}
+      nodePort: {{ .Values.serviceSSH.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "gitflic.selectorLabels" . | nindent 4 }}
+{{- end }}

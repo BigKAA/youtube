@@ -1,0 +1,19 @@
+{{- if and .Values.mailRelay.builtin .Values.mailRelay.enableNetworkPolicy }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "gitflic.fullname" . }}.mail-relay
+  labels:
+    {{- include "gitflic.mailRelayLabels" . | nindent 4 }}
+spec:
+  policyTypes:
+  - Ingress
+  podSelector:
+    matchLabels:
+      {{- include "gitflic.mailRelaySelectorLabels" . | nindent 6 }}
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            {{- include "gitflic.selectorLabels" . | nindent 12 }}
+{{- end }}

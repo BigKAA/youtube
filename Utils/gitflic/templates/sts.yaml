@@ -1,0 +1,177 @@
+{{- if eq .Values.type "StatefulSet" }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "gitflic.fullname" . }}
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  serviceName: {{ include "gitflic.fullname" . }}-headless
+  selector:
+    matchLabels:
+      {{- include "gitflic.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        confChecksumm: "{{ include ( print $.Template.BasePath "/configmap.yaml") . | sha256sum }}"
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "gitflic.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gitflic.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: JAVA_OPTS
+              value: "{{ .Values.javaOptions }} -Dspring.config.additional-location=/opt/gitflic/config/application.properties"
+            - name: POSTGRES_PASS
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-user-password
+                  {{- if .Values.postgresql.secretName }}
+                  name: {{ .Values.postgresql.secretName }}
+                  {{- else }}
+                  name: {{ include "gitflic.fullname" . }}-db-user
+                  {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: ssh
+              containerPort: 22
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: "{{ .Values.volumes.repoDir.mountPath }}"
+              name: repo-dir
+            - mountPath: "{{ .Values.volumes.imageDir.mountPath }}"
+              name: image-dir
+            - mountPath: "{{ .Values.volumes.releasesDir.mountPath }}"
+              name: releases-dir
+            - mountPath: "{{ .Values.volumes.cicdDir.mountPath }}"
+              name: cicd-dir
+            - mountPath: "{{ .Values.volumes.certsDir.mountPath }}"
+              name: certs-dir
+            - mountPath: "{{ .Values.volumes.registryDir.mountPath }}"
+              name: registry-dir
+            - mountPath: "/opt/gitflic/config/application.properties"
+              name: config-file
+              subPath: "application.properties"
+            - mountPath: "/opt/gitflic/var/certs/key.pem"
+              subPath: "key.pem"
+              name: ssh-key
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config-file
+          configMap:
+            name: {{ include "gitflic.fullname" . }}
+        - name: ssh-key
+          secret:
+            secretName: {{ .Values.volumes.sshKey.secretName }}
+  volumeClaimTemplates:
+    - metadata:
+        name: repo-dir
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.volumes.repoDir.storageClassName }}
+        storageClassName: {{ .Values.volumes.repoDir.storageClassName }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.volumes.repoDir.storage }}
+    - metadata:
+        name: image-dir
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.volumes.imageDir.storageClassName }}
+        storageClassName: {{ .Values.volumes.imageDir.storageClassName }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.volumes.imageDir.storage }}
+    - metadata:
+        name: releases-dir
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.volumes.releasesDir.storageClassName }}
+        storageClassName: {{ .Values.volumes.releasesDir.storageClassName }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.volumes.releasesDir.storage }}
+    - metadata:
+        name: certs-dir
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.volumes.certsDir.storageClassName }}
+        storageClassName: {{ .Values.volumes.certsDir.storageClassName }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.volumes.certsDir.storage }}
+    - metadata:
+        name: cicd-dir
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.volumes.cicdDir.storageClassName }}
+        storageClassName: {{ .Values.volumes.cicdDir.storageClassName }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.volumes.cicdDir.storage }}
+    - metadata:
+        name: registry-dir
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.volumes.registryDir.storageClassName }}
+        storageClassName: {{ .Values.volumes.registryDir.storageClassName }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.volumes.registryDir.storage }}
+{{- end }}

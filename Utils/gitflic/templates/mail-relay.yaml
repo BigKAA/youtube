@@ -1,0 +1,70 @@
+{{- if .Values.mailRelay.builtin }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "gitflic.fullname" . }}-mr
+  labels:
+    {{- include "gitflic.mailRelayLabels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 25
+      name: smtp
+      targetPort: smtp
+  selector:
+    {{- include "gitflic.mailRelaySelectorLabels" . | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &application {{ include "gitflic.fullname" . }}-mr
+  labels:
+    {{- include "gitflic.mailRelayLabels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "gitflic.mailRelaySelectorLabels" . | nindent 6 }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{- include "gitflic.mailRelaySelectorLabels" . | nindent 8 }}
+      annotations:
+        confChecksumm: "{{ include ( print $.Template.BasePath "/mail-relay-cm.yaml") . | sha256sum }}"
+    spec:
+      containers:
+        - name: *application
+          image: "{{ .Values.mailRelay.image }}:{{ .Values.mailRelay.tag }}"
+          imagePullPolicy: {{ .Values.mailRelay.imagePullPolicy }}
+          ports:
+            - containerPort: 25
+              name: smtp
+          envFrom:
+            - configMapRef:
+                name: {{ include "gitflic.fullname" . }}-mr-env
+          {{- with .Values.mailRelay.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: template
+              mountPath: /etc/postfix/main.cf.tmpl
+              subPath: main.cf.tmpl
+      {{- with .Values.mailRelay.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mailRelay.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mailRelay.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: template
+          configMap:
+            name: {{ include "gitflic.fullname" . }}-mr
+{{- end }}

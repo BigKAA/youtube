@@ -1,0 +1,117 @@
+# Service types: NodePort, LoadBalancer
+serviceSSH:
+  enable: true
+  type: NodePort
+  port: 2022
+  nodePort: "32222"
+  # Пример конфигурации сервиса типа LoadBalancer MetalLB
+  annotations: {}
+  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
+
+ingress:
+  enabled: true
+  className: "system-ingress"
+  hosts:
+    - host: gitflic.kryukov.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+  requests:
+    cpu: 1000m
+    memory: 4Gi
+
+# Аргументы командной строки java приложения.
+# Параметры по умолчанию от разработчика приложения.
+javaOptions: "-Xms4g -Xmx4g"
+
+volumes:
+  repoDir:
+    storage: 1Gi
+    storageClassName: "managed-nfs-storage"
+  imageDir:
+    storage: 1Gi
+    storageClassName: "managed-nfs-storage"
+  releasesDir:
+    storage: 1Gi
+    storageClassName: "managed-nfs-storage"
+  cicdDir:
+    storage: 1Gi
+    storageClassName: "managed-nfs-storage"
+  certsDir:
+    storage: 50Mi
+    storageClassName: "managed-nfs-storage"
+  registryDir:
+    storage: 1Gi
+    storageClassName: "managed-nfs-storage"
+  sshKey:
+    # ssh key Должен находиться в заранее созданном secret
+    # ssh-keygen -t ed25519 -f key.pem
+    # kubectl -n NAMESPACE create secret generic ssh-key --from-file=key.pem --from-file=key.pem.pub
+    secretName: ssh-key
+
+
+config:
+  url:
+    base: "http://gitflic.kryukov.local"
+    transport: "gitflic.kryukov.local"
+
+mailRelay:
+  builtin: true
+
+redis:
+  builtin: true
+  # Конфигурация встроенного Redis
+  master:
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      size: 1Gi
+  replica:
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      size: 1Gi
+
+postgresql:
+  builtin: true
+  # Общие параметры.
+  postgresDBName: "gitflic"
+  postgresUser: "gitflic"
+  auth:
+    postgresPassword: "password"
+  architecture: replication
+  shmVolume:
+    sizeLimit: "1Gi"
+  primary:
+    resources:
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      size: "1Gi"
+  readReplicas:
+    resources:
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      size: "1Gi"

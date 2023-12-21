@@ -1,0 +1,303 @@
+# Default values for gitflic.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+# Тип развертывания зависит от того, какой volume используется при работе
+# с контейнером.
+# Если volume типа ReadWriteMany - Deployment
+# Если volume типа ReadWriteOnce - StatefulSet
+type: StatefulSet
+# В случе type: StatefulSet replicaCount всегда = 1
+replicaCount: 1
+
+image:
+  # Внимание, этот образ будет удален после того как сниму видео. Используйте свой образ контейнера.
+  repository: bigkaa/gitflic
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# Данный сервис необходим только для StatefulSet
+serviceHeadless:
+  port: 80
+
+# Service types: NodePort, LoadBalancer
+serviceSSH:
+  enable: false
+  type: NodePort
+  port: 2022
+  nodePort: ""
+  # Пример конфигурации сервиса типа LoadBalancer MetalLB
+  annotations: {}
+  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
+
+# Service types: ClusterIP, NodePort, LoadBalancer
+service:
+  type: ClusterIP
+  port: 80
+  nodePort: ""
+  # Пример конфигурации сервиса типа LoadBalancer MetalLB
+  annotations: {}
+  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  #limits:
+  #  cpu: 2000m
+  #  memory: 4Gi
+  #requests:
+  #  cpu: 1000m
+  #  memory: 4Gi
+
+# В случе type: StatefulSet этот параметр не работает.
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+livenessProbe: {}
+
+readinessProbe: {}
+
+# Аргументы командной строки java приложения.
+# Параметры по умолчанию от разработчика приложения.
+javaOptions: "-Xms4g -Xmx4g"
+
+volumes:
+  repoDir:
+    storage: 1Gi
+    storageClassName: ""
+    mountPath: "/opt/gitflic/var/repo/"
+  imageDir:
+    storage: 1Gi
+    storageClassName: ""
+    mountPath: "/opt/gitflic/var/img/"
+  releasesDir:
+    storage: 1Gi
+    storageClassName: ""
+    mountPath: "/opt/gitflic/var/releases/"
+  cicdDir:
+    storage: 1Gi
+    storageClassName: ""
+    mountPath: "/opt/gitflic/var/cicd/"
+  certsDir:
+    storage: 50Mi
+    storageClassName: ""
+    mountPath: "/opt/gitflic/var/certs/"
+  registryDir:
+    storage: 1Gi
+    storageClassName: ""
+    mountPath: "/opt/gitflic/var/registry/"
+  sshKey:
+    # ssh key Должен находиться в заранее созданном secret
+    # ssh-keygen -t ed25519 -f key.pem
+    # kubectl -n NAMESPACE create secret generic ssh-key --from-file=key.pem --from-file=key.pem.pub
+    secretName: ssh-key
+
+config:
+  url:
+    base: "http://localhost"
+    transport: "http://localhost"
+  multipart:
+    maxFileSize: "500MB"
+    maxRequestSize: "500MB"
+  defaultPackSize: "100MB"
+  limitPackSize: false
+  limitProjectSize: false
+  logging:
+    # Дублирование логов в файл.
+    file:
+      name: "/dev/null"
+    # OFF - логирование выключено.
+    # ERROR - показывает ошибки значительной важности, которые мешают нормальному выполнению программы.
+    # WARN - показывает предупреждения.
+    # INFO - показывает информационные сообщения, которые могут иметь смысл для конечных пользователей и системных администраторов, сопровождая ход работы приложения.
+    # DEBUG - показывает детальное отслеживание, используемое разработчиками приложений.
+    # ALL - вывод всех сообщений.
+    level: INFO
+
+mailRelay:
+  builtin: false
+  # global parameters
+  sender:
+    name: "Gitflic Admin"
+    email: "admin@gitflic.kryukov.local"
+  mailDebug: false
+  # external mail relay
+  external:
+    host: "mail.local"
+    port: "25"
+    smtp:
+      auth: true
+      ssl: false
+    user: "user@mail.local"
+    password: "passw0rd"
+  # TODO: добавить работу с Secrets
+  # built in mail relay parameters
+  postfix:
+    smtpHeloName: "gitflic.kryukov.local"
+    myOrigin: "gitflic.kryukov.local"
+    myHostname: "gitflic.kryukov.local"
+    kuberNetwork: "10.233.0.0/16"
+  enableNetworkPolicy: true
+  image: "bigkaa/mail-relay"
+  tag: "0.0.1"
+  imagePullPolicy: IfNotPresent
+  resources: {}
+  #  limits:
+  #    cpu: "0.5"
+  #    memory: "500Mi"
+  #  requests:
+  #    cpu: "0.2"
+  #    memory: "200Mi"
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+redis:
+  builtin: true
+  # Конфигурация внешнего Redis
+  externalRedis:
+    host: "192.168.0.1"
+    port: "6379"
+    # user: "gitflic"
+    user: ""
+    # password: "passw0rd"
+    password: ""
+    # database: "0"
+    database: ""
+    ssl: false
+  # Конфигурация встроенного Redis
+  global:
+    storageClass: ""
+  auth:
+    enabled: false
+    password: "PASSW0RD"
+  master:
+    count: 1
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 1Gi
+  replica:
+    replicaCount: 1
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 1Gi
+  volumePermissions:
+    enabled: true
+
+postgresql:
+  builtin: true
+  # Общие параметры.
+  postgresDBName: "gitflic"
+  postgresUser: "gitflic"
+  # Secret создаваемый в ручную.
+  # ---
+  # apiVersion: v1
+  # kind: Secret
+  # metadata:
+  #   name: secretName
+  # type: Opaque
+  # stringData:
+  #   postgres-user-password: password
+  # ...
+  # Если имя секрета определеноЮ пароль берется из этого сикрета
+  secretName: ""
+  # Если Secret не определён, и пароль явно не задан в следующем параметре,
+  # Secret с паролем генерируется автоматически.
+  postgresPassword: ""
+  # Параметры внешней базы данных.
+  externalDB:
+    postgresHost: "192.168.0.1"
+    postgresPort: "5432"
+  # Параметры встроенной базы данных.
+  jobInitDB:
+    image: postgres
+    tag: 12.17-alpine3.19
+    imagePullPolicy: IfNotPresent
+  global:
+    storageClass: ""
+  clusterDomain: "cluster.local"
+  image:
+    tag: 12.17.0-debian-11-r16
+  auth:
+    postgresPassword: "password"
+  architecture: replication
+  shmVolume:
+    sizeLimit: "1Gi"
+  primary:
+    resources:
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: "1Gi"
+  readReplicas:
+    resources:
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: "1Gi"

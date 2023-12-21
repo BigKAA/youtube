@@ -1,0 +1,146 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "gitflic.fullname" . }}
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+data:
+  application.properties: |
+    # ======= Конфигурация сервера =======
+    # Дефолтное значение порта 8080
+    server.port=8080
+    # Дефолтное значение адреса localhost
+    server.address=0.0.0.0
+    # При необходимости также можно указать порт, на котором будет запущен SSH сервер для работы
+    # SSH транспорта git. Дефолтное значение порта 22
+    ssh.server.port=22
+    # С помощью свойств spring.servlet.multipart.maxFileSize и spring.servlet.multipart.maxRequestSize можно ограничить
+    # как размер загружаемых файлов в формах и запросах api, так и размер самого запроса.
+    # Стандартное значение для обоих свойств 500MB
+    spring.servlet.multipart.maxFileSize={{ .Values.config.multipart.maxFileSize }}
+    spring.servlet.multipart.maxRequestSize={{ .Values.config.multipart.maxRequestSize }}
+    # ======= Конфигурация базы данных =======
+    {{- if .Values.postgresql.builtin }}
+    # Встроенный Postgresql
+    spring.datasource.url=jdbc:postgresql://{{ .Release.Name }}-postgresql-primary/{{ .Values.postgresql.postgresDBName }}
+    {{- else }}
+    # External Postgresql
+    spring.datasource.url=jdbc:postgresql://{{ .Values.postgresql.externalDB.postgresHost}}:{{ .Values.postgresql.externalDB.postgresPort}}/{{ .Values.postgresql.postgresDBName }}
+    {{- end }}
+    spring.datasource.username={{ .Values.postgresql.postgresUser }}
+    spring.datasource.password=${POSTGRES_PASS}
+    # ======= Конфигурация Redis =======
+    # Необходимо указать хост, порт (если редис запущен не на стандартном порте 6379),
+    # юзернейм и пароль
+    {{- if .Values.redis.builtin }}
+    spring.redis.host={{ .Release.Name }}-redis-master
+    spring.redis.port=6379
+    {{- if .Values.redis.auth.enabled }}
+    spring.redis.password={{ .Values.redis.auth.password }}
+    {{- end }}
+    {{- else }}
+    spring.redis.host={{ .Values.redis.externalRedis.host }}
+    spring.redis.port={{ .Values.redis.externalRedis.port }}
+    {{- if .Values.redis.externalRedis.user }}
+    spring.redis.username={{ .Values.redis.externalRedis.user }}
+    {{- end }}
+    {{- if .Values.redis.externalRedis.password }}
+    spring.redis.password={{ .Values.redis.externalRedis.password }}
+    {{- end }}
+    # При необходимости можно указать номер базы данных
+    {{- if .Values.redis.externalRedis.database }}
+    spring.redis.database={{ .Values.redis.externalRedis.database }}
+    {{- end }}
+    # Если редис находится не в локальном контуре, а обращаться к нему необходимо через https протокол,
+    # то возможно указать свойство spring.redis.ssl. Стандартное значение данного параметра false
+    {{- if .Values.redis.externalRedis.database }}
+    spring.redis.ssl=true
+    {{- end }}
+    {{- end }}
+    # Так же возможно указать полный URL для соединения с редисом.
+    # Если указан URL для соединения, то параметры host, port, и password будут перезаписаны из URL.
+    # Параметр user будет проигнорирован. Пример URL: redis://user:password@example.com:6379
+    #spring.redis.url=redis://user:redis@redis:6379
+    # ======= Настройки директорий, используемых для работы приложения =======
+    # Свойство repository.dir указывает папку, где должны храниться репозитории git,путь к директории должен заканчиваться на /
+    repository.dir={{ .Values.volumes.repoDir.mountPath }}
+    # Свойство image.upload.dir указывает папку, где должны храниться аватары и иные медиафайлы
+    image.upload.dir={{ .Values.volumes.imageDir.mountPath }}
+    # Свойство releases.upload.dir указывает папку, где должны хранится файлы, которые приложены к релизу на основе тегов git
+    releases.upload.dir={{ .Values.volumes.releasesDir.mountPath }}
+    # Параметр ssh.server.cert отвечает за путь к сертификату, который используется для ssh транспорта
+    ssh.server.cert={{ .Values.volumes.certsDir.mountPath }}key.pem
+    # CICD
+    cicd.pipeline.dir={{ .Values.volumes.cicdDir.mountPath }}
+    #Параметр gitflic.registry.package.dir отвечает за путь для файлов реестра пакетов
+    gitflic.registry.package.dir={{ .Values.volumes.registryDir.mountPath }}
+    # ======= Настройка SMTP сервера =======
+    # Данная настройка является обязательной для работы приложения.
+    # Без настройки smtp сервера приложение не сможет отправлять письма как минимум для регистрации пользователей
+    {{- if .Values.mailRelay.builtin }}
+    # Встроенный mail relay
+    spring.mail.host={{ include "gitflic.fullname" . }}-mr
+    spring.mail.port=25
+    spring.mail.properties.mail.smtp.auth=false
+    spring.mail.properties.mail.smtp.ssl.enable=false
+    spring.mail.username=test@test.local
+    spring.mail.password=passw0rd
+    {{- else }}
+    # Внешний mail relay
+    spring.mail.host={{ .Values.mailRelay.external.host }}
+    spring.mail.port={{ .Values.mailRelay.external.port }}
+    spring.mail.properties.mail.smtp.auth={{ .Values.mailRelay.external.smtp.auth }}
+    spring.mail.properties.mail.smtp.ssl.enable={{ .Values.mailRelay.external.smtp.ssl }}
+    spring.mail.username={{ .Values.mailRelay.external.user }}
+    spring.mail.password={{ .Values.mailRelay.external.password }}
+    {{- end }}
+    # Имя отправителя в письме
+    smtp.sender.name={{ .Values.mailRelay.sender.name }}
+    # От кого, должен совпадать с username
+    smtp.sender.email={{ .Values.mailRelay.sender.email }}
+    # Для дебага
+    spring.mail.properties.mail.debug={{ .Values.mailRelay.mailDebug }}
+    # ======= Общие свойства приложения =======
+    # Свойство gitflic.base.url должно содержать в себе домен или хост, на котором запущено приложение.
+    # Данное свойство используется при генерации ссылок для внешних источников, например для ссылок в письмах.
+    gitflic.base.url={{ .Values.config.url.base }}
+    # Свойство gitflic.transport.url должно содержать в себе домен или хост, по которому осуществляется транспорт данных
+    # в git репозиторий. Стандартное значение для данного параметра localhost.
+    # Данный параметр используется для генерации урла, который отображается на странице каждого проекта и приходит в данных
+    # в из методов API и в данных вебхуков.
+    # Есть некоторые нюансы в генерации урлов для ssh транспорта, так как порт, по которому осуществляется биндинг ssh сервера
+    # стандартный (22), но может быть изменен, то вариант урла (например) git@gitflic.ru:vault/zookeeper.git с нестандартными
+    # настройками работать не будет. В таком случае необходимо настроить прокси сервер (например HaProxy), для того
+    #  чтобы внешние обращения были перенаправлены на указанный в приложении порт.
+    # Плюс если указать в значении урла порт (например localhost:8080), то для ssh транспорта будет сгенерирован
+    # урл git@localhost:vault/zookeeper.git без указанного порта
+    gitflic.transport.url={{ .Values.config.url.transport }}
+    #Параметр gitflic.defaultPackSize ограничивает максимальный размер пакета, который гит может отправить во время пуша в
+    #репозиторий. Стандартное значение 100MB. Данное поле имеет тип String. Возможны следующие суффиксы KB, MB, GB, TB.
+    {{- if .Values.config.defaultPackSize }}
+    gitflic.defaultPackSize=100MB
+    {{- end }}
+    #Свойство gitflic.limitPackSize используется для включения и отключения механизма ограничения максимального размера
+    #пакета при пуше. Если данный параметр имеет значение true, то настройка конкретного проекта происходит через настройки
+    #компании в администраторской панели. Стандартное значение false.
+    {{- if .Values.config.limitPackSize }}
+    gitflic.limitPackSize=true
+    {{- end }}
+    #Свойство gitflic.limitProjectSize используется для включения и отключения механизма ограничения максимального размера
+    #репозитория. Если данное значение имеет значение true, то настройка конкретного проекта происходит через настройки проекта
+    #в панеле администрирования. Стандартное значение false.
+    {{- if .Values.config.limitProjectSize }}
+    gitflic.limitProjectSize=true
+    {{- end }}
+    # ======= Настройки логирования =======
+    # Настройки название и пути файла логов
+    # Свойтво logging.file.name должно содержать в себе название файла. Стандартное значение server.log.
+    # Название файла может содержать в себе как относительный путь к директории из которой происходит запуска приложения
+    # так и точный путь, если он начинается с /
+    # Обратите внимание, что на каждый запущенный инстанс можно указать свой файл логов, в ином случае будет использован один
+    # файл для всех инстансов
+    logging.file.name={{ .Values.config.logging.file.name }}
+    # Настройки уровня логирования
+    # Дефолтное значение INFO
+    logging.level.root={{ .Values.config.logging.level }}
+
