@@ -50,7 +50,7 @@ serviceHeadless:
 
 # Service types: NodePort, LoadBalancer
 serviceSSH:
-  enable: true
+  enable: false
   type: NodePort
   port: 2022
   nodePort: ""
@@ -60,7 +60,7 @@ serviceSSH:
 
 # Service types: ClusterIP, NodePort, LoadBalancer
 service:
-  type: NodePort
+  type: ClusterIP
   port: 80
   nodePort: ""
   # Пример конфигурации сервиса типа LoadBalancer MetalLB
@@ -68,7 +68,7 @@ service:
   #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
 
 ingress:
-  enabled: true
+  enabled: false
   className: ""
   annotations: {}
     # kubernetes.io/ingress.class: nginx
@@ -83,13 +83,13 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources:
-   limits:
-     cpu: 2000m
-     memory: 4Gi
-   requests:
-     cpu: 1000m
-     memory: 4Gi
+resources: {}
+  #limits:
+  #  cpu: 2000m
+  #  memory: 4Gi
+  #requests:
+  #  cpu: 1000m
+  #  memory: 4Gi
 
 # В случе type: StatefulSet этот параметр не работает.
 autoscaling:
@@ -110,34 +110,44 @@ livenessProbe: {}
 readinessProbe: {}
 
 # Аргументы командной строки java приложения.
+# Параметры по умолчанию от разработчика приложения.
 javaOptions: "-Xms4g -Xmx4g"
 
 volumes:
   repoDir:
     storage: 1Gi
     storageClassName: ""
+    mountPath: "/opt/gitflic/var/repo/"
   imageDir:
     storage: 1Gi
     storageClassName: ""
+    mountPath: "/opt/gitflic/var/img/"
   releasesDir:
     storage: 1Gi
     storageClassName: ""
+    mountPath: "/opt/gitflic/var/releases/"
   cicdDir:
     storage: 1Gi
     storageClassName: ""
+    mountPath: "/opt/gitflic/var/cicd/"
   certsDir:
-    storage: 1Gi
+    storage: 50Mi
     storageClassName: ""
+    mountPath: "/opt/gitflic/var/certs/"
   registryDir:
     storage: 1Gi
     storageClassName: ""
+    mountPath: "/opt/gitflic/var/registry/"
   sshKey:
     # ssh key Должен находиться в заранее созданном secret
     # ssh-keygen -t ed25519 -f key.pem
     # kubectl -n NAMESPACE create secret generic ssh-key --from-file=key.pem --from-file=key.pem.pub
-    secretName: sshKey
+    secretName: ssh-key
 
 config:
+  url:
+    base: "http://localhost"
+    transport: "http://localhost"
   multipart:
     maxFileSize: "500MB"
     maxRequestSize: "500MB"
@@ -145,13 +155,19 @@ config:
   limitPackSize: false
   limitProjectSize: false
   logging:
+    # Дублирование логов в файл.
     file:
-      name: "stdout"
-      path: "/dev/"
+      name: "/dev/null"
+    # OFF - логирование выключено.
+    # ERROR - показывает ошибки значительной важности, которые мешают нормальному выполнению программы.
+    # WARN - показывает предупреждения.
+    # INFO - показывает информационные сообщения, которые могут иметь смысл для конечных пользователей и системных администраторов, сопровождая ход работы приложения.
+    # DEBUG - показывает детальное отслеживание, используемое разработчиками приложений.
+    # ALL - вывод всех сообщений.
     level: INFO
 
 mailRelay:
-  builtin: true
+  builtin: false
   # global parameters
   sender:
     name: "Gitflic Admin"

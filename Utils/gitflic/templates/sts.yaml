@@ -13,10 +13,11 @@ spec:
       {{- include "gitflic.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        confChecksumm: "{{ include ( print $.Template.BasePath "/configmap.yaml") . | sha256sum }}"
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "gitflic.selectorLabels" . | nindent 8 }}
     spec:
@@ -69,17 +70,17 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - mountPath: "/opt/gitflic/var/repo/"
+            - mountPath: "{{ .Values.volumes.repoDir.mountPath }}"
               name: repo-dir
-            - mountPath: "/opt/gitflic/var/img/"
+            - mountPath: "{{ .Values.volumes.imageDir.mountPath }}"
               name: image-dir
-            - mountPath: "/opt/gitflic/var/releases/"
+            - mountPath: "{{ .Values.volumes.releasesDir.mountPath }}"
               name: releases-dir
-            - mountPath: "/opt/gitflic/var/cicd/"
+            - mountPath: "{{ .Values.volumes.cicdDir.mountPath }}"
               name: cicd-dir
-            - mountPath: "/opt/gitflic/var/certs/"
+            - mountPath: "{{ .Values.volumes.certsDir.mountPath }}"
               name: certs-dir
-            - mountPath: "/opt/gitflic/var/registry/"
+            - mountPath: "{{ .Values.volumes.registryDir.mountPath }}"
               name: registry-dir
             - mountPath: "/opt/gitflic/config/application.properties"
               name: config-file

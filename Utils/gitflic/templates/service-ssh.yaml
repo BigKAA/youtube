@@ -1,4 +1,4 @@
-{{- if .Values.serviceSSH }}
+{{- if .Values.serviceSSH.enable }}
 apiVersion: v1
 kind: Service
 metadata:

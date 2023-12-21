@@ -63,17 +63,17 @@ data:
     #spring.redis.url=redis://user:redis@redis:6379
     # ======= Настройки директорий, используемых для работы приложения =======
     # Свойство repository.dir указывает папку, где должны храниться репозитории git,путь к директории должен заканчиваться на /
-    repository.dir=${REPO_DIR}
+    repository.dir={{ .Values.volumes.repoDir.mountPath }}
     # Свойство image.upload.dir указывает папку, где должны храниться аватары и иные медиафайлы
-    image.upload.dir=${IMG_DIR}
+    image.upload.dir={{ .Values.volumes.imageDir.mountPath }}
     # Свойство releases.upload.dir указывает папку, где должны хранится файлы, которые приложены к релизу на основе тегов git
-    releases.upload.dir=${RELEASES_DIR}
+    releases.upload.dir={{ .Values.volumes.releasesDir.mountPath }}
     # Параметр ssh.server.cert отвечает за путь к сертификату, который используется для ssh транспорта
-    ssh.server.cert=${SSH_CERT}
+    ssh.server.cert={{ .Values.volumes.certsDir.mountPath }}key.pem
     # CICD
-    cicd.pipeline.dir=${CICD_DIR}
+    cicd.pipeline.dir={{ .Values.volumes.cicdDir.mountPath }}
     #Параметр gitflic.registry.package.dir отвечает за путь для файлов реестра пакетов
-    gitflic.registry.package.dir=${REG_PACK_DIR}
+    gitflic.registry.package.dir={{ .Values.volumes.registryDir.mountPath }}
     # ======= Настройка SMTP сервера =======
     # Данная настройка является обязательной для работы приложения.
     # Без настройки smtp сервера приложение не сможет отправлять письма как минимум для регистрации пользователей
@@ -103,7 +103,7 @@ data:
     # ======= Общие свойства приложения =======
     # Свойство gitflic.base.url должно содержать в себе домен или хост, на котором запущено приложение.
     # Данное свойство используется при генерации ссылок для внешних источников, например для ссылок в письмах.
-    gitflic.base.url=${GITFLIC_BASE_URL}
+    gitflic.base.url={{ .Values.config.url.base }}
     # Свойство gitflic.transport.url должно содержать в себе домен или хост, по которому осуществляется транспорт данных
     # в git репозиторий. Стандартное значение для данного параметра localhost.
     # Данный параметр используется для генерации урла, который отображается на странице каждого проекта и приходит в данных
@@ -114,7 +114,7 @@ data:
     #  чтобы внешние обращения были перенаправлены на указанный в приложении порт.
     # Плюс если указать в значении урла порт (например localhost:8080), то для ssh транспорта будет сгенерирован
     # урл git@localhost:vault/zookeeper.git без указанного порта
-    gitflic.transport.url=${GITFLIC_TRANSPORT_URL}
+    gitflic.transport.url={{ .Values.config.url.transport }}
     #Параметр gitflic.defaultPackSize ограничивает максимальный размер пакета, который гит может отправить во время пуша в
     #репозиторий. Стандартное значение 100MB. Данное поле имеет тип String. Возможны следующие суффиксы KB, MB, GB, TB.
     {{- if .Values.config.defaultPackSize }}
@@ -140,8 +140,6 @@ data:
     # Обратите внимание, что на каждый запущенный инстанс можно указать свой файл логов, в ином случае будет использован один
     # файл для всех инстансов
     logging.file.name={{ .Values.config.logging.file.name }}
-    # С помощью свойства logging.file.path можно указать директорию для файла логов.
-    logging.file.path={{ .Values.config.logging.file.path }}
     # Настройки уровня логирования
     # Дефолтное значение INFO
     logging.level.root={{ .Values.config.logging.level }}
