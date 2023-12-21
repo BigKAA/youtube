@@ -1,0 +1,128 @@
+{{- if eq .Values.type "Deployment" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gitflic.fullname" . }}
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gitflic.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gitflic.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gitflic.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: JAVA_OPTS
+              value: "{{ .Values.javaOptions }} -Dspring.config.additional-location=/opt/gitflic/config/application.properties"
+            - name: POSTGRES_PASS
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-user-password
+                  {{- if .Values.postgresql.secretName }}
+                  name: {{ .Values.postgresql.secretName }}
+                  {{- else }}
+                  name: {{ include "gitflic.fullname" . }}-db-user
+                  {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: ssh
+              containerPort: 22
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: "/opt/gitflic/var/repo/"
+              name: repo-dir
+            - mountPath: "/opt/gitflic/var/img/"
+              name: image-dir
+            - mountPath: "/opt/gitflic/var/releases/"
+              name: releases-dir
+            - mountPath: "/opt/gitflic/var/cicd/"
+              name: cicd-dir
+            - mountPath: "/opt/gitflic/var/certs/"
+              name: certs-dir
+            - mountPath: "/opt/gitflic/var/registry/"
+              name: registry-dir
+            - mountPath: "/opt/gitflic/config/application.properties"
+              name: config-file
+              subPath: "application.properties"
+            - mountPath: "/opt/gitflic/var/certs/key.pem"
+              subPath: "key.pem"
+              name: ssh-key
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: repo-dir
+          persistentVolumeClaim:
+            claimName: {{ include "gitflic.fullname" . }}-repo
+        - name: image-dir
+          persistentVolumeClaim:
+            claimName: {{ include "gitflic.fullname" . }}-image
+        - name: releases-dir
+          persistentVolumeClaim:
+            claimName: {{ include "gitflic.fullname" . }}-releases
+        - name: cicd-dir
+          persistentVolumeClaim:
+            claimName: {{ include "gitflic.fullname" . }}-cicd
+        - name: certs-dir
+          persistentVolumeClaim:
+            claimName: {{ include "gitflic.fullname" . }}-certs
+        - name: registry-dir
+          persistentVolumeClaim:
+            claimName: {{ include "gitflic.fullname" . }}-registry
+        - name: config-file
+          configMap:
+            name: {{ include "gitflic.fullname" . }}
+        - name: ssh-key
+          secret:
+            secretName: {{ .Values.volumes.sshKey.secretName }}
+{{- end }}

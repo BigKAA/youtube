@@ -2,84 +2,140 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-#replicaCount: 1
-#
-#image:
-#  repository: nginx
-#  pullPolicy: IfNotPresent
-#  # Overrides the image tag whose default is the chart appVersion.
-#  tag: ""
-#
-#imagePullSecrets: []
-#nameOverride: ""
-#fullnameOverride: ""
-#
-#serviceAccount:
-#  # Specifies whether a service account should be created
-#  create: true
-#  # Annotations to add to the service account
-#  annotations: {}
-#  # The name of the service account to use.
-#  # If not set and create is true, a name is generated using the fullname template
-#  name: ""
-#
-#podAnnotations: {}
-#
-#podSecurityContext: {}
-#  # fsGroup: 2000
-#
-#securityContext: {}
-#  # capabilities:
-#  #   drop:
-#  #   - ALL
-#  # readOnlyRootFilesystem: true
-#  # runAsNonRoot: true
-#  # runAsUser: 1000
-#
-#service:
-#  type: ClusterIP
-#  port: 80
-#
-#ingress:
-#  enabled: false
-#  className: ""
-#  annotations: {}
-#    # kubernetes.io/ingress.class: nginx
-#    # kubernetes.io/tls-acme: "true"
-#  hosts:
-#    - host: chart-example.local
-#      paths:
-#        - path: /
-#          pathType: ImplementationSpecific
-#  tls: []
-#  #  - secretName: chart-example-tls
-#  #    hosts:
-#  #      - chart-example.local
-#
-#resources: {}
-#  # We usually recommend not to specify default resources and to leave this as a conscious
-#  # choice for the user. This also increases chances charts run on environments with little
-#  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-#  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-#  # limits:
-#  #   cpu: 100m
-#  #   memory: 128Mi
-#  # requests:
-#  #   cpu: 100m
-#  #   memory: 128Mi
-#
-#autoscaling:
-#  enabled: false
-#  minReplicas: 1
-#  maxReplicas: 100
-#  targetCPUUtilizationPercentage: 80
-#  # targetMemoryUtilizationPercentage: 80
-#
-#nodeSelector: {}
-#
-#tolerations: []
-#
-#affinity: {}
+
+# Тип развертывания зависит от того, какой volume используется при работе
+# с контейнером.
+# Если volume типа ReadWriteMany - Deployment
+# Если volume типа ReadWriteOnce - StatefulSet
+type: StatefulSet
+# В случе type: StatefulSet replicaCount всегда = 1
+replicaCount: 1
+
+image:
+  # Внимание, этот образ будет удален после того как сниму видео. Используйте свой образ контейнера.
+  repository: bigkaa/gitflic
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# Данный сервис необходим только для StatefulSet
+serviceHeadless:
+  port: 80
+
+# Service types: NodePort, LoadBalancer
+serviceSSH:
+  enable: true
+  type: NodePort
+  port: 2022
+  nodePort: ""
+  # Пример конфигурации сервиса типа LoadBalancer MetalLB
+  annotations: {}
+  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
+
+# Service types: ClusterIP, NodePort, LoadBalancer
+service:
+  type: NodePort
+  port: 80
+  nodePort: ""
+  # Пример конфигурации сервиса типа LoadBalancer MetalLB
+  annotations: {}
+  #  metallb.universe.tf/loadBalancerIPs: 192.168.1.100
+
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+   limits:
+     cpu: 2000m
+     memory: 4Gi
+   requests:
+     cpu: 1000m
+     memory: 4Gi
+
+# В случе type: StatefulSet этот параметр не работает.
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+livenessProbe: {}
+
+readinessProbe: {}
+
+# Аргументы командной строки java приложения.
+javaOptions: "-Xms4g -Xmx4g"
+
+volumes:
+  repoDir:
+    storage: 1Gi
+    storageClassName: ""
+  imageDir:
+    storage: 1Gi
+    storageClassName: ""
+  releasesDir:
+    storage: 1Gi
+    storageClassName: ""
+  cicdDir:
+    storage: 1Gi
+    storageClassName: ""
+  certsDir:
+    storage: 1Gi
+    storageClassName: ""
+  registryDir:
+    storage: 1Gi
+    storageClassName: ""
+  sshKey:
+    # ssh key Должен находиться в заранее созданном secret
+    # ssh-keygen -t ed25519 -f key.pem
+    # kubectl -n NAMESPACE create secret generic ssh-key --from-file=key.pem --from-file=key.pem.pub
+    secretName: sshKey
 
 config:
   multipart:

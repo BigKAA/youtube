@@ -1,0 +1,110 @@
+{{- if eq .Values.type "Deployment" }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "gitflic.fullname" . }}-repo
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+    dir: repo
+spec:
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .Values.volumes.repoDir.storage }}
+  {{- if .Values.volumes.repoDir.storageClassName }}
+  storageClassName: {{ .Values.volumes.repoDir.storageClassName }}
+  {{- end }}
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "gitflic.fullname" . }}-image
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+    dir: image
+spec:
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .Values.volumes.imageDir.storage }}
+  {{- if .Values.volumes.imageDir.storageClassName }}
+  storageClassName: {{ .Values.volumes.imageDir.storageClassName }}
+  {{- end }}
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "gitflic.fullname" . }}-releases
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+    dir: releases
+spec:
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .Values.volumes.releasesDir.storage }}
+  {{- if .Values.volumes.releasesDir.storageClassName }}
+  storageClassName: {{ .Values.volumes.releasesDir.storageClassName }}
+  {{- end }}
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "gitflic.fullname" . }}-cicd
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+    dir: cicd
+spec:
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .Values.volumes.cicdDir.storage }}
+  {{- if .Values.volumes.cicdDir.storageClassName }}
+  storageClassName: {{ .Values.volumes.cicdDir.storageClassName }}
+  {{- end }}
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "gitflic.fullname" . }}-certs
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+    dir: certs
+spec:
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .Values.volumes.certsDir.storage }}
+  {{- if .Values.volumes.certsDir.storageClassName }}
+  storageClassName: {{ .Values.volumes.certsDir.storageClassName }}
+  {{- end }}
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "gitflic.fullname" . }}-registry
+  labels:
+    {{- include "gitflic.labels" . | nindent 4 }}
+    dir: registry
+spec:
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .Values.volumes.registryDir.storage }}
+  {{- if .Values.volumes.registryDir.storageClassName }}
+  storageClassName: {{ .Values.volumes.registryDir.storageClassName }}
+  {{- end }}
+  accessModes:
+    - ReadWriteMany
+{{- end }}
