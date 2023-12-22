@@ -400,3 +400,10 @@ spec:
 [Задал вопрос](https://github.com/projectcalico/calico/issues/8109) разработчикам calico. Ждал ответа недели две.
 В итоге принял решение снять видео так как есть. Надеюсь, когда вы смотрите это видео от разработчиков поступит
 ответ, что я делал не так.
+
+## Видео
+
+* [VK](https://vk.com/video7111833_456239253)
+* [Rutube](https://rutube.ru/video/c31360c9854ae30976d7c2b51200971f/)
+* [Zen](https://dzen.ru/video/watch/6560735ac55cb406db4a20d4)
+* [Youtube](https://youtu.be/5g2cnLvgjq8)
