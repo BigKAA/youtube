@@ -13,6 +13,11 @@ kubectl create -f 00-priorityclass.yaml
 ```shell
 kubectl -n kube-system create -f 01-nfs.yaml
 ```
+
+```shell
+kubectl -n kube-system create -f 01-nfs-k3s.yaml
+```
+
 ```shell
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.yaml
 ```

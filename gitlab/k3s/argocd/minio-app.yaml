@@ -22,11 +22,11 @@ spec:
         - name: disableWebUI
           value: "true"
         - name: statefulset.replicaCount
-          value: "2"
+          value: "1"
         - name: statefulset.zones
           value: "1"
         - name: statefulset.drivesPerNode
-          value: "2"
+          value: "4"
         - name: persistence.enabled
           value: "true"
         - name: persistence.storageClass
