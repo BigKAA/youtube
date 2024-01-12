@@ -14,15 +14,15 @@ spec:
     helm:
       parameters:
         - name: global.storageClass
-          value: local-path
+          value: managed-nfs-storage
         - name: global.redis.password
           value: 'qUwTt8g9it'
         - name: master.persistence.storageClass
-          value: local-path
+          value: managed-nfs-storage
         - name: pdb.create
           value: 'true'
         - name: replica.persistence.storageClass
-          value: local-path
+          value: managed-nfs-storage
         - name: replica.replicaCount
           value: '1'
 #        - name: master.resources.requests.memory
