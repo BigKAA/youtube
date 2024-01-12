@@ -38,7 +38,9 @@ data:
 
 ```shell
 kubectl create namespace argocd
-kubectl -n argocd create -f 01-argocd.yaml
+```
+```shell
+kubectl -n argocd create -f 01-2.9.3-argocd.yaml
 ```
 
 Дальше необходимо решить, как будет осуществляться доступ к ArgoCD.
@@ -57,6 +59,10 @@ kubectl -n argocd create -f 03-service-lb.yaml
 ```
 
 ```shell
+kubectl -n argocd create -f 03-service-lb-k3s.yaml
+```
+
+```shell
 kubectl -n argocd create -f 04-certs.yaml -f 05-ingress.yaml
 ```
 
@@ -66,7 +72,7 @@ CLI можно ставить на любом компьютере. Как ва�
 control ноде.
 
 ```shell
-wget https://github.com/argoproj/argo-cd/releases/download/v2.6.7/argocd-linux-amd64
+wget https://github.com/argoproj/argo-cd/releases/download/v2.9.3/argocd-linux-amd64
 mv -f argocd-linux-amd64 /usr/local/bin/argocd
 chmod +x /usr/local/bin/argocd
 argocd version

@@ -1,0 +1,66 @@
+imagePullPolicy: IfNotPresent
+revisionHistoryLimit: 3
+gitlabUrl: http://gitlab.kryukov.local/
+terminationGracePeriodSeconds: 3600
+# Количество раннеров
+concurrent: 5
+checkInterval: 30
+logLevel: info
+logFormat: json
+sessionServer:
+  enabled: false
+rbac:
+  create: true
+  rules:
+  - resources: ["pods", "secrets", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
+  - apiGroups: [""]
+    resources: ["pods/exec", "pods/attach"]
+    verbs: ["create", "patch", "delete"]
+  clusterWideAccess: false
+  podSecurityPolicy:
+    enabled: false
+    resourceNames:
+    - gitlab-runner
+metrics:
+  enabled: true
+  portName: metrics
+  port: 9252
+  serviceMonitor:
+    enabled: false
+service:
+  enabled: false
+runners:
+  config: |
+    # log_level = "debug"
+    [[runners]]
+      output_limit = 10000
+      [runners.kubernetes]
+        image = "ubuntu:22.04"
+        # helper_image = "if use custom helper"
+      [runners.cache]
+        Type = "s3"
+        Path = ""
+        Shared = true
+        [runners.cache.s3]
+          ServerAddress = "gitlab-minio:9000"
+          BucketName = "dev-runner-cache"
+          BucketLocation = "us-east-1"
+          Insecure = true
+          AuthenticationType = "access-key"
+  cache:
+    secretName: dev-gitlab-runner
+  executor: kubernetes
+  secret: dev-gitlab-runner
+securityContext:
+  runAsUser: 100
+  # runAsGroup: 65533
+  fsGroup: 65533
+  # supplementalGroups: [65533]
+resources:
+  limits:
+    memory: 256Mi
+    cpu: 200m
+  requests:
+    memory: 128Mi
+    cpu: 100m

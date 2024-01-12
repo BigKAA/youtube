@@ -1,0 +1,66 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: console
+  labels:
+    name: console
+spec:
+  ports:
+    - port: 9090
+      name: http
+    - port: 9443
+      name: https
+  selector:
+    app: console
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: console
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: console
+  template:
+    metadata:
+      labels:
+        app: console
+    spec:
+      containers:
+        - name: console
+          image: minio/console:v0.29.0
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - server
+          ports:
+            - containerPort: 9090
+              name: http
+          env:
+            - name: CONSOLE_MINIO_SERVER
+              value: "http://gitlab-minio:9000"
+            - name: CONSOLE_PORT
+              value: "9090"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minioconsole
+  # ## Fix to new versions of ingress controllers
+  # annotations:
+  #   kubernetes.io/ingress.class: "system-ingress"
+spec:
+  ## Fix to new versions of ingress controllers
+  ingressClassName: "system-ingress"
+  rules:
+    - host: "minio.kryukov.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: console
+                port:
+                  name: http
