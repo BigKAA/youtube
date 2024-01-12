@@ -116,4 +116,4 @@ gitlab:
   gitaly:
     persistence:
       size: 50Gi
-      storageClass: "local-path"
+      storageClass: "managed-nfs-storage"

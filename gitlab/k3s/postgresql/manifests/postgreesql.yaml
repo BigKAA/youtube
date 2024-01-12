@@ -77,7 +77,7 @@ spec:
       name: postgresdata
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "local-path"
+      storageClassName: "managed-nfs-storage"
       resources:
         requests:
           storage: 10Gi 

@@ -30,7 +30,7 @@ spec:
         - name: persistence.enabled
           value: "true"
         - name: persistence.storageClass
-          value: local-path
+          value: managed-nfs-storage
         - name: persistence.size
           value: 2Gi
         - name: volumePermissions.enabled
