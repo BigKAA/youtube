@@ -1,0 +1,138 @@
+### Не работает! Надо разбираться
+### Пока ставим руками через helm install
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.gitlab.io'
+    chart: gitlab
+    targetRevision: 7.7.3
+    helm:
+      values: |
+        certmanager:
+          install: false
+        postgresql:
+          install: false
+        redis:
+          install: false
+        prometheus:
+          install: false
+        nginx-ingress:
+          enabled: false
+        #registry:
+        #  enabled: false
+        gitlab-runner:
+          install: false
+
+        global:
+          minio:
+            enabled: false
+          # Включаем Community Edition
+          edition: ce
+
+          initialRootPassword:
+            key: password
+            secret: initial-admin-password
+
+          redis:
+            auth:
+              enabled: true
+              secret: gitlab-redis
+              key: redis-password
+            host: gitlab-redis-master
+            port: 6379
+
+          psql:
+            host: postgres-np
+            port: 5432
+            database: gitlab
+            username: artur
+            password:
+              useSecret: true
+              secret: postgres-secret
+              key: POSTGRES_PASSWORD
+
+          ingress:
+            configureCertmanager: false
+            class: system-ingress
+        #    provider: nginx
+            tls:
+              enabled: false
+
+          hosts:
+            domain: kryukov.local
+            https: false
+            externalIP: 192.168.218.180
+
+          appConfig:
+            # https://docs.gitlab.com/charts/advanced/external-object-storage/#lfs-artifacts-uploads-packages-external-diffs-terraform-state-dependency-proxy
+            lfs:
+              bucket: gitlab-lfs-storage
+              connection: # https://gitlab.com/gitlab-org/charts/gitlab/blob/master/doc/charts/globals.md#connection
+                secret: minio-credentials
+                key: connection
+            artifacts:
+              bucket: gitlab-artifacts-storage
+              connection:
+                secret: minio-credentials
+                key: connection
+            uploads:
+              bucket: gitlab-uploads-storage
+              connection:
+                secret: minio-credentials
+                key: connection
+            packages:
+              bucket: gitlab-packages-storage
+              connection:
+                secret: minio-credentials
+                key: connection
+
+            # https://docs.gitlab.com/charts/advanced/external-object-storage/#backups
+            backups:
+              bucket: gitlab-backup-storage
+              tmpBucket: gitlab-tmp-storage
+
+          ## https://docs.gitlab.com/charts/charts/globals#outgoing-email
+          ## Outgoing email server settings
+          smtp:
+            enabled: true
+            tls: false
+            starttls_auto: false
+            openssl_verify_mode: 'none'
+            domain: "git.kryukov.local"
+            address: mail-relay
+            port: 25
+            authentication: "none"
+            password:
+              secret: 'fake-mail-password'
+              key: 'password'
+          email:
+            from: "noreply@gitlab.kryukov.local"
+            display_name: "GitLab kryukov.local"
+
+        # https://docs.gitlab.com/charts/advanced/external-object-storage/#backups
+        gitlab:
+          toolbox:
+            backups:
+              objectStorage:
+                config:
+                  secret: s3-credentials
+                  key: config
+          gitaly:
+            persistence:
+              size: 50Gi
+              storageClass: "managed-nfs-storage"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: gitlab
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
