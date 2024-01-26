@@ -50,6 +50,8 @@ kafka:
   tls:
     type: PEM
     existingSecret: "kafka-tls"
+    keystorePassword: "PASSWORD"
+    truststorePassword: "PASSWORD"
     zookeeper:
       enabled: false
       verifyHostname: true
