@@ -15,6 +15,14 @@ kafka:
       storageClass: "managed-nfs-storage"
       size: 1Gi
 
+  broker:
+    replicaCount: 3
+    zookeeperMigrationMode: true
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      size: 1Gi
+
   service:
     type: NodePort
     ports:
