@@ -6,6 +6,9 @@ kafka:
   nameOverride: "kafka"
   fullnameOverride: "kafka"
 
+  image:
+    debug: false
+
   heapOpts: -Xmx1024m -Xms1024m
 
   listeners:
@@ -48,14 +51,16 @@ kafka:
       sslClientAuth: "required"
 
   tls:
-    type: PEM
-    existingSecret: "kafka-tls"
+    type: JKS
+    existingSecret: "kafka-jks"
     keystorePassword: "PASSWORD"
     truststorePassword: "PASSWORD"
     zookeeper:
-      enabled: false
+      enabled: true
       verifyHostname: true
-      existingSecret: "zoo-tls"
+      existingSecret: "zoo-jks"
+      keystorePassword: "PASSWORD"
+      truststorePassword: "PASSWORD"
 
   controller:
     replicaCount: 0
@@ -103,6 +108,7 @@ kafka:
       client:
         enabled: true
         auth: none
+        ### Умеет только в PEM
         existingSecret: "zoo-tls"
         keystorePassword: "PASSWORD"
         truststorePassword: "PASSWORD"

@@ -67,9 +67,37 @@ spec:
     - server auth
     - client auth
   dnsNames:
-  - kafka-broker-0
-  - kafka-broker-1
-  - kafka-broker-2
+  - kafka-broker
+  - kafka-broker-0.kafka-broker-headless.kafka.svc.cluster.local
+  - kafka-broker-1.kafka-broker-headless.kafka.svc.cluster.local
+  - kafka-broker-2.kafka-broker-headless.kafka.svc.cluster.local
+  issuerRef:
+    name: kafka-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-zoo-client-certificate
+  namespace: kafka
+spec:
+  secretName: kafka-zoo-client-tls
+  duration: 9125h # 1y
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+    - arturs k8s
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+    rotationPolicy: Always
+  usages:
+    - client auth
+  dnsNames:
+  - kafka-broker
   issuerRef:
     name: kafka-issuer
     kind: Issuer
@@ -97,9 +125,10 @@ spec:
     - server auth
     - client auth
   dnsNames:
-  - kafka-zookeeper-0
-  - kafka-zookeeper-1
-  - kafka-zookeeper-2
+  - kafka-zookeeper
+  - kafka-zookeeper-0.kafka-zookeeper-headless.kafka.svc.cluster.local
+  - kafka-zookeeper-1.kafka-zookeeper-headless.kafka.svc.cluster.local
+  - kafka-zookeeper-2.kafka-zookeeper-headless.kafka.svc.cluster.local
   issuerRef:
     name: kafka-issuer
     kind: Issuer
