@@ -1,0 +1,243 @@
+kafka:
+  enabled: true
+  global:
+    storageClass: "managed-nfs-storage"
+
+  nameOverride: "kafka"
+  fullnameOverride: "kafka"
+
+  image:
+    registry: docker.io
+    repository: bitnami/kafka
+    tag: 3.2.0-debian-11-r3
+    pullPolicy: IfNotPresent
+    debug: false
+  heapOpts: -Xmx1024m -Xms1024m
+  ## @param deleteTopicEnable Switch to enable topic deletion or not
+  ##
+  deleteTopicEnable: true
+  ## @param autoCreateTopicsEnable Switch to enable auto creation of topics. Enabling auto creation of topics not recommended for production or similar environments
+  ##
+  autoCreateTopicsEnable: false
+  ## @param logFlushIntervalMessages The number of messages to accept before forcing a flush of data to disk
+  ##
+  logFlushIntervalMessages: _10000
+  ## @param logFlushIntervalMs The maximum amount of time a message can sit in a log before we force a flush
+  ##
+  logFlushIntervalMs: 1000
+  ## @param logRetentionBytes A size-based retention policy for logs
+  ##
+  logRetentionBytes: _1073741824
+  ## @param logRetentionCheckIntervalMs The interval at which log segments are checked to see if they can be deleted
+  ##
+  logRetentionCheckIntervalMs: 300000
+  ## @param logRetentionHours The minimum age of a log file to be eligible for deletion due to age
+  ##
+  logRetentionHours: 6
+  ## @param logSegmentBytes The maximum size of a log segment file. When this size is reached a new log segment will be created
+  ##
+  logSegmentBytes: _1073741824
+  ## @param logsDirs A comma separated list of directories under which to store log files
+  ##
+  logsDirs: /bitnami/kafka/data
+  ## @param maxMessageBytes The largest record batch size allowed by Kafka
+  ##
+  maxMessageBytes: _1000012
+  ## @param defaultReplicationFactor Default replication factors for automatically created topics
+  ##
+  defaultReplicationFactor: 1
+  ## @param offsetsTopicReplicationFactor The replication factor for the offsets topic
+  ##
+  offsetsTopicReplicationFactor: 1
+  ## @param transactionStateLogReplicationFactor The replication factor for the transaction topic
+  ##
+  transactionStateLogReplicationFactor: 1
+  ## @param transactionStateLogMinIsr Overridden min.insync.replicas config for the transaction topic
+  ##
+  transactionStateLogMinIsr: 1
+  ## @param numIoThreads The number of threads doing disk I/O
+  ##
+  numIoThreads: 8
+  ## @param numNetworkThreads The number of threads handling network requests
+  ##
+  numNetworkThreads: 3
+  ## @param numPartitions The default number of log partitions per topic
+  ##
+  numPartitions: 2
+  ## @param numRecoveryThreadsPerDataDir The number of threads per data directory to be used for log recovery at startup and flushing at shutdown
+  ##
+  numRecoveryThreadsPerDataDir: 1
+  ## @param socketReceiveBufferBytes The receive buffer (SO_RCVBUF) used by the socket server
+  ##
+  socketReceiveBufferBytes: 102400
+  ## @param socketRequestMaxBytes The maximum size of a request that the socket server will accept (protection against OOM)
+  ##
+  socketRequestMaxBytes: _104857600
+  ## @param socketSendBufferBytes The send buffer (SO_SNDBUF) used by the socket server
+  ##
+  socketSendBufferBytes: 102400
+  ## @param zookeeperConnectionTimeoutMs Timeout in ms for connecting to ZooKeeper
+  ##
+  zookeeperConnectionTimeoutMs: 6000
+  ## @param zookeeperChrootPath Path which puts data under some path in the global ZooKeeper namespace
+  ## ref: https://kafka.apache.org/documentation/#brokerconfigs_zookeeper.connect
+  ##
+  zookeeperChrootPath: ""
+  ## @param authorizerClassName The Authorizer is configured by setting authorizer.class.name=kafka.security.authorizer.AclAuthorizer in server.properties
+  ##
+  authorizerClassName: ""
+  ## @param allowEveryoneIfNoAclFound By default, if a resource has no associated ACLs, then no one is allowed to access that resource except super users
+  ##
+  allowEveryoneIfNoAclFound: true
+  ## @param superUsers You can add super users in server.properties
+  ##
+  superUsers: User:admin
+
+  ## @param replicaCount Number of Kafka nodes
+  ##
+  replicaCount: 2
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    periodSeconds: 10
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    failureThreshold: 6
+    timeoutSeconds: 5
+    periodSeconds: 10
+    successThreshold: 1
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 15
+    successThreshold: 1
+  resources:
+    limits: {}
+    requests:
+      memory: 1024Mi
+      cpu: 500m
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+    runAsNonRoot: true
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+              - kafka
+          - key: role
+            operator: In
+            values:
+              - kafka
+        topologyKey: kubernetes.io/hostname
+  podManagementPolicy: Parallel
+
+  service:
+    type: NodePort
+    ports:
+      client: 9092
+      internal: 9093
+      external: 9094
+    nodePorts:
+      client: "32092"
+      external: ""
+    sessionAffinity: None
+    sessionAffinityConfig: {}
+    clusterIP: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    externalTrafficPolicy: Cluster
+  persistence:
+    enabled: true
+    existingClaim: ""
+    storageClass: "managed-nfs-storage"
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
+    annotations: {}
+    selector: {}
+    mountPath: /bitnami/kafka
+  volumePermissions:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/bitnami-shell
+      tag: 11-debian-11-r3
+      pullPolicy: IfNotPresent
+    resources:
+      limits: {}
+      requests: {}
+  metrics:
+    kafka:
+      enabled: true
+      image:
+        registry: docker.io
+        repository: bitnami/kafka-exporter
+        tag: 1.4.2-debian-11-r4
+        pullPolicy: IfNotPresent
+      containerPorts:
+        metrics: 9308
+      resources:
+        limits: {}
+        requests:
+          memory: 256Mi
+          cpu: 250m
+    jmx:
+      enabled: true
+      image:
+        registry: docker.io
+        repository: bitnami/jmx-exporter
+        tag: 0.17.0-debian-11-r4
+        pullPolicy: IfNotPresent
+      resources:
+        limits: {}
+        requests: {}
+      service:
+        ports:
+          metrics: 5556
+  zookeeper:
+    ## @param zookeeper.enabled Switch to enable or disable the ZooKeeper helm chart
+    ##
+    enabled: true
+    podManagementPolicy: Parallel
+    ## @param zookeeper.replicaCount Number of ZooKeeper nodes
+    ##
+    replicaCount: 2
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
+    resources:
+      limits: {}
+      requests:
+        memory: 256Mi
+        cpu: 250m
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - zookeeper
+            - key: role
+              operator: In
+              values:
+                - zookeeper
+          topologyKey: kubernetes.io/hostname
