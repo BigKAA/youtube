@@ -47,11 +47,7 @@ kafka:
     replicaCount: 3
     auth:
       client:
-        enabled: true
-        clientUser: "user1"
-        clientPassword: "passworuser1"
-        serverUsers: "user1,user2"
-        serverPasswords: "passworuser1,passworuser2"
+        enabled: false
 
     persistence:
       enabled: true
