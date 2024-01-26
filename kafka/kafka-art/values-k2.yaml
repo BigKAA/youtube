@@ -51,7 +51,7 @@ kafka:
     type: PEM
     existingSecret: "kafka-tls"
     zookeeper:
-      enabled: true
+      enabled: false
       verifyHostname: true
       existingSecret: "zoo-tls"
 
