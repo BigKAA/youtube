@@ -102,3 +102,5 @@ kafka:
         enabled: true
         auth: none
         existingSecret: "zoo-tls"
+        keystorePassword: "PASSWORD"
+        truststorePassword: "PASSWORD"
