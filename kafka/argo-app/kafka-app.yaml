@@ -11,7 +11,7 @@ spec:
     namespace: kafka
     server: 'https://kubernetes.default.svc'
   source:
-    path: kafka/charts/kafka-art
+    path: kafka/kafka-art
     repoURL: 'https://github.com/BigKAA/youtube'
     targetRevision: kafkassl
     helm:
