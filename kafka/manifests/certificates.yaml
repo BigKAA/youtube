@@ -2,7 +2,7 @@
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: selfsigned-issuer
+  name: kafka-ss-issuer
   namespace: kafka
 spec:
   selfSigned: {}
@@ -11,7 +11,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: ca
+  name: kafka-ca
   namespace: kafka
 spec:
   isCA: true
@@ -26,32 +26,32 @@ spec:
     countries:
       - "RU"
   commonName: CA
-  secretName: ca-secret
+  secretName: kafka-ca-secret
   privateKey:
     algorithm: RSA
     encoding: PKCS8
     size: 4096
   issuerRef:
-    name: selfsigned-issuer
+    name: kafka-ss-issuer
     kind: Issuer
     group: cert-manager.io
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: argocd-issuer
+  name: kafka-issuer
   namespace: kafka
 spec:
   ca:
-    secretName: ca-secret
+    secretName: kafka-ca-secret
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: argocd-certificate
+  name: kafka-broker-certificate
   namespace: kafka
 spec:
-  secretName: argocd-tls
+  secretName: kafka-tls
   duration: 9125h # 1y
   renewBefore: 360h # 15d
   subject:
@@ -67,10 +67,40 @@ spec:
     - server auth
     - client auth
   dnsNames:
-  - argocd.kryukov.local
-  ipAddresses:
-    - 192.168.218.181
+  - kafka-broker-0
+  - kafka-broker-1
+  - kafka-broker-2
   issuerRef:
-    name: argocd-issuer
+    name: kafka-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-zoo-certificate
+  namespace: kafka
+spec:
+  secretName: zoo-tls
+  duration: 9125h # 1y
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+    - arturs k8s
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+    rotationPolicy: Always
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - kafka-zookeeper-0
+  - kafka-zookeeper-1
+  - kafka-zookeeper-2
+  issuerRef:
+    name: kafka-issuer
     kind: Issuer
     group: cert-manager.io

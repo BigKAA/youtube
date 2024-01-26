@@ -16,7 +16,7 @@ spec:
     targetRevision: kafkassl
     helm:
       valueFiles:
-        - values-kafka.yaml
+        - values-k2.yaml
   project: default
   syncPolicy:
     automated:
