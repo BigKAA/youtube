@@ -9,15 +9,10 @@ kafka:
   heapOpts: -Xmx1024m -Xms1024m
 
   controller:
-    replicaCount: 3
-    persistence:
-      enabled: true
-      storageClass: "managed-nfs-storage"
-      size: 1Gi
+    replicaCount: 0
 
   broker:
     replicaCount: 3
-    zookeeperMigrationMode: true
     persistence:
       enabled: true
       storageClass: "managed-nfs-storage"
