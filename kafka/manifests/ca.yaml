@@ -1,0 +1,46 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: kafka-ssl-issuer
+  namespace: kafka
+spec:
+  selfSigned: {}
+---
+# Самоподписанный сертификат CA
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-ca
+  namespace: kafka
+spec:
+  isCA: true
+  duration: 87600h # 10y
+  subject:
+    organizations:
+      - "Artur's home"
+    organizationalUnits:
+      - "IT dep"
+    localities:
+      - "Moscow"
+    countries:
+      - "RU"
+  commonName: CA
+  secretName: kafka-ca-secret
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+  issuerRef:
+    name: kafka-ssl-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: kafka-issuer
+  namespace: kafka
+spec:
+  ca:
+    secretName: kafka-ca-secret

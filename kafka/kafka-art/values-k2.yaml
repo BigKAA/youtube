@@ -1,0 +1,129 @@
+kafka:
+  enabled: true
+  global:
+    storageClass: "managed-nfs-storage"
+  clusterDomain: cluster.local
+  nameOverride: "kafka"
+  fullnameOverride: "kafka"
+
+  image:
+    debug: true
+
+  heapOpts: -Xmx1024m -Xms1024m
+
+  listeners:
+    ## @param listeners.client.name Name for the Kafka client listener
+    ## @param listeners.client.containerPort Port for the Kafka client listener
+    ## @param listeners.client.protocol Security protocol for the Kafka client listener. Allowed values are 'PLAINTEXT', 'SASL_PLAINTEXT', 'SASL_SSL' and 'SSL'
+    ## @param listeners.client.sslClientAuth Optional. If SASL_SSL is enabled, configure mTLS TLS authentication type. If SSL protocol is enabled, overrides tls.authType for this listener. Allowed values are 'none', 'requested' and 'required'
+    client:
+      containerPort: 9092
+      protocol: SSL
+      name: CLIENT
+      sslClientAuth: "required"
+    ## @param listeners.controller.name Name for the Kafka controller listener
+    ## @param listeners.controller.containerPort Port for the Kafka controller listener
+    ## @param listeners.controller.protocol Security protocol for the Kafka controller listener. Allowed values are 'PLAINTEXT', 'SASL_PLAINTEXT', 'SASL_SSL' and 'SSL'
+    ## @param listeners.controller.sslClientAuth Optional. If SASL_SSL is enabled, configure mTLS TLS authentication type. If SSL protocol is enabled, overrides tls.authType for this listener. Allowed values are 'none', 'requested' and 'required'
+    ## Ref: https://cwiki.apache.org/confluence/display/KAFKA/KIP-684+-+Support+mutual+TLS+authentication+on+SASL_SSL+listeners
+    controller:
+      name: CONTROLLER
+      containerPort: 9093
+      protocol: SSL
+      sslClientAuth: "required"
+    ## @param listeners.interbroker.name Name for the Kafka inter-broker listener
+    ## @param listeners.interbroker.containerPort Port for the Kafka inter-broker listener
+    ## @param listeners.interbroker.protocol Security protocol for the Kafka inter-broker listener. Allowed values are 'PLAINTEXT', 'SASL_PLAINTEXT', 'SASL_SSL' and 'SSL'
+    ## @param listeners.interbroker.sslClientAuth Optional. If SASL_SSL is enabled, configure mTLS TLS authentication type. If SSL protocol is enabled, overrides tls.authType for this listener. Allowed values are 'none', 'requested' and 'required'
+    interbroker:
+      containerPort: 9094
+      protocol: SSL
+      name: INTERNAL
+      sslClientAuth: "required"
+    ## @param listeners.external.containerPort Port for the Kafka external listener
+    ## @param listeners.external.protocol Security protocol for the Kafka external listener. . Allowed values are 'PLAINTEXT', 'SASL_PLAINTEXT', 'SASL_SSL' and 'SSL'
+    ## @param listeners.external.name Name for the Kafka external listener
+    ## @param listeners.external.sslClientAuth Optional. If SASL_SSL is enabled, configure mTLS TLS authentication type. If SSL protocol is enabled, overrides tls.sslClientAuth for this listener. Allowed values are 'none', 'requested' and 'required'
+    external:
+      containerPort: 9095
+      protocol: SSL
+      name: EXTERNAL
+      sslClientAuth: "required"
+
+  tls:
+    type: PEM
+    existingSecret: "kafka-tls"
+    keystorePassword: "PASSWORD"
+    truststorePassword: "PASSWORD"
+    zookeeper:
+      enabled: true
+      ### Не умеет работать с PEM файлами.
+      existingSecret: "zoo-jks"
+      keystorePassword: "PASSWORD"
+      truststorePassword: "PASSWORD"
+
+  controller:
+    replicaCount: 0
+
+  broker:
+    replicaCount: 3
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      size: 1Gi
+
+  service:
+    type: NodePort
+    ports:
+      client: 9092
+      internal: 9093
+      interbroker: 9094
+      external: 9095
+    nodePorts:
+      client: "32092"
+      external: ""
+
+  networkPolicy:
+    enabled: false
+
+  volumePermissions:
+    enabled: true
+
+  kraft:
+    enabled: false
+
+  zookeeper:
+    ## @param zookeeper.enabled Switch to enable or disable the ZooKeeper helm chart
+    ##
+    enabled: true
+    replicaCount: 3
+    auth:
+      client:
+        enabled: false
+
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+
+    nameOverride: "kafka-zookeeper"
+    fullnameOverride: "kafka-zookeeper"
+
+    tls:
+      client:
+        enabled: true
+        auth: "none"
+        existingSecret: "zoo-tls"
+        keystorePassword: "PASSWORD"
+        truststorePassword: "PASSWORD"
+      quorum:
+        enabled: true
+        auth: "none"
+        existingSecret: "zoo-tls"
+        keystorePassword: "PASSWORD"
+        truststorePassword: "PASSWORD"
+
+    networkPolicy:
+      enabled: false

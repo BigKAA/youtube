@@ -1,0 +1,55 @@
+kafka:
+  enabled: true
+  global:
+    storageClass: "managed-nfs-storage"
+  clusterDomain: cluster.local
+  nameOverride: "kafka"
+  fullnameOverride: "kafka"
+
+  image:
+    debug: false
+
+  heapOpts: -Xmx1024m -Xms1024m
+
+  controller:
+    replicaCount: 0
+
+  broker:
+    replicaCount: 3
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      size: 1Gi
+
+  service:
+    type: NodePort
+    ports:
+      client: 9092
+      internal: 9093
+      interbroker: 9094
+      external: 9095
+    nodePorts:
+      client: "32092"
+      external: ""
+
+  volumePermissions:
+    enabled: true
+
+  kraft:
+    enabled: false
+
+  zookeeper:
+    ## @param zookeeper.enabled Switch to enable or disable the ZooKeeper helm chart
+    ##
+    enabled: true
+    replicaCount: 3
+    auth:
+      client:
+        enabled: false
+
+    persistence:
+      enabled: true
+      storageClass: "managed-nfs-storage"
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
