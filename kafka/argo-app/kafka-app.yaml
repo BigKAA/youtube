@@ -13,7 +13,7 @@ spec:
   source:
     path: kafka/kafka-art
     repoURL: 'https://github.com/BigKAA/youtube'
-    targetRevision: kafkassl
+    targetRevision: master
     helm:
       valueFiles:
         - values-k2.yaml

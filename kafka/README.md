@@ -77,3 +77,62 @@ kubectl -n kafka create secret generic zoo-jks --from-file=zookeeper.truststore.
 ```
 
 ### Чарт
+
+По традиции делаю чарт "обертку" сабчартом kafka от bitnami:
+
+```yaml
+dependencies:
+- name: kafka
+  condition: kafka.enabled
+  repository: https://charts.bitnami.com/bitnami
+  version: 26.8.1
+```
+
+Файл с параметрами чарта: [values-k2.yaml](kafka-art/values-k2.yaml).
+
+Во всех `listeners` включаем поддержку SSL и `sslClientAuth: "required"`.
+
+```yaml
+  tls:
+    type: JKS
+    existingSecret: "kafka-jks"
+    keystorePassword: "PASSWORD"
+    truststorePassword: "PASSWORD"
+    zookeeper:
+      enabled: true
+      verifyHostname: true
+      existingSecret: "zoo-jks"
+      keystorePassword: "PASSWORD"
+      truststorePassword: "PASSWORD"
+```
+
+Именно в `tls.zookeeper` нет поддержки PEM формата!
+
+Конфигурация сабчарта/сабчарта zookeeper.
+
+```yaml
+  zookeeper:
+    enabled: true
+    replicaCount: 3
+    tls:
+      client:
+        enabled: true
+        auth: none
+        existingSecret: "zoo-tls"
+        keystorePassword: "PASSWORD"
+        truststorePassword: "PASSWORD"
+```
+
+А вот сабчарт `zookeeper.tls.client.existingSecret` умеет только в PEM! Вот такие пироги...
+
+Дальше просто устанавливаем чарт либо при помощи helm:
+
+```shell
+helm install kafka kafka-art -f kafka-art/values-k2.yaml -n kafka
+```
+
+Либо при помощи ArgoCD:
+
+```shell
+kubectl apply -f kafka/argo-app/kafka-app.yaml
+```

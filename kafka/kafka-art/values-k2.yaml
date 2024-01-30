@@ -7,7 +7,7 @@ kafka:
   fullnameOverride: "kafka"
 
   image:
-    debug: false
+    debug: true
 
   heapOpts: -Xmx1024m -Xms1024m
 
@@ -51,13 +51,13 @@ kafka:
       sslClientAuth: "required"
 
   tls:
-    type: JKS
-    existingSecret: "kafka-jks"
+    type: PEM
+    existingSecret: "kafka-tls"
     keystorePassword: "PASSWORD"
     truststorePassword: "PASSWORD"
     zookeeper:
       enabled: true
-      verifyHostname: true
+      ### Не умеет работать с PEM файлами.
       existingSecret: "zoo-jks"
       keystorePassword: "PASSWORD"
       truststorePassword: "PASSWORD"
@@ -83,6 +83,9 @@ kafka:
       client: "32092"
       external: ""
 
+  networkPolicy:
+    enabled: false
+
   volumePermissions:
     enabled: true
 
@@ -104,11 +107,23 @@ kafka:
       accessModes:
         - ReadWriteOnce
       size: 1Gi
+
+    nameOverride: "kafka-zookeeper"
+    fullnameOverride: "kafka-zookeeper"
+
     tls:
       client:
         enabled: true
-        auth: none
-        ### Умеет только в PEM
+        auth: "none"
         existingSecret: "zoo-tls"
         keystorePassword: "PASSWORD"
         truststorePassword: "PASSWORD"
+      quorum:
+        enabled: true
+        auth: "none"
+        existingSecret: "zoo-tls"
+        keystorePassword: "PASSWORD"
+        truststorePassword: "PASSWORD"
+
+    networkPolicy:
+      enabled: false
