@@ -21,10 +21,12 @@ spec:
     - server auth
     - client auth
   dnsNames:
+  - kafka
+  - kafka.kafka.svc
+  - kafka.kafka.svc.cluster.local
   - kafka-broker-0.kafka-broker-headless.kafka.svc.cluster.local
   - kafka-broker-1.kafka-broker-headless.kafka.svc.cluster.local
   - kafka-broker-2.kafka-broker-headless.kafka.svc.cluster.local
-  - kafka.kafka.svc.cluster.local
   issuerRef:
     name: kafka-issuer
     kind: Issuer

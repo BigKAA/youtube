@@ -21,6 +21,8 @@ spec:
     - client auth
   dnsNames:
   - kafka-zookeeper
+  - kafka-zookeeper.kafka.svc
+  - kafka-zookeeper.kafka.svc.cluster.local
   - kafka-zookeeper-0.kafka-zookeeper-headless.kafka.svc.cluster.local
   - kafka-zookeeper-1.kafka-zookeeper-headless.kafka.svc.cluster.local
   - kafka-zookeeper-2.kafka-zookeeper-headless.kafka.svc.cluster.local

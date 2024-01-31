@@ -58,7 +58,7 @@ kafka:
     zookeeper:
       enabled: true
       ### Не умеет работать с PEM файлами.
-      existingSecret: "zoo-jks"
+      existingSecret: "kafka-client-jks"
       keystorePassword: "PASSWORD"
       truststorePassword: "PASSWORD"
 
@@ -114,13 +114,13 @@ kafka:
     tls:
       client:
         enabled: true
-        auth: "none"
+        auth: "need"
         existingSecret: "zoo-tls"
         keystorePassword: "PASSWORD"
         truststorePassword: "PASSWORD"
       quorum:
         enabled: true
-        auth: "none"
+        auth: "need"
         existingSecret: "zoo-tls"
         keystorePassword: "PASSWORD"
         truststorePassword: "PASSWORD"
