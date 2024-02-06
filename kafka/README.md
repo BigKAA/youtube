@@ -146,6 +146,8 @@ kubectl -n kafka create secret generic kafka-client1-jks --from-file=kafka.trust
 helm -n kafka upgrade kafka kafka-ssl -f kafka-ssl/values-k3.yaml
 ```
 
+### Внешний клиент
+
 Обновляем kafka с учетом новых параметров сервера:
 
 ```shell
@@ -155,6 +157,8 @@ helm upgrade kafka kafka-ssl -f kafka-ssl/values-k4.yaml -n kafka
 Смотрим настройки kafka, видим что то типа: `EXTERNAL://kafka:32198`
 
 Для клиента будем использовать сертификат, выписанный для kafdrop.
+
+Используем клиент из дистрибутива kafka.
 
 ```shell
 cd tmp
