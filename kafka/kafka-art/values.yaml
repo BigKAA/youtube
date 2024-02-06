@@ -2554,3 +2554,6 @@ kafka:
     ## @param externalZookeeper.servers List of external zookeeper servers to use. Typically used in combination with 'zookeeperChrootPath'. Must be empty if you use KRaft mode.
     ##
     servers: [ ]
+
+kafdrop:
+  enabled: false

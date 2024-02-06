@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kafdrop.fullname" . }}
+  labels:
+    {{- include "kafdrop.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kafdrop.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kafdrop.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- if .Values.podAnnotations }}
+        {{ toYaml .Values.podAnnotations | indent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: KAFKA_BROKERCONNECT
+              value: "{{ .Values.kafka.brokerConnect }}"
+            # Additional properties to configure the broker connection (base-64 encoded).
+            - name: KAFKA_PROPERTIES
+              value: "{{ .Values.kafka.properties }}"
+            # Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
+            - name: KAFKA_TRUSTSTORE
+              value: "{{ .Values.kafka.truststore }}"
+            # Private key for mutual TLS authentication (base-64 encoded).
+            - name: KAFKA_KEYSTORE
+              value: "{{ .Values.kafka.keystore }}"
+            - name: JVM_OPTS
+              value: "{{ .Values.jvm.opts }}"
+            - name: JMX_PORT
+              value: "{{ .Values.jmx.port }}"
+            - name: HOST
+              value: "{{ .Values.host }}"
+            - name: SERVER_SERVLET_CONTEXTPATH
+              value: "{{ .Values.server.servlet.contextPath | trimSuffix "/" }}"
+            # где находится файл kafka.properties
+            - name: KAFKA_PROPERTIES_FILE
+              value: "/tmp/properties/kafka.properties"
+
+            - name: KAFKA_TRUSTSTORE_FILE
+              value: "{{ .Values.kafka.truststoreFile }}"
+            - name: KAFKA_KEYSTORE_FILE
+              value: "{{ .Values.kafka.keystoreFile }}"
+            - name: SERVER_PORT
+              value: "{{ .Values.server.port }}"
+            - name: CMD_ARGS
+              value: "{{ .Values.cmdArgs }}"
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: "{{ .Values.server.servlet.contextPath | trimSuffix "/" }}/actuator/health"
+              port: http
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: "{{ .Values.server.servlet.contextPath | trimSuffix "/" }}/actuator/health"
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 10
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.kafka.ssl.enable }}
+          volumeMounts:
+            - mountPath: "/tmp/stores"
+              name: secret-store
+            - mountPath: "/tmp/properties"
+              name: kafka-properties
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.kafka.ssl.enable }}
+      volumes:
+        - name: secret-store
+          secret:
+            secretName: {{.Values.kafka.ssl.secretName }}
+        - name: kafka-properties
+          secret:
+            secretName: {{ include "kafdrop.fullname" . }}-properties
+      {{- end }}

@@ -9,6 +9,9 @@ kafka:
   image:
     debug: true
 
+  networkPolicy:
+      enabled: false
+
   heapOpts: -Xmx1024m -Xms1024m
 
   listeners:
@@ -56,11 +59,31 @@ kafka:
     keystorePassword: "PASSWORD"
     truststorePassword: "PASSWORD"
     zookeeper:
-      enabled: false
-      ### Не умеет работать с PEM файлами.
-      existingSecret: "kafka-client-jks"
-      keystorePassword: "PASSWORD"
-      truststorePassword: "PASSWORD"
+        enabled: true
+        existingSecret: "kafka-client-jks"
+        keystorePassword: "PASSWORD"
+        truststorePassword: "PASSWORD"
+
+  rbac:
+    create: true
+
+  externalAccess:
+    enabled: true
+    autoDiscovery:
+      enabled: true
+    broker:
+      service:
+        #type: LoadBalancer
+        type: NodePort
+        #annotations:
+        #  metallb.universe.tf/address-pool: default
+        nodePorts:
+          - 32196
+          - 32197
+          - 32198
+        useHostIPs: true
+        domain: "kafka"
+        # publishNotReadyAddresses: true
 
   controller:
     replicaCount: 0
@@ -71,6 +94,7 @@ kafka:
       enabled: true
       storageClass: "managed-nfs-storage"
       size: 1Gi
+    automountServiceAccountToken: true
 
   service:
     type: NodePort
@@ -127,3 +151,86 @@ kafka:
 
     networkPolicy:
       enabled: false
+
+kafdrop:
+  enabled: true
+  nameOverride: "kafka-kafdrop"
+  fullnameOverride: "kafka-kafdrop"
+  replicaCount: 1
+
+  image:
+    repository: obsidiandynamics/kafdrop
+    tag: 4.0.1
+    pullPolicy: IfNotPresent
+
+  kafka:
+    brokerConnect: kafka:9092
+    # Additional properties to configure the broker connection (base-64 encoded).
+    properties: ""
+    # Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
+    truststore: ""
+    # Private key for mutual TLS authentication (base-64 encoded).
+    keystore: ""
+
+    truststoreFile: "kafka.truststore.jks"
+    keystoreFile: "kafka.keystore.jks"
+    ssl:
+      enable: true
+      properties: |
+        ssl.truststore.password: PASSWORD
+        ssl.truststore.location=/tmp/stores/kafka.truststore.jks
+        ssl.keystore.password: PASSWORD
+        ssl.keystore.location=/tmp/stores/kafka.keystore.jks
+        security.protocol: SSL
+      secretName: "kafka-client1-jks"
+
+  host:
+
+  jvm:
+    opts: "-Xms128M -Xmx128M"
+  jmx:
+    port: 8686
+
+  cmdArgs: ""
+
+  global:
+    kubeVersion: ~
+
+  server:
+    port: 9000
+    servlet:
+      contextPath: /
+
+  service:
+    annotations: { }
+    type: NodePort
+    port: 9000
+    nodePort: 30900
+
+  ingress:
+    enabled: true
+    className: system-ingress
+    path: /
+    pathType: Prefix
+    hosts:
+      - host: kafdrop.kryukov.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: [ ]
+
+  resources:
+  #  limits:
+  #    cpu: 100m
+  #    memory: 128Mi
+  #  requests:
+  #    cpu: 1m
+  #    memory: 128Mi
+
+  nodeSelector: { }
+
+  tolerations: [ ]
+
+  affinity: { }
+
+  podAnnotations: { }

@@ -1,0 +1,81 @@
+replicaCount: 1
+
+image:
+  repository: obsidiandynamics/kafdrop
+  tag: 4.0.1
+  pullPolicy: IfNotPresent
+
+kafka:
+  brokerConnect: kafka:9092
+  # Additional properties to configure the broker connection (base-64 encoded).
+  properties: ""
+  # Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
+  truststore: ""
+  # Private key for mutual TLS authentication (base-64 encoded).
+  keystore: ""
+
+  truststoreFile: "kafka.truststore.jks"
+  keystoreFile: "kafka.keystore.jks"
+  ssl:
+    enable: true
+    properties: |
+      ssl.truststore.password: PASSWORD
+      ssl.truststore.location=/tmp/stores/kafka.truststore.jks
+      ssl.keystore.password: PASSWORD
+      ssl.keystore.location=/tmp/stores/kafka.keystore.jks
+      security.protocol: SSL
+    secretName: "kafka-client1-jks"
+
+host:
+
+jvm:
+  opts: "-Xms128M -Xmx128M"
+jmx:
+  port: 8686
+
+nameOverride: "kafdrop"
+fullnameOverride: "kafdrop"
+
+cmdArgs: ""
+
+global:
+  kubeVersion: ~
+
+server:
+  port: 9000
+  servlet:
+    contextPath: /
+
+service:
+  annotations: {}
+  type: NodePort
+  port: 9000
+  nodePort: 30900
+
+ingress:
+  enabled: true
+  className: system-ingress
+  path: /
+  pathType: Prefix
+  hosts:
+    - host: kafdrop.kryukov.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+#  limits:
+#    cpu: 100m
+#    memory: 128Mi
+#  requests:
+#    cpu: 1m
+#    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+podAnnotations: {}

@@ -1,0 +1,23 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-client-certificate
+  namespace: kafka
+spec:
+  secretName: kafka-client1-tls
+  duration: 9125h # 1y
+  renewBefore: 360h # 15d
+  commonName: kafka-client-1
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+    rotationPolicy: Always
+  usages:
+    - client auth
+  issuerRef:
+    name: kafka-issuer
+    kind: Issuer
+    group: cert-manager.io
