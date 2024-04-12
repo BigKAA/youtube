@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: ingress-controller
+  namespace: ingress-nginx
+spec:
+  repo: https://kubernetes.github.io/ingress-nginx
+  chart: ingress-nginx
+  version: 4.10.0
+  targetNamespace: ingress-nginx
+  valuesContent: |-
+    controller:
+      ingressClassResource:
+        name: system-ingress
+        enabled: true
+        default: true
+        controllerValue: "k8s.io/ingress-nginx"
+
+      replicaCount: 1
+      minAvailable: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 90Mi
+
+      service:
+        enabled: true
+        type: LoadBalancer
+
+      admissionWebhooks:
+        enabled: false
+
+      metrics:
+        enabled: true
+        service:
+          annotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "10254"
+
+      priorityClassName: "medium-priority"
