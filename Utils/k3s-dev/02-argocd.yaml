@@ -1,0 +1,85 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: argo-cd
+  namespace: argo-cd
+spec:
+  repo: https://argoproj.github.io/argo-helm
+  chart: argo-cd
+  version: 6.0.6
+  targetNamespace: argo-cd
+  valuesContent: |-
+    crds:
+      keep: false
+
+    global:
+      logging:
+        format: json
+        # -- Set the global logging level. One of: `debug`, `info`, `warn` or `error`
+        level: info
+
+    controller:
+      replicas: 1
+
+    configs:
+      params:
+        server.insecure: true
+      
+      repositories:
+        artur-repo:
+          url: https://github.com/BigKAA/youtube
+          name: bigkaa
+          type: git
+
+      secret:
+        # -- Bcrypt hashed admin password
+        ## Argo expects the password in the secret to be bcrypt hashed. You can create this hash with
+        ## `htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'`
+        argocdServerAdminPassword: "$2a$10$L8OqGEFh3a0yxwfIha4DLuyq6GIYP119hlFM5wlSEsI.nviVAv/zq"
+
+    ## Redis
+    redis:
+      enabled: true
+
+    ## Server
+    server:
+      name: server
+      replicas: 1
+      certificate:
+        enabled: true
+        domain: argocd-dev.kryukov.local
+        renewBefore: 360h
+        duration: 9125h
+        issuer:
+          group: cert-manager.io
+          kind: ClusterIssuer
+          name: dev-ca-issuer
+        privateKey:
+          algorithm: RSA
+          encoding: PKCS8
+          size: 4096
+          rotationPolicy: Always
+        usages:
+          - server auth
+
+      ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        ingressClassName: "system-ingress"
+        hostname: argocd-dev.kryukov.local
+        path: /
+        pathType: Prefix
+        tls: true
+    
+    repoServer:
+      volumes:
+      - name: dev-ca-certs
+        secret:
+          secretName: dev-ca-certs
+      volumeMounts:
+      - mountPath: /etc/ssl/certs/dev-ca.pem
+        name: dev-ca-certs
+        subPath: dev-ca.pem
+      

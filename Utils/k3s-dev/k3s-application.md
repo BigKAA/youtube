@@ -65,3 +65,39 @@ kubectl apply -f 01-ingress-controller.yaml
 kubectl -n ingress-nginx get all
 curl http://192.168.218.189
 ```
+
+## ArgoCD
+
+```shell
+kubectl create ns argo-cd
+```
+
+Создадим сикрет содержащий сертификат CA.
+
+```shell
+kubectl create secret generic -n argo-cd dev-ca-certs --from-file=dev-ca.pem=ca.crt
+```
+
+Запускаем ArgoCD
+
+```shell
+kubectl apply -f 02-argocd.yaml
+```
+
+Остальные приложения ставим либо при помощи ArgoCD, либо в ручную.
+
+## Reloader
+
+https://github.com/stakater/Reloader
+
+ArgoCD:
+
+```shell
+kubectl apply -f argocd-apps/reloader-app.yaml
+```
+
+или
+
+```shell
+kubectl apply -f manifests/reloader/
+```
