@@ -1,0 +1,19 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: redis
+  namespace: redis
+spec:
+  repo: 'https://charts.bitnami.com/bitnami'
+  chart: redis
+  version: 18.12.1
+  targetNamespace: redis
+  valuesContent: |-
+    global:
+      redis:
+        password: 'qUwTt8g9it'
+    pdb:
+      create: true
+    replica:
+      replicaCount: 1
