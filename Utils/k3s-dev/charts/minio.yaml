@@ -1,0 +1,31 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minio
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  repo: 'https://charts.bitnami.com/bitnami'
+  chart: minio
+  version: 13.4.5
+  targetNamespace: minio
+  valuesContent: |-
+    mode: distributed
+    auth:
+      rootUser: admin
+      rootPassword: password
+    disableWebUI: true
+    statefulset:
+      replicaCount: 1
+      zones: 1
+      drivesPerNode: 4
+    persistence:
+      enabled: true
+      size: 4Gi
+    volumePermissions:
+      enabled: true

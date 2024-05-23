@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argo-cd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    chart: minio
+    targetRevision: 13.4.5
+    helm:
+      parameters:
+        - name: mode
+          value: distributed
+        - name: auth.rootUser
+          value: admin
+        - name: auth.rootPassword
+          value: password
+        - name: disableWebUI
+          value: "true"
+        - name: statefulset.replicaCount
+          value: "1"
+        - name: statefulset.zones
+          value: "1"
+        - name: statefulset.drivesPerNode
+          value: "4"
+        - name: persistence.enabled
+          value: "true"
+        - name: persistence.size
+          value: 4Gi
+        - name: volumePermissions.enabled
+          value: "true"
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

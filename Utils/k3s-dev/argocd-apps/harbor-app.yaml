@@ -1,0 +1,111 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: harbor
+  namespace: argo-cd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    chart: harbor
+    targetRevision: 19.6.0
+    helm:
+      values: |
+        # initial admin password
+        adminPassword: "password"
+        externalURL: https://registry.kryukov.local
+        logLevel: info
+        ipFamily:
+          ipv6:
+            enabled: false
+        exposureType: ingress
+        ingress:
+          core:
+            ingressClassName: "system-ingress"
+            hostname: registry.kryukov.local
+            annotations:
+              ingress.kubernetes.io/ssl-redirect: "true"
+              ingress.kubernetes.io/proxy-body-size: "0"
+              nginx.ingress.kubernetes.io/ssl-redirect: "true"
+              nginx.ingress.kubernetes.io/proxy-body-size: "0"
+              cert-manager.io/cluster-issuer: dev-ca-issuer
+              cert-manager.io/common-name: registry.kryukov.local
+              cert-manager.io/subject-organizations: "home dev lab"
+              cert-manager.io/subject-countries: "RU"
+              cert-manager.io/subject-localities: "Moscow"
+              cert-manager.io/duration: "9125h"
+              cert-manager.io/renew-before: "360h"
+              cert-manager.io/usages: "server auth"
+              cert-manager.io/private-key-algorithm: RSA
+              cert-manager.io/private-key-encoding: "PKCS8"
+              cert-manager.io/private-key-size: "4096"
+              cert-manager.io/private-key-rotation-policy: Always
+            tls: true
+        persistence:
+          enabled: true
+          resourcePolicy: "keep"
+          persistentVolumeClaim:
+            registry:
+              accessModes:
+                - ReadWriteOnce
+              size: 30Gi
+            jobservice:
+              accessModes:
+                - ReadWriteOnce
+              size: 1Gi
+            trivy:
+              accessModes:
+                - ReadWriteOnce
+              size: 1Gi
+          imageChartStorage:
+            type: filesystem
+        volumePermissions:
+          enabled: true
+        portal:
+          networkPolicy:
+            enabled: false
+        core:
+          networkPolicy:
+            enabled: false
+        jobservice:
+          networkPolicy:
+            enabled: false
+        registry:
+          networkPolicy:
+            enabled: false
+        trivy:
+          networkPolicy:
+            enabled: false
+        exporter:
+          networkPolicy:
+            enabled: false
+        postgresql:
+          enabled: false
+        externalDatabase:
+          host: postgres-np.psql.svc
+          port: 5432
+          user: artur
+          password: "password"
+          sslmode: disable
+          coreDatabase: "harbor"
+        redis:
+          enabled: false
+        externalRedis:
+          host: redis-master.redis.svc
+          port: 6379
+          password: "qUwTt8g9it"
+          coreDatabaseIndex: "0"
+          jobserviceDatabaseIndex: "1"
+          registryDatabaseIndex: "2"
+          trivyAdapterDatabaseIndex: "5"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: harbor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

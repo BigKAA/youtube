@@ -1,0 +1,85 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console
+spec:
+  ports:
+    - port: 9090
+      name: http
+    - port: 9443
+      name: https
+  selector:
+    app: minio-console
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-console
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-console
+      
+  template:
+    metadata:
+      labels:
+        app: minio-console
+    spec:
+      containers:
+        - name: minio-console
+          image: minio/console:v0.30.0
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - server
+          ports:
+            - containerPort: 9090
+              name: http
+          env:
+            - name: CONSOLE_MINIO_SERVER
+              value: "http://minio:9000"
+            - name: CONSOLE_PORT
+              value: "9090"
+          resources:
+            requests:
+              cpu: "0.4"
+              memory: "256Mi"
+            limits:
+              cpu: "0.8"
+              memory: "512Mi"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-console
+  annotations:
+    cert-manager.io/cluster-issuer: dev-ca-issuer
+    cert-manager.io/common-name: minio.kryukov.local
+    cert-manager.io/subject-organizations: "home dev lab"
+    cert-manager.io/subject-countries: "RU"
+    cert-manager.io/subject-localities: "Moscow"
+    cert-manager.io/duration: "9125h"
+    cert-manager.io/renew-before: "360h"
+    cert-manager.io/usages: "server auth"
+    cert-manager.io/private-key-algorithm: RSA
+    cert-manager.io/private-key-encoding: "PKCS8"
+    cert-manager.io/private-key-size: "4096"
+    cert-manager.io/private-key-rotation-policy: Always
+spec:
+  ingressClassName: "system-ingress"
+  rules:
+    - host: "minio.kryukov.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-console
+                port:
+                  name: http
+  tls:
+    - hosts:
+      - minio.kryukov.local
+      secretName: minio-console-tls

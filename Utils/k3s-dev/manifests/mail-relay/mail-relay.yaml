@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: &application mail-relay
+  labels:
+    app: *application
+    ver: 0.0.1
+spec:
+  type: ClusterIP
+  ports:
+    - port: 25
+      name: smtp
+      targetPort: smtp
+  selector:
+    app: *application
+    ver: 0.0.1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &application mail-relay
+  labels:
+    app: *application
+    ver: 0.0.1
+  annotations:
+    reloader.stakater.com/auto: "true"
+    configmap.reloader.stakater.com/reload: "mail-relay-env,mail-relay"
+spec:
+  selector:
+    matchLabels:
+      app: *application
+      ver: 0.0.1
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: *application
+        ver: 0.0.1
+    spec:
+      volumes:
+        - name: template
+          configMap:
+            name: mail-relay
+      containers:
+        - name: *application
+          image: bigkaa/mail-relay:0.0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 25
+              name: smtp
+          envFrom:
+            - configMapRef:
+                name: mail-relay-env
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "500Mi"
+            requests:
+              cpu: "0.2"
+              memory: "200Mi"
+          volumeMounts:
+            - name: template
+              mountPath: /etc/postfix/main.cf.tmpl
+              subPath: main.cf.tmpl

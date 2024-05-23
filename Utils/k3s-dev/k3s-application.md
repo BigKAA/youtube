@@ -133,3 +133,67 @@ kubectl apply -f argocd-apps/redis-app.yaml
 kubectl create ns redis
 kubectl apply -f charts/redis.yaml
 ```
+
+## Minio
+
+ArgoCD:
+
+```shell
+kubectl apply -f argocd-apps/minio-app.yaml
+```
+
+или
+
+```shell
+kubectl apply -f charts/minio.yaml
+```
+
+## Minio console
+
+ArgoCD:
+
+```shell
+kubectl apply -f argocd-apps/minio-console-app.yaml
+```
+
+или
+
+```shell
+kubectl -n minio apply -f manifests/minio-console/minio-console.yaml
+```
+
+**Внимание!** Через некоторое время, после создания видео. Проект mino console в dockerhub закрыли.
+Подписчик моего канала на [Boosty](https://boosty.to/bigkaa), сделал чарт
+[minio](charts/minio-after-delete-console.yaml) с учетом удаления проекта minio console.
+
+## Mail relay
+
+ArgoCD:
+
+```shell
+kubectl apply -f argocd-apps/mail-relay-app.yaml
+```
+
+или
+
+```shell
+kubectl create ns mail-relay
+kubectl -n mail-relay apply -f manifests/mail-relay/
+```
+
+## Harbor
+
+База дынных `harbor`
+
+ArgoCD:
+
+```shell
+kubectl apply -f argocd-apps/harbor-app.yaml
+```
+
+или:
+
+```shell
+kubectl create ns harbor
+kubectl apply -f charts/harbor.yaml
+```
