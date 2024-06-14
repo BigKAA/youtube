@@ -162,10 +162,6 @@ kubectl apply -f argocd-apps/minio-console-app.yaml
 kubectl -n minio apply -f manifests/minio-console/minio-console.yaml
 ```
 
-**Внимание!** Через некоторое время, после создания видео. Проект mino console в dockerhub закрыли.
-Подписчик моего канала на [Boosty](https://boosty.to/bigkaa), сделал чарт
-[minio](charts/minio-after-delete-console.yaml) с учетом удаления проекта minio console.
-
 ## Mail relay
 
 ArgoCD:
@@ -183,7 +179,7 @@ kubectl -n mail-relay apply -f manifests/mail-relay/
 
 ## Harbor
 
-База дынных `harbor`
+База данных `harbor`
 
 ArgoCD:
 
@@ -196,4 +192,68 @@ kubectl apply -f argocd-apps/harbor-app.yaml
 ```shell
 kubectl create ns harbor
 kubectl apply -f charts/harbor.yaml
+```
+
+## Gitlab
+
+Перед запуском GitLab требуется провести подготовительные действия.
+
+```shell
+kubectl create ns gitlab
+```
+
+Создаём сикреты, необходимые для работы gitlab:
+
+```shell
+kubectl -n gitlab apply -f gitlab-secrets
+```
+
+Создаём базу данных `gitlab` в PostgreSQL.
+
+В minio создаём buckets:
+
+- `gitlab-lfs-storage`
+- `gitlab-artifacts-storage`
+- `gitlab-uploads-storage`
+- `gitlab-packages-storage`
+- `gitlab-backup-storage`
+- `gitlab-tmp-storage`
+
+ArgoCD:
+
+Почему то, в ArgoCD чарт не работает. Поэтому ставим через helm который встроен в k3s
+
+```shell
+kubectl apply -f charts/gitlab.yaml
+```
+
+## GitLab runner
+
+В WEB интерфейсе создай runner. Получите токен и подставьте eго значение в Secret.
+
+```shell
+cat << EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dev-gitlab-runner
+  namespace: gitlab
+  labels:
+    manual: "yes"
+type: Opaque
+stringData:
+  runner-registration-token: ""
+  # тут подставляем полученный в WEB интерфейсе токен
+  runner-token: "glrt-qZeoBLU_jZ3yDsFtdT7k"
+  
+  # S3 cache parameters
+  accesskey: "admin"
+  secretkey: "password"
+EOF
+```
+
+В minio добавляем бакет `dev-runner-cache`.
+
+```shell
+kubectl apply -f charts/gitlab-runner.yaml
 ```

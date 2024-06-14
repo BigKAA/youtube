@@ -1,0 +1,82 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: gitlab-runner-global
+  namespace: gitlab
+spec:
+  repo: 'https://charts.gitlab.io'
+  chart: gitlab-runner
+  version: 0.62.1
+  targetNamespace: gitlab
+  valuesContent: |-
+    imagePullPolicy: IfNotPresent
+    revisionHistoryLimit: 3
+    gitlabUrl: https://gitlab.kryukov.local/
+    terminationGracePeriodSeconds: 3600
+    # Количество раннеров
+    concurrent: 5
+    checkInterval: 30
+    logLevel: info
+    logFormat: json
+    sessionServer:
+      enabled: false
+    rbac:
+      create: true
+      rules:
+      - resources: ["pods", "secrets", "configmaps"]
+        verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
+      - apiGroups: [""]
+        resources: ["pods/exec", "pods/attach"]
+        verbs: ["create", "patch", "delete"]
+      clusterWideAccess: false
+      podSecurityPolicy:
+        enabled: false
+        resourceNames:
+        - gitlab-runner
+    metrics:
+      enabled: false
+    service:
+      enabled: false
+    runners:
+      config: |
+        # log_level = "debug"
+        [[runners]]
+          output_limit = 10000
+          tls-ca-file = "/home/gitlab-runner/.gitlab-runner/certs/ca.crt"
+          [runners.kubernetes]
+            image = "ubuntu:22.04"
+            # helper_image = "if use custom helper"
+          [[runners.kubernetes.volumes.secret]]
+            # ??? не уверен, что надо
+            name = "gitlab-tls"
+            mount_path = "/home/gitlab-runner/.gitlab-runner/certs/"
+          [runners.cache]
+            Type = "s3"
+            Path = ""
+            Shared = true
+            [runners.cache.s3]
+              ServerAddress = "minio.minio.svc:9000"
+              BucketName = "dev-runner-cache"
+              BucketLocation = "us-east-1"
+              Insecure = true
+              AuthenticationType = "access-key"
+      cache:
+        secretName: dev-gitlab-runner
+      executor: kubernetes
+      secret: dev-gitlab-runner
+    securityContext:
+      runAsUser: 100
+      # runAsGroup: 65533
+      fsGroup: 65533
+      # supplementalGroups: [65533]
+    resources:
+      limits:
+        memory: 2048Mi
+        cpu: "2"
+      requests:
+        memory: 128Mi
+        cpu: 100m  
+    # mount at /home/gitlab-runner/.gitlab-runner/certs/
+    certsSecretName: gitlab-tls 
+    

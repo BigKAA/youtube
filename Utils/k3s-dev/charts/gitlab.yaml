@@ -1,0 +1,153 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  repo: 'https://charts.gitlab.io'
+  chart: gitlab
+  version: 7.9.2
+  targetNamespace: gitlab
+  valuesContent: |-
+    certmanager:
+      install: false
+    postgresql:
+      install: false
+    redis:
+      install: false
+    prometheus:
+      install: false
+    nginx-ingress:
+      enabled: false
+    gitlab-runner:
+      install: false
+    registry:
+      enabled: false
+
+    global:
+      edition: ce
+      minio:
+        enabled: false
+      initialRootPassword:
+        key: password
+        secret: initial-admin-password
+      redis:
+        auth:
+          enabled: true
+          secret: gitlab-redis
+          key: redis-password
+        host: redis-master.redis.svc
+        port: 6379
+
+      psql:
+        host: postgres-np.psql.svc
+        port: 5432
+        database: gitlab
+        username: artur
+        password:
+          useSecret: true
+          secret: postgres-secret
+          key: password
+
+      ingress:
+        configureCertmanager: false
+        class: system-ingress
+        annotations:
+          cert-manager.io/cluster-issuer: dev-ca-issuer
+          cert-manager.io/subject-organizations: "home dev lab"
+          cert-manager.io/subject-countries: "RU"
+          cert-manager.io/subject-localities: "Moscow"
+          cert-manager.io/duration: "9125h"
+          cert-manager.io/renew-before: "360h"
+          cert-manager.io/usages: "server auth"
+          cert-manager.io/private-key-algorithm: RSA
+          cert-manager.io/private-key-encoding: "PKCS8"
+          cert-manager.io/private-key-size: "4096"
+          cert-manager.io/private-key-rotation-policy: Always
+        tls:
+          enabled: true
+
+      hosts:
+        domain: kryukov.local
+        https: true
+        externalIP: 192.168.218.189
+
+      appConfig:
+        # https://docs.gitlab.com/charts/advanced/external-object-storage/#lfs-artifacts-uploads-packages-external-diffs-terraform-state-dependency-proxy
+        lfs:
+          bucket: gitlab-lfs-storage
+          connection: # https://gitlab.com/gitlab-org/charts/gitlab/blob/master/doc/charts/globals.md#connection
+            secret: minio-credentials
+            key: connection
+        artifacts:
+          bucket: gitlab-artifacts-storage
+          connection:
+            secret: minio-credentials
+            key: connection
+        uploads:
+          bucket: gitlab-uploads-storage
+          connection:
+            secret: minio-credentials
+            key: connection
+        packages:
+          bucket: gitlab-packages-storage
+          connection:
+            secret: minio-credentials
+            key: connection
+        cron_jobs:
+          expire_build_artifacts_worker:
+            cron: "*/7 * * * *"
+          repository_check_worker:
+            cron: "20 * * * *"
+          repository_archive_cache_worker:
+            cron: "0 * * * *"
+          
+
+        # https://docs.gitlab.com/charts/advanced/external-object-storage/#backups
+        backups:
+          bucket: gitlab-backup-storage
+          tmpBucket: gitlab-tmp-storage
+
+      ## https://docs.gitlab.com/charts/charts/globals#outgoing-email
+      ## Outgoing email server settings
+      smtp:
+        enabled: true
+        tls: false
+        starttls_auto: false
+        openssl_verify_mode: 'none'
+        domain: "git.kryukov.local"
+        address: mail-relay.mail-relay.svc
+        port: 25
+        authentication: "none"
+        password:
+          secret: 'fake-mail-password'
+          key: 'password'
+      email:
+        from: "noreply@gitlab.kryukov.local"
+        display_name: "GitLab kryukov.local"
+
+    # https://docs.gitlab.com/charts/advanced/external-object-storage/#backups
+    gitlab:
+      toolbox:
+        backups:
+          objectStorage:
+            config:
+              secret: s3-credentials
+              key: config
+      gitaly:
+        persistence:
+          size: 50Gi
+      webservice:
+        ingress:
+          annotations:
+            cert-manager.io/common-name: gitlab.kryukov.local
+          tls:
+            secretName: gitlab-tls
+      kas:
+        ingress:
+          annotations:
+            cert-manager.io/common-name: kas.kryukov.local
+          tls:
+            secretName: kas-tls
+    
