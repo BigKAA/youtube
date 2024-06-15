@@ -44,3 +44,4 @@ Nexus внутри kubernetes, делаем свой docker registry.
   * **[Трейсинг](tracing)** - Jaeger, Open telemetry, Opensearch Observability.
 * **k3s**
   * [Установка](k3s)
+  * [Среда разработки на безе k3s](Utils/k3s-dev/README.md)
