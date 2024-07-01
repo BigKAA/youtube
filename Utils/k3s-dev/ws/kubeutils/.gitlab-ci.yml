@@ -1,0 +1,43 @@
+stages:
+  - build
+
+variables:
+  KUBE_VERSION:
+    value: "v1.28.6"
+    description: "Версия kubernetes, для которой готовится контейнер"
+  HELM_VERSION:
+    value: "v3.14.0"
+    description: "Версия helm"
+  REGCLIENT_VERSION:
+    value: "v0.5.7"
+    description: "Версия regclient"
+  KUBECONFORM_VERSION:
+    value: "v0.6.4"
+    description: "Версия kubeconform"
+
+container:
+  stage: build
+  image:
+    # https://github.com/GoogleContainerTools/kaniko/releases
+    name: gcr.io/kaniko-project/executor:v1.20.1-debug
+    entrypoint: [""]
+  tags:
+    - global
+  before_script:
+    - echo "{\"auths\":{\"${DEV_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${DEV_REGISTRY_USER}" "${DEV_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - cat ${DEV_CA} > ${PROJECT_DIR}/ca.crt
+  script:
+    - echo "Build container..."
+    - >-
+      /kaniko/executor 
+      -c ${CI_PROJECT_DIR} 
+      -d "${DEV_REGISTRY}/library/kubeutils:$(echo ${KUBE_VERSION} | cut -c2-)"
+      -f ${CI_PROJECT_DIR}/Dockerfile
+      --registry-certificate ${DEV_REGISTRY}=${PROJECT_DIR}/ca.crt
+      --build-arg KUBE_VERSION=${KUBE_VERSION}
+      --build-arg HELM_VERSION=${HELM_VERSION}
+      --build-arg REGCLIENT_VERSION=${REGCLIENT_VERSION}
+      --build-arg KUBECONFORM_VERSION=${KUBECONFORM_VERSION}
+  when: manual
+  only:
+    - web

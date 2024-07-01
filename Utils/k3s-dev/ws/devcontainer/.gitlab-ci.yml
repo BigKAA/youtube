@@ -1,0 +1,35 @@
+stages:
+  - build
+
+variables:
+  TAG:
+    value: "24.04"
+    description: "Введите tag (версию) контейнера. Пример: 24.04"
+
+container:
+  stage: build
+  image:
+    # https://github.com/GoogleContainerTools/kaniko/releases
+    name: gcr.io/kaniko-project/executor:v1.20.1-debug
+    entrypoint: [""]
+  tags:
+    - global
+  before_script:
+    - |
+      if [ -z $TAG ]; then
+        echo "Please select a container TAG"
+        exit 1 
+      fi
+    - echo "{\"auths\":{\"${DEV_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${DEV_REGISTRY_USER}" "${DEV_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - cat ${DEV_CA} > ${PROJECT_DIR}/ca.crt
+  script:
+    - echo "Build container..."
+    - >-
+      /kaniko/executor 
+      -c ${CI_PROJECT_DIR} 
+      -d "${DEV_REGISTRY}/${CONTAINER_NAME}:${TAG}"
+      -f ${CI_PROJECT_DIR}/Dockerfile
+      --registry-certificate ${DEV_REGISTRY}=${PROJECT_DIR}/ca.crt
+  when: manual
+  only:
+    - web
