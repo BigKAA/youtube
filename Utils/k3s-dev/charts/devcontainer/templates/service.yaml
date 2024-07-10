@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "devcontainer.fullname" . }}
+  labels:
+    {{- include "devcontainer.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  ports:
+    - name: ssh
+      port: 22
+      targetPort: ssh
+      protocol: TCP
+      nodePort: {{ .Values.service.nodePort }}
+    - name: application
+      port: {{ .Values.applicationService.port }}
+      targetPort: application
+      protocol: TCP
+      nodePort: {{ .Values.applicationService.nodePort }}
+  selector:
+    {{- include "devcontainer.selectorLabels" . | nindent 4 }}

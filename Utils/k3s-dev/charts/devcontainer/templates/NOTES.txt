@@ -1,0 +1,5 @@
+Доступ к контейнеру:
+
+  export NODE_PORT=$(kubectl get -n {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "devcontainer.fullname" . }})
+  export NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+  ssh {{ .Values.user.name }}@$NODE_IP -p $NODE_PORT

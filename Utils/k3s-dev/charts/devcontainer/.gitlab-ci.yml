@@ -1,0 +1,22 @@
+stages:
+  - build
+
+chart:
+  stage: build
+  image:
+    # https://github.com/GoogleContainerTools/kaniko/releases
+    name: registry.kryukov.local/library/kubeutils:1.28.6
+    entrypoint: [""]
+  tags:
+    - default
+  before_script:
+    - cat ${DEV_CA} >> /etc/ssl/certs/ca-certificates.crt
+    - helm registry login ${DEV_REGISTRY} -u ${DEV_REGISTRY_USER} -p ${DEV_REGISTRY_PASSWORD}
+  script:
+    - echo "Build chart"
+    - export CHART_VERSION=$(cat devcontainer/Chart.yaml | grep version | cut -f2 -d':' | cut -c2-)
+    - helm package devcontainer
+    - helm push devcontainer-${CHART_VERSION}.tgz oci://registry.kryukov.local/charts
+  when: manual
+  only:
+    - web

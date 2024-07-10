@@ -1,0 +1,9 @@
+apiVersion: v2
+name: devcontainer
+description: A developer container chart
+type: application
+version: 0.1.0
+appVersion: "24.04"
+maintainers:
+  - name: Artur Kryukov
+    email: artur@kryukov.moscow

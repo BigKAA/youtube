@@ -1,0 +1,72 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: artur_dev
+  namespace: default
+spec:
+  repo: 'oci://registry.kryukov.local/charts'
+  chart: devcontainer
+  version: 0.1.0
+  targetNamespace: default
+  valuesContent: |-
+    image:
+      repository: registry.kryukov.local/library/ubuntu_ssh
+      pullPolicy: Always
+      tag: "24.04"
+
+    user:
+      name: artur
+      id: "1001"
+      baseHomeDirHostPath: /home
+      pubKey:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICqKwP0oJQXgdrT5FEhR04kokG0RGbdyilTGSd4fLQNk artur@ART-RYZEN9"
+
+    cacrt: |
+      -----BEGIN CERTIFICATE-----
+      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
+      -----END CERTIFICATE-----
+    
+    service:
+      nodePort: 31022
+    applicationService:
+      port: 8080
+      nodePort: 31080
+    
+    resources:
+      limits:
+        cpu: "2"
+        memory: "2Gi"
+      requests:
+        cpu: "512mi"
+        memory: "1Gi"
+    
