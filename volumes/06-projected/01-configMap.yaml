@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-txt
+  namespace: volumes-sample
+data:
+  example.txt: |-
+    Пример configMap для видео
+    на моём канале.
+  config.yaml: |-
+    any_body:
+      params:
+        param1: value1
+        param2: value2

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openresty
+  namespace: volumes-sample
+  labels:
+    app: openresty
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openresty
+  template:
+    metadata:
+      labels:
+        app: openresty
+    spec:
+      containers:
+      - name: centos
+        image: centos:centos8
+        command: ['bash']
+        args: ['-c','sleep 50000']
+        volumeMounts:
+          - name: logs-volume
+            mountPath: /host_logs
+      volumes:
+        - name: logs-volume
+          hostPath:
+            path: /var/directory
+            type: Directory
+

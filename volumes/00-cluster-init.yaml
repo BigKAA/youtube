@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: volumes-sample
+  labels:
+    app: volumes-sample
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openresty-srv
+  namespace: volumes-sample
+  labels:
+    app: openresty-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: openresty
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: test-application-access
+  namespace: volumes-sample
+  labels:
+    app: openresty-srv
+  annotations:
+    kubernetes.io/ingress.class: "nginx-host"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: prometheus.kryukov.local
+      http:
+        paths:
+          - backend:
+              serviceName: openresty-srv
+              servicePort: 80
+            path: /volumes/

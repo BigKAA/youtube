@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openresty
+  namespace: volumes-sample
+  labels:
+    app: openresty
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: openresty
+  template:
+    metadata:
+      labels:
+        app: openresty
+    spec:
+      containers:
+        - name: openresty
+          image: openresty/openresty:centos-rpm
+          env:
+            - name: NGINX_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: "300Mi"
+            requests:
+              cpu: "0.1"
+              memory: "100Mi"
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - mountPath: "/etc/pod-data"
+              name: all-values
+              readOnly: true
+      volumes:
+        - name: all-values
+          projected:
+            sources:
+              - downwardAPI:
+                  items:
+                    - path: limits/cpu-millicore
+                      resourceFieldRef:
+                        containerName: openresty
+                        resource: limits.cpu
+                        divisor: 1m
+                    - path: limits/memory-kibibytes
+                      resourceFieldRef:
+                        containerName: openresty
+                        resource: limits.memory
+                        divisor: 1Ki
+                    - path: labels
+                      fieldRef:
+                        fieldPath: metadata.labels
+              - secret:
+                  name: user-password-secret
+                  items:
+                    - key: user
+                      path: secret/user
+                    - key: password
+                      path: secret/password
+              - configMap:
+                  name: example-txt
+                  items:
+                    - key: example.txt
+                      path: configs/example.txt
+                    - key: config.yaml
+                      path: configs/config.yaml

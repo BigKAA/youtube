@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-config
+data:
+  ENV_HOSTS: "1"
+  ENV_SOME_VALUE: new
+  ENV_URL_KRYUKOV_BIZ: http://www.kryukov.biz

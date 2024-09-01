@@ -3,6 +3,7 @@
 * **[K8s step by step](k8s-step-by-step)** - установка небольшого кластера шаг за шагом.
   * **[Kubernetes offline installation by kubespray](k8s-step-by-step/07-starter)**
   * **[kubeadm](kubeadm)** - управление кластером при помощи kubeadm.
+  * **[Volumes](volumes)** - Про volumes в kubernetes.
 * **[Helm](helm)** - всякое про Helm
 * **[Net](net)** - Про сеть в kubernetes.
   * **[Network Polices](net/04-NetworkPolicies)** - Встроенный firewall.

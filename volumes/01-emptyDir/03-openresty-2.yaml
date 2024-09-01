@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openresty
+  namespace: volumes-sample
+  labels:
+    app: openresty
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: openresty
+  template:
+    metadata:
+      labels:
+        app: openresty
+    spec:
+      initContainers:
+        - name: busybox-init
+          image: busybox:1.32.0
+          command: ['sh', '-c', 'touch /empty/init-file']
+          volumeMounts:
+            - name: empty-volume
+              mountPath: /empty
+      containers:
+      - name: openresty
+        image: openresty/openresty:centos-rpm
+        env:
+        - name: NGINX_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        resources:
+          limits:
+            cpu: "0.2"
+            memory: "300Mi"
+          requests:
+            cpu: "0.2"
+            memory: "100Mi"
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        volumeMounts:
+          - name: empty-volume
+            mountPath: /empty
+      - name: centos
+        image: centos:centos8
+        command: ['bash']
+        args: ['-c','sleep 50000']
+        volumeMounts:
+          - name: empty-volume
+            mountPath: /empty
+        env:
+          - name: ENV_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+        resources:
+          limits:
+            cpu: "0.2"
+            memory: "300Mi"
+          requests:
+            cpu: "0.1"
+            memory: "100Mi"
+      volumes:
+        - name: empty-volume
+          emptyDir:
+            medium: "Memory"

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openresty
+  namespace: volumes-sample
+  labels:
+    app: openresty
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: openresty
+  template:
+    metadata:
+      labels:
+        app: openresty
+    spec:
+      containers:
+        - name: openresty
+          image: openresty/openresty:centos-rpm
+          env:
+            - name: NGINX_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: "300Mi"
+            requests:
+              cpu: "0.1"
+              memory: "100Mi"
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: index-html
+              mountPath: /usr/local/openresty/nginx/html/
+#            - name: openresty-config
+#              mountPath: /usr/local/openresty/nginx/conf/nginx.conf
+#              subPath: nginx.conf
+      volumes:
+        - name: index-html
+          configMap:
+            name: index-html
+#        - name: openresty-config
+#          configMap:
+#            name: openresty-config
