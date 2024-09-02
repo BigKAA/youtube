@@ -8,7 +8,7 @@ spec:
   type: LoadBalancer
   selector:
     app: nginx
-    version: 1.27.1
+    version: "1.27.1"
   ports:
   - port: 8080
     targetPort: 80
@@ -20,27 +20,28 @@ metadata:
   name: sample-volume
   namespace: default
   labels:
-    app: nginx
-    version: 1.27.1
+    app: &app nginx
+    version: &version 1.27.1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx
-      version: 1.27.1 
+      app: *app
+      version: *version
   template:
     metadata:
       labels:
-        app: nginx
+        app: *app
+        version: *version
     spec:
       volumes:
       - name: nginx-persistent-storage
         image: 
-          reference: registry.kryukov.local/library/files:1.0.0
+          reference: registry-cl.kryukov.local/library/files:1.0.0
           pullPolicy: IfNotPresent
       containers:
       - name: nginx
-        image: nginx:1.27.1
+        image: registry-cl.kryukov.local/library/nginx:1.27.1
         ports:
         - containerPort: 80
         volumeMounts:

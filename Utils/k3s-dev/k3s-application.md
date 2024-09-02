@@ -51,6 +51,17 @@ sudo vim /usr/local/share/ca-certificates/extra/dev-ca.crt
 sudo update-ca-certificates
 ```
 
+### Добавление сертификата CA в Rocky Linux
+
+```shell
+vim /etc/pki/ca-trust/source/anchors/dev-ca.crt
+```
+
+```shell
+update-ca-trust force-enable
+update-ca-trust extract
+```
+
 ## Ingress controller
 
 Устанавливаем чарт. Можно при помощи встроенного в k3s helm.

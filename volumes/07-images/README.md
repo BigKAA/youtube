@@ -1,4 +1,6 @@
-# images volumes
+# Images volumes
+
+**Внимание! Работает только с Container runtime, которые поддерживают этот механизм. Например, CRI-O ≥ v1.31.**
 
 В kubernetes v1.31 появился новый тип volume - [image](https://kubernetes.io/docs/concepts/storage/volumes/#image).
 
@@ -10,9 +12,9 @@
 
 ### ORAS
 
-Для создания (и не только) артефактов в OCI хранилище можно использовать приложение [oras](https://oras.land/). 
+Для создания (и не только) артефактов в OCI хранилище можно использовать приложение [oras](https://oras.land/).
 
-Установка приложения описана в [документации](https://oras.land/docs/install/).
+Установка приложения описана в [документации](https://oras.land/docs/installation#linux).
 
 Если вы привыкли к контейнерам, то для вас разработчики создали контейнер с приложением:
 
@@ -24,25 +26,19 @@ docker run -it --rm -v $(pwd):/workspace ghcr.io/oras-project/oras:v1.2.0 help
 
 В качестве примера будем использовать файлы из директории `files`.
 
-Сначала подключимся к репозиторию:
-
-```shell
-docker run -it --rm -v $(pwd):/workspace ghcr.io/oras-project/oras:v1.2.0 \
-       login -u admin registry.kryukov.local
-```
+У меня свой собственный СА, поэтому приходится при запуске приложения указывать его сертификат.
 
 Грузим артефакт в хранилище:
 
 ```shell
-docker run -it --rm -v $(pwd):/workspace ghcr.io/oras-project/oras:v1.2.0 \
-       push -u admin registry.kryukov.local/library/files:1.0.0 ./html/:text/html
+export CL_PASS=password
+echo $CL_PASS | oras push -u admin --password-stdin --ca-file ca.crt registry-cl.kryukov.local/library/files:1.0.0 ./html/:text/html
 ```
 
 Проверяем:
 
 ```shell
-docker run -it --rm -v $(pwd):/workspace ghcr.io/oras-project/oras:v1.2.0 \
-       manifest fetch registry.kryukov.local/library/files:1.0.0 --pretty
+oras manifest fetch --ca-file ca.crt registry-cl.kryukov.local/library/files:1.0.0 --pretty
 ```
 
 ## Пример использования volume image
@@ -52,24 +48,26 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: sample-volume
+  namespace: default
   labels:
-    app: nginx
-    version: 1.27.1
+    app: &app nginx
+    version: &version 1.27.1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx
-      version: 1.27.1 
+      app: *app
+      version: *version
   template:
     metadata:
       labels:
-        app: nginx
+        app: *app
+        version: *version
     spec:
       volumes:
       - name: nginx-persistent-storage
         image: 
-          reference: registry.kryukov.local/library/files:1.0.0
+          reference: registry-cl.kryukov.local/library/files:1.0.0
           pullPolicy: IfNotPresent
       containers:
       - name: nginx
@@ -79,4 +77,11 @@ spec:
         volumeMounts:
         - name: nginx-persistent-storage
           mountPath: /usr/share/nginx
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
 ```

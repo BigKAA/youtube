@@ -1,0 +1,9 @@
+global:
+  defaultStorageClass: "managed-nfs-storage"
+  storageClass: "managed-nfs-storage"
+  redis:
+    password: 'qUwTt8g9it'
+pdb:
+  create: true
+replica:
+  replicaCount: 1
