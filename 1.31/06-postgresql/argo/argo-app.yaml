@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgresql
+  namespace: argocd
+spec:
+  destination:
+    name: ''
+    namespace: pg
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: 1.31/06-postgresql/manifests
+    repoURL: 'https://github.com/BigKAA/youtube'
+    targetRevision: master
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
