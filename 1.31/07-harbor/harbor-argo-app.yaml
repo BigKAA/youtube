@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 19.6.0
+    targetRevision: 23.0.2
     helm:
       values: |
         global:
