@@ -16,6 +16,15 @@
 
 Установка приложения описана в [документации](https://oras.land/docs/installation#linux).
 
+```shell
+export VERSION="1.2.0"
+curl -LO "https://github.com/oras-project/oras/releases/download/v${VERSION}/oras_${VERSION}_linux_amd64.tar.gz"
+mkdir -p oras-install/
+tar -zxf oras_${VERSION}_*.tar.gz -C oras-install/
+sudo mv oras-install/oras /usr/local/bin/
+rm -rf oras_${VERSION}_*.tar.gz oras-install/
+```
+
 Если вы привыкли к контейнерам, то для вас разработчики создали контейнер с приложением:
 
 ```shell
