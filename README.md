@@ -36,6 +36,7 @@ Nexus внутри kubernetes, делаем свой docker registry.
   * **[Local Path Provisioner](base/local-path-provisioner)** - Доступ к локальным 
     дискам кластера при помощи Local Path Provisioner.
   * **[Longhorn](longhorn)** - Highly available persistent storage for Kubernetes.
+  * **[OpenLDAP](openldap)** - OpenLDAP.
 * **[Hashicorp vault](vault)**
 * **Observability**
   * **[Мониторинг](monitoring)**
