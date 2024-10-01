@@ -17,7 +17,7 @@ kubectl -n kube-system create -f 01-nfs.yaml
 ## Cert manager
 
 ```shell
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.2/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.3/cert-manager.yaml
 ```
 
 Добавляем CA для всего кластера и ClusterIssuer.

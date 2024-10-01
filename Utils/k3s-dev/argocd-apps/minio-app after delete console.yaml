@@ -1,0 +1,61 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argo-cd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    chart: minio
+    targetRevision: 14.7.4
+    helm:
+      values: |
+        mode: distributed
+        auth:
+          rootUser: admin
+          rootPassword: password
+        tls:
+          enabled: false
+        statefulset:
+          replicaCount: 1
+          zones: 1
+          drivesPerNode: 4
+        persistence:
+          enabled: true
+          size: 4Gi
+        volumePermissions:
+          enabled: true
+        ingress:
+          enabled: true
+          ingressClassName: "system-ingress"
+          hostname: minio.kryukov.local
+          path: /
+          pathType: Prefix
+          servicePort: minio-console
+          annotations:
+            cert-manager.io/cluster-issuer: dev-ca-issuer
+            cert-manager.io/common-name: minio.kryukov.local
+            cert-manager.io/subject-organizations: "home dev lab"
+            cert-manager.io/subject-countries: "RU"
+            cert-manager.io/subject-localities: "Moscow"
+            cert-manager.io/duration: "9125h"
+            cert-manager.io/renew-before: "360h"
+            cert-manager.io/usages: "server auth"
+            cert-manager.io/private-key-algorithm: RSA
+            cert-manager.io/private-key-encoding: "PKCS8"
+            cert-manager.io/private-key-size: "4096"
+            cert-manager.io/private-key-rotation-policy: Always
+          tls: true      
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
