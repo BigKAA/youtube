@@ -1,0 +1,18 @@
+# Пользователь Linux
+dn: uid=petrov_vs,ou=Users,dc=my-domain,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: Петров
+sn: Василий
+displayName: Петров Василий Сергеевич
+# slappasswd пароль: password
+userPassword: {SSHA}nwXoxv3hFEbtZmQctIH57vFik1mb1380
+loginShell: /bin/bash
+uid: petrov_vs
+uidNumber: 30000
+gidNumber: 20000
+homeDirectory: /home/petrov_vs
+shadowLastChange: 0
+shadowMax: 0
+shadowWarning: 0

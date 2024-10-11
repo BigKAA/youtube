@@ -453,3 +453,177 @@ chown -R ldap:ldap /etc/openldap/slapd.d/
 Исследуем содержимое директории `/etc/openldap/slapd.d`.
 
 **Внимание!** Не редактируйте файлы в директории `/etc/openldap/slapd.d`! Изменение конфигурации должно происходить только при помощи специальных утилит.
+
+## Запуск сервера
+
+```shell
+systemctl start slapd
+systemctl status slapd
+systemctl enable slapd
+```
+
+Проверяем наличие socket файла и открытого порта 389:
+
+```shell
+ls -l /var/symas/run/
+ss -nltp | grep 389
+```
+
+Директория с данными:
+
+```shell
+ls -l /var/symas/openldap-data
+```
+
+## Клиенты
+
+### Утилиты командной строки
+
+Создадим конфигурационный файл клиентских приложений.
+
+```shell
+cd /opt/symas/etc/openldap
+cat > ldap.conf << EOF
+BASE   dc=my-domain,dc=com
+URI    ldap://127.0.0.1:389 ldapi://%2Fvar%2Fsymas%2Frun%2Fsldap.sock/
+
+EOF
+```
+
+Делаем красиво:
+
+```shell
+ln -s /opt/symas/etc/openldap/ldap.conf /etc/openldap/ldap.conf
+```
+
+На данный момент у нас в LDAP в базе mdb нет никакой информации. Поэтому запросим данные из системы мониторинга.
+
+Пытаемся подключиться с правами системного пользователя `root` через ldapi (socket файл).
+
+```shell
+ldapsearch -Q -LLL -Y EXTERNAL -b 'cn=Monitor' '(cn=Monitor)'
+```
+
+В ответ должны получить:
+
+```txt
+SASL/EXTERNAL authentication started
+SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+SASL SSF: 0
+dn: cn=Monitor
+objectClass: monitorServer
+cn: Monitor
+description: This subtree contains monitoring/managing objects.
+description: This object contains information about this server.
+description: Most of the information is held in operational attributes, which 
+ must be explicitly requested.
+```
+
+Аналогичный запрос, но уже с правами администратора:
+
+```shell
+ldapsearch -LLL -x -D cn=Manager,dc=my-domain,dc=com -W -b 'cn=Monitor' '(cn=Monitor)'
+```
+
+- `-x` включает base auth.
+- `-W` приложение попросит вас ввести пароль администратора.
+
+Аналогичным образом можно посмотреть, например конфигурацию сервера:
+
+```shell
+ldapsearch -Q -LLL -Y EXTERNAL -b 'cn=config' | less
+```
+
+### Добавление информации в дерево LDAP
+
+Для добавления данных необходимо создать ldif файл, содержащие данные.
+
+В файле `init_data.ldif` находится базовая структура дерева и служебные пользователи.
+
+```bash
+ldapadd -Y EXTERNAL -f init_data.ldif
+```
+
+Договоримся (проведем приказом по отделу), что пользователи, которые будут отображаться на машины Linux, будут иметь RDN uid. И находится в определенном OU.
+
+Добавим пользователя, который будет отображаться в Linux машины:
+
+```bash
+ldapadd -Y EXTERNAL -f add_user.ldif
+```
+
+Посмотрим содержимое дерева:
+
+```shell
+ldapsearch -Q -LLL -Y EXTERNAL 
+```
+
+Выведем список пользователей, отображаемых на Linux машины:
+
+```shell
+ldapsearch -Q -LLL -Y EXTERNAL -b 'ou=Users,dc=my-domain,dc=com' 'uid=*' dn displayName uid
+```
+
+```ldif
+dn: uid=petrov_vs,ou=Users,dc=my-domain,dc=com
+displayName:: 0J/QtdGC0YDQvtCyINCS0LDRgdC40LvQuNC5INCh0LXRgNCz0LXQtdCy0LjRhw==
+uid: petrov_vs
+```
+
+### Модификация данных
+
+#### Изменение пароля пользователя
+
+Для изменения пароля пользователя petrov_vs создадим ldif файл `petrov_password.ldif`.
+
+Хеш пароля получим при помощи приложения `slappasswd`.
+
+```ldif
+dn: uid=petrov_vs,ou=Users,dc=my-domain,dc=com
+changetype: modify
+userPassword: olcRootPW
+# password: password2
+olcRootPW: {SSHA}2o0EN89kKcR/T4z2EAI1nFI/oG1mFX9T
+```
+
+```shell
+ldapmodify -Q -Y EXTERNAL -f petrov_password.ldif
+```
+
+Проверяем:
+
+```shell
+ldapsearch -LLL -x -D uid=petrov_vs,ou=Users,dc=my-domain,dc=com -W "uid=*" dn uid userPassword
+```
+
+```ldif
+dn: uid=petrov_vs,ou=Users,dc=my-domain,dc=com
+uid: petrov_vs
+userPassword:: e1NTSEF9Mm8wRU44OWtLY1IvVDR6MkVBSTFuRkkvb0cxbUZYOVQ=
+```
+
+#### Изменение пароля админа
+
+Изменение пароля администратора происходит аналогичным образом. Но нужно учитывать в каком дереве находится информация об этом пользователе и его пароле.
+
+Создадим файл `admin_password.ldif`.
+
+```ldif
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+replace: olcRootPW
+# password: password2
+olcRootPW: {SSHA}2o0EN89kKcR/T4z2EAI1nFI/oG1mFX9T
+```
+
+Применяем изменения:
+
+```shell
+ldapmodify -Q -Y EXTERNAL -f admin_password.ldif
+```
+
+Проверяем:
+
+```bash
+ldapsearch -LLL -x -D cn=Manager,dc=my-domain,dc=com -W dn
+```
