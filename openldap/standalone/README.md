@@ -141,7 +141,7 @@ cp slapd.ldif.default slapd.ldif
 
 #### cn=module,cn=config
 
-Следующая запись: `dn: cn=module,cn=config`, позоволяет указать какие модули необходимо запускать при старте OpenLDAP.
+Следующая запись: `dn: cn=module,cn=config`, позволяет указать какие модули необходимо запускать при старте OpenLDAP.
 
 [https://www.openldap.org/doc/admin26/guide.html#cn=module](https://www.openldap.org/doc/admin26/guide.html#cn=module)
 
@@ -485,7 +485,7 @@ ls -l /var/symas/openldap-data
 cd /opt/symas/etc/openldap
 cat > ldap.conf << EOF
 BASE   dc=my-domain,dc=com
-URI    ldap://127.0.0.1:389 ldapi://%2Fvar%2Fsymas%2Frun%2Fsldap.sock/
+URI    ldapi://%2Fvar%2Fsymas%2Frun%2Fsldap.sock/ ldap://127.0.0.1:389
 
 EOF
 ```
@@ -507,9 +507,6 @@ ldapsearch -Q -LLL -Y EXTERNAL -b 'cn=Monitor' '(cn=Monitor)'
 В ответ должны получить:
 
 ```txt
-SASL/EXTERNAL authentication started
-SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
-SASL SSF: 0
 dn: cn=Monitor
 objectClass: monitorServer
 cn: Monitor

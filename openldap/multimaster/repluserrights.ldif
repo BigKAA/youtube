@@ -1,0 +1,4 @@
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+add: olcAccess
+olcAccess: {0}to dn.subtree="dc=my-domain,dc=com" by dn.exact="cn=repluser,dc=my-domain,dc=com" read by * break

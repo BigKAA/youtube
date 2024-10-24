@@ -1,0 +1,8 @@
+dn: cn=repluser,dc=my-domain,dc=com
+objectClass: inetOrgPerson
+cn: repluser
+sn: repluser
+description: Application account for LDAP replication
+# password: password
+userPassword: {SSHA}Cl6ONU2E26tVc4CziboiSrkh3FP76MTC
+

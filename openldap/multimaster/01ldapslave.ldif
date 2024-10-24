@@ -1,0 +1,17 @@
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=001
+  provider=ldap://rocky2.kryukov.local:389/
+  bindmethod=simple
+  binddn="cn=repluser,dc=my-domain,dc=com"
+  credentials=password
+  searchbase="dc=my-domain,dc=com"
+  scope=sub
+  schemachecking=off
+  type=refreshAndPersist
+  retry="60 +"
+  interval=00:00:05:00
+-
+add: olcMirrorMode
+olcMirrorMode: TRUE
