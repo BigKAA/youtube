@@ -1,5 +1,7 @@
 # Материалы для моих видео в Youtube
 
+_Фокнул репо - поставь звезду. Звезды зажигаются не просто так_
+
 * **[K8s step by step](k8s-step-by-step)** - установка небольшого кластера шаг за шагом.
   * **[Kubernetes offline installation by kubespray](k8s-step-by-step/07-starter)**
   * **[kubeadm](kubeadm)** - управление кластером при помощи kubeadm.
