@@ -66,5 +66,3 @@ kubectl -n kube-system exec etcd-control1.kryukov.local -- etcdctl \
   --cert /etc/kubernetes/pki/etcd/server.crt \
   member remove b7460bb084b5c02b
 ```
-
-
