@@ -1,0 +1,44 @@
+# Корень дерева
+dn: dc=my-domain,dc=com
+objectClass: top
+objectClass: dcObject
+objectclass: organization
+o: Тестовая организация
+dc: my-domain
+
+# Админ. Что бы был. Пароль не нужен
+dn: cn=Manager,dc=my-domain,dc=com
+objectClass: organizationalRole
+cn: Manager
+description: OpenLDAP Manager
+
+# Пользователь для доступа к мониторингу
+dn: cn=Monitoring,dc=my-domain,dc=com
+objectClass: inetOrgPerson
+cn: Monitoring
+sn: Monitoring
+# slappasswd пароль: password
+userPassword: {SSHA}nwXoxv3hFEbtZmQctIH57vFik1mb1380
+
+# OU для хранения учетных записей
+dn: ou=Users,dc=my-domain,dc=com
+objectClass: organizationalUnit
+ou: Users
+
+# OU для хранения групп
+dn: ou=Groups,dc=my-domain,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+# Группа мониторинг для демонстрации memberOf
+dn: cn=monitoring,ou=Groups,dc=my-domain,dc=com
+objectclass: groupOfNames
+cn: monitoring
+member: cn=Monitoring,dc=my-domain,dc=com
+
+# Posix группа для отображения на Linux
+dn: cn=users,ou=Groups,dc=my-domain,dc=com
+objectClass: posixGroup
+cn: users
+gidNumber: 20000
+memberUid: Monitoring

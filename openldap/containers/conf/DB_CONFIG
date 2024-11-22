@@ -1,0 +1,12 @@
+# one 0.25 GB cache
+set_cachesize 0 268435456 1
+
+# Data Directory
+#set_data_dir db
+
+# Transaction Log settings
+set_lg_regionmax 262144
+set_lg_bsize 2097152
+#set_lg_dir logs
+
+set_flags DB_LOG_AUTOREMOVE

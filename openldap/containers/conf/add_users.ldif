@@ -1,0 +1,26 @@
+# Пользователь Linux
+dn: uid=petrov_vs,ou=Users,dc=my-domain,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: Петров
+sn: Василий
+displayName: Петров Василий Сергеевич
+# slappasswd пароль: password
+userPassword: {SSHA}nwXoxv3hFEbtZmQctIH57vFik1mb1380
+loginShell: /bin/bash
+uid: petrov_vs
+uidNumber: 30000
+gidNumber: 20000
+homeDirectory: /home/petrov_vs
+shadowLastChange: 0
+shadowMax: 0
+shadowWarning: 0
+
+dn: cn=repluser,dc=my-domain,dc=com
+objectClass: inetOrgPerson
+cn: repluser
+sn: repluser
+description: Application account for LDAP replication
+# password: password
+userPassword: {SSHA}Cl6ONU2E26tVc4CziboiSrkh3FP76MTC

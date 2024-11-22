@@ -18,12 +18,9 @@ ldapmodify -Q -Y EXTERNAL -f admin_password.ldif
 
 ```shell
 wget -q https://repo.symas.com/configs/SOLDAP/rhel9/release26.repo -O /etc/yum.repos.d/soldap-release26.repo
-dnf update -y
+dnf update
 dnf install -y symas-openldap-clients symas-openldap-servers
-exit
 ```
-
-Выходим для того, что бы применились изменения в среде окружения пользователя.
 
 Подготовим файл `slapd.ldif`. Содержимое файла аналогично файлу с первого сервера OpenLDAP:
 
@@ -47,7 +44,7 @@ cd /opt/symas/etc/openldap
 cat > ldap.conf << EOF
 BASE   dc=my-domain,dc=com
 URI    ldapi://%2Fvar%2Fsymas%2Frun%2Fsldap.sock/ ldap://127.0.0.1:389
-SASL_NOCANON    on
+
 EOF
 rm -f /etc/openldap/ldap.conf
 ln -s /opt/symas/etc/openldap/ldap.conf /etc/openldap/ldap.conf
@@ -56,15 +53,15 @@ ln -s /opt/symas/etc/openldap/ldap.conf /etc/openldap/ldap.conf
 Создание директорий и установка прав доступа:
 
 ```shell
-rm -rf /etc/openldap/slapd.d
 mkdir -p /etc/openldap/slapd.d
+chown ldap:ldap /var/symas/openldap-data /var/symas/run /etc/openldap/slapd.d
 ```
 
 Создание конфигурации:
 
 ```shell
 slapadd -b cn=config -l ~/slapd.ldif -F /etc/openldap/slapd.d/
-chown -R ldap:ldap /var/symas/openldap-data /var/symas/run /etc/openldap/slapd.d
+chown -R ldap:ldap /etc/openldap/slapd.d/
 ```
 
 Запуск сервера:
@@ -188,7 +185,7 @@ olcSyncRepl: rid=001
   credentials=password
   searchbase="dc=my-domain,dc=com"
   scope=sub
-  schemachecking=off
+  schemachecking=on
   type=refreshAndPersist
   retry="60 +"
   interval=00:00:05:00
@@ -201,7 +198,7 @@ olcMirrorMode: TRUE
 
 - `olcSyncRepl`
   - `schemachecking` - `on` каждая реплицируемая запись будет проверяться на соответствие ее схеме, на сервере-получателе. Если параметр отключен, записи будут сохранены без проверки соответствия схемы. Значение по умолчанию отключено.
-  - `type` - определяет, какой режим будет использовать клиент при подключении к провайдеру. Существует два режима:
+  - `type` - определяет, какой режим будет использовать клиент при подключении к провайдеру. Существует два режима: 
     - `refreshOnly` - следующая операция поиска синхронизации периодически переносится через определенный промежуток времени после завершения каждой операции синхронизации. Интервал определяется параметром `interval`.
     - `refreshAndPersist` - операция поиска является постоянной.
   - `retry` - Если во время репликации возникает ошибка, пользователь попытается повторно подключиться в соответствии с параметром `retry`, который представляет собой список пар <интервал повторных попыток> и <количество повторных попыток>. Например, параметр retry="30 5 300 3" позволяет пользователю повторять попытку каждые 30 секунд в течение первых 5 раз, а затем каждые 300 секунд в течение следующих трех раз, прежде чем прекратить повторные попытки. + в <числе повторных попыток> означает неопределенное количество попыток до достижения успеха.
@@ -214,10 +211,6 @@ ldapmodify -Y EXTERNAL -f 02ldapslave.ldif
 Подключаемся к slave LDAP серверу и наблюдаем записи с основного мастера.
 
 Если записей нет, значит вы где то ошиблись. Смотрите логи slave и мастер серверов.
-
-```shell
-journalctl -u symas-openldap-servers --no-pager
-```
 
 ## Multimaster
 
@@ -238,7 +231,7 @@ olcSyncRepl: rid=001
   credentials=password
   searchbase="dc=my-domain,dc=com"
   scope=sub
-  schemachecking=off
+  schemachecking=on
   type=refreshAndPersist
   retry="60 +"
   interval=00:00:05:00
@@ -268,7 +261,7 @@ olcSyncRepl: rid=001
   credentials=password
   searchbase="dc=my-domain,dc=com"
   scope=sub
-  schemachecking=off
+  schemachecking=on
   type=refreshAndPersist
   retry="60 +"
   interval=00:00:05:00
@@ -279,7 +272,7 @@ olcSyncRepl: rid=002
   credentials=password
   searchbase="dc=my-domain,dc=com"
   scope=sub
-  schemachecking=off
+  schemachecking=on
   type=refreshAndPersist
   retry="60 +"
   interval=00:00:05:00

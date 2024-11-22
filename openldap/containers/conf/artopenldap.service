@@ -1,0 +1,28 @@
+[Unit]
+Description=OpenLDAP Service
+After=containerd.service
+Requires=containerd.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/ctr task kill %n
+ExecStartPre=-/usr/bin/ctr task rm %n
+ExecStartPre=-/usr/bin/ctr snapshot rm %n
+ExecStartPre=-/usr/bin/ctr c rm %n
+ExecStartPre=/usr/bin/ctr image pull registry.kryukov.local/library/artopenldap:2.4.59
+ExecStart=/usr/local/bin/nerdctl run --network host -d \
+   --mount type=bind,src=/etc/openldap/slapd.d,dst=/etc/openldap/slapd.d \
+   --mount type=bind,src=/var/lib/openldap,dst=/var/lib/openldap \
+   --name %n \
+   --ulimit nofile=1024:1024\
+   --entrypoint /usr/sbin/slapd \
+   registry.kryukov.local/library/artopenldap:2.4.59  \
+      -4 -F /etc/openldap/slapd.d -u ldap -g ldap \
+      -h "ldap://0.0.0.0:10389/ \
+      ldapi://%2Fvar%2Flib%2Fopenldap%2Frun%2Fsldap.sock/" \
+      -d "256"
+ExecReload=/usr/local/bin/nerdctl restart %n
+
+[Install]
+WantedBy=multi-user.target

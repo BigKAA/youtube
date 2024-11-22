@@ -1,8 +1,13 @@
-dn: olcDatabase={1}mdb,cn=config
+dn: cn=config
+changetype: modify
+replace: olcServerID
+olcServerID: 101
+
+dn: olcDatabase={1}hdb,cn=config
 changetype: modify
 add: olcSyncRepl
 olcSyncRepl: rid=001
-  provider=ldap://rocky1.kryukov.local:389/
+  provider=ldap://rocky2.kryukov.local:10389/
   bindmethod=simple
   binddn="cn=repluser,dc=my-domain,dc=com"
   credentials=password

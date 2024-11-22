@@ -1,0 +1,111 @@
+stages:
+  - build
+  - push
+
+variables:
+  CONTAINER_TAG_2_6:
+    value: "2.6.7"
+    description: "Версия контейнера 2.6"
+  CONTAINER_TAG_2_4:
+    value: "2.4.59"
+    description: "Версия контейнера 2.4"
+  EXPORTER_TAG:
+    value: "2.2.2"
+    description: "Версия контейнера экспортера"
+
+exporter-build:
+  stage: build
+  tags:
+    - global
+  image: 
+    name: golang:1.20.14-alpine3.19
+    entrypoint:
+      - ""
+  script:
+    - apk add git
+    - git clone https://github.com/tomcz/openldap_exporter.git
+    - cd openldap_exporter
+    - go build -o ../out/openldap_exporter ./cmd/openldap_exporter/main.go
+  cache:
+    - key: openldap_exporter
+      paths:
+        - out
+  when: manual
+  only:
+    - web
+
+exporter-push:
+  stage: push
+  image:
+    name: gcr.io/kaniko-project/executor:v1.20.1-debug
+    entrypoint: [""]
+  tags:
+    - global
+  cache:
+    - key: openldap_exporter
+      paths:
+        - out
+  needs:
+    - exporter-build
+  before_script:
+    - echo "{\"auths\":{\"${DEV_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${DEV_REGISTRY_USER}" "${DEV_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - cat ${DEV_CA} > ${PROJECT_DIR}/ca.crt
+  script:
+    - echo "Build container..."
+    - >-
+      /kaniko/executor 
+      -c ${CI_PROJECT_DIR} 
+      -d "${DEV_REGISTRY}/library/artopenldapexporter:${EXPORTER_TAG}"
+      -f ${CI_PROJECT_DIR}/exporter.Dockerfile
+      --registry-certificate ${DEV_REGISTRY}=${PROJECT_DIR}/ca.crt
+      --registry-mirror mirror.gcr.io
+  when: on_success
+  only:
+    - web
+
+openldap-2.6-push:
+  stage: push
+  image:
+    # https://github.com/GoogleContainerTools/kaniko/releases
+    name: gcr.io/kaniko-project/executor:v1.20.1-debug
+    entrypoint: [""]
+  tags:
+    - global
+  before_script:
+    - echo "{\"auths\":{\"${DEV_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${DEV_REGISTRY_USER}" "${DEV_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - cat ${DEV_CA} > ${PROJECT_DIR}/ca.crt
+  script:
+    - echo "Build container..."
+    - >-
+      /kaniko/executor 
+      -c ${CI_PROJECT_DIR} 
+      -d "${DEV_REGISTRY}/library/artopenldap:${CONTAINER_TAG_2_6}"
+      -f ${CI_PROJECT_DIR}/openldap.Dockerfile
+      --registry-certificate ${DEV_REGISTRY}=${PROJECT_DIR}/ca.crt
+      --registry-mirror mirror.gcr.io
+  when: manual
+  only:
+    - web
+
+openldap-2.4-push:
+  stage: push
+  image:
+    name: gcr.io/kaniko-project/executor:v1.20.1-debug
+    entrypoint: [""]
+  tags:
+    - global
+  before_script:
+    - echo "{\"auths\":{\"${DEV_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${DEV_REGISTRY_USER}" "${DEV_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - cat ${DEV_CA} > ${PROJECT_DIR}/ca.crt
+  script:
+    - echo "Build container..."
+    - >-
+      /kaniko/executor 
+      -c ${CI_PROJECT_DIR} 
+      -d "${DEV_REGISTRY}/library/artopenldap:${CONTAINER_TAG_2_4}"
+      -f ${CI_PROJECT_DIR}/openldap-2.4.Dockerfile
+      --registry-certificate ${DEV_REGISTRY}=${PROJECT_DIR}/ca.crt
+      --registry-mirror mirror.gcr.io
+  when: manual
+  only:
+    - web
