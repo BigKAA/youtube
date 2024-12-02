@@ -25,6 +25,15 @@ spec:
     configs:
       params:
         server.insecure: true
+
+      # В последней версии исправили добавление сертифкатов СА
+      # tls:
+      #   certificates:
+      #     myserver-ca: |
+      #       -----BEGIN CERTIFICATE-----
+      #       ...
+      #       -----END CERTIFICATE-----
+
       
       repositories:
         artur-repo:
@@ -73,6 +82,8 @@ spec:
         pathType: Prefix
         tls: true
     
+    # В последней версии исправили добавление сертифкатов СА
+    # Смотрите выше пример configs.tls.certificates
     repoServer:
       volumes:
       - name: dev-ca-certs
