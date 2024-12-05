@@ -1,0 +1,187 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "artopenldap.fullname" . }}
+  labels:
+    {{- include "artopenldap.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.multimaster.replicas }}
+  podManagementPolicy: {{ .Values.podManagementPolicy }}
+  selector:
+    matchLabels:
+      {{- include "artopenldap.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "artopenldap.fullname" . }}-hl
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.exporter.enable }}
+        {{ .Values.exporter.annotationKeys.path }}: "/metrics"
+        {{ .Values.exporter.annotationKeys.port }}: "9330"
+        {{ .Values.exporter.annotationKeys.scrape }}: "true"
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "artopenldap.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: init
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/var/lib/openldap/bin/initscript.sh"]
+          # command: ["/bin/sh"]
+          # args: ["-c", "sleep infinity"]
+          env:
+            - name: LDAP_DEBUG
+              value: "{{ .Values.debugLevel }}"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          envFrom:
+            - secretRef:
+                {{- if .Values.ldap.adminPasswodSecret }}
+                name: {{ .Values.ldap.adminPasswodSecret }}
+                {{- else }}
+                name: {{ include "artopenldap.fullname" . }}-adminpw
+                {{- end }}
+            - secretRef:
+                {{- if .Values.multimaster.RepUserPasswodSecret }}
+                name: {{ .Values.multimaster.ReplUserPasswodSecret }}
+                {{- else }}
+                name: {{ include "artopenldap.fullname" . }}-repluserpw
+                {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/openldap/
+            - name: initldif
+              mountPath: /etc/openldap/slapd.ldif
+              subPath: slapd.ldif
+            {{- if eq .Values.ldap.dbBackend "hdb" }}
+            - name: initldif
+              mountPath: /etc/openldap/DB_CONFIG
+              subPath: DB_CONFIG
+            {{- end }}
+            - name: bin
+              mountPath: /var/lib/openldap/bin/
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/sbin/slapd"]
+          args: 
+            - "-4"
+            - "-u"
+            - "ldap"
+            - "-F"
+            - "/var/lib/openldap/slapd.d"
+            - "-h"
+            - "ldap://0.0.0.0:10389/ ldapi://%2Fvar%2Flib%2Fopenldap%2Frun%2Fsldap.sock/"
+            - "-d"
+            - "{{ .Values.debugLevel }}"
+          # command: ["/bin/sh"]
+          # args: ["-c", "sleep infinity"]
+          ports:
+            - name: ldap
+              containerPort: 10389
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}  
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}  
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}  
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/openldap/
+            - name: initldif
+              mountPath: /etc/openldap/slapd.ldif
+              subPath: slapd.ldif
+            {{- if eq .Values.ldap.dbBackend "hdb" }}
+            - name: initldif
+              mountPath: /etc/openldap/DB_CONFIG
+              subPath: DB_CONFIG
+            {{- end }}
+            - name: bin
+              mountPath: /var/lib/openldap/bin/
+        {{- if .Values.exporter.enable }}
+        - name: exporter
+          {{- with .Values.exporter.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag }}"
+          imagePullPolicy: {{ .Values.exporter.image.pullPolicy }}
+          ports:
+            - name: exporter
+              containerPort: 9330
+              protocol: TCP
+          envFrom:
+          - secretRef:
+              {{- if .Values.ldap.adminPasswodSecret }}
+              name: {{ .Values.ldap.adminPasswodSecret }}
+              {{- else }}
+              name: {{ include "artopenldap.fullname" . }}-adminpw
+              {{- end }}
+          env:
+            - name: LDAP_USER
+              value: "{{ .Values.ldap.olcRootDN }}"
+            - name: INTERVAL
+              value: "{{ .Values.exporter.interval }}"
+            - name: PROM_ADDR
+              value: "0.0.0.0:9300"
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: initldif
+          configMap:
+            name: {{ include "artopenldap.fullname" . }}-initldif
+        - name: bin
+          configMap:
+            name: {{ include "artopenldap.fullname" . }}-bin
+            defaultMode: 0777
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: 
+      - ReadWriteOnce
+      {{- if .Values.volumes.data.storageClassName }}
+      storageClassName: {{ .Values.volumes.data.storageClassName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.volumes.data.storage }}

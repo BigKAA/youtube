@@ -8,7 +8,7 @@ olcSyncRepl: rid=001
   credentials=password
   searchbase="dc=my-domain,dc=com"
   scope=sub
-  schemachecking=on
+  schemachecking=off
   type=refreshAndPersist
   retry="60 +"
   interval=00:00:05:00

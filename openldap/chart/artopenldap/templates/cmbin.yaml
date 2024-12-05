@@ -1,0 +1,383 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: {{ include "artopenldap.fullname" . }}-bin
+data:
+  probe.sh: |
+    #!/bin/sh
+    LDAPI_PATH="ldapi://%2Fvar%2Flib%2Fopenldap%2Frun%2Fsldap.sock/"
+    ldapsearch -Q -LLL -Y EXTERNAL -H "$LDAPI_PATH" -s base -b {{ .Values.ldap.olcSuffix }} 'dn={{ .Values.ldap.olcRootDN }}' cn > /dev/null 2>&1
+    exit $?
+
+  initscript.sh: |
+    #! /bin/sh
+    # set -e
+
+    ####### Конфигурационные переменные ##############
+    ##
+    ## LDAP_INIT_FLAG - Путь к файлу, выступающему в качестве флага.
+    ## Если файл существует - инициализация LDAP сервера выполнена.
+    LDAP_INIT_FLAG=/var/lib/openldap/run/ldap_init.flag
+    ##
+    ## LDAP_RESTORE - если true - то включить восстановление из резервной копии
+    LDAP_RESTORE={{ .Values.backup.restore.enable }}
+    ##
+    ## LDAPI_PATH - путь к файлу socket slapd    
+    LDAPI_PATH="ldapi://%2Fvar%2Flib%2Fopenldap%2Frun%2Fsldap.sock/"
+    ##
+    ## POD_NAME - имя пода
+    ## Определена только в режиме multimaster
+    ## Переменная наследуюется из среды окружения пода.
+    ##
+    ## MASTERS_COUNT - число. Количество подов с мастер сервером.
+    MASTERS_COUNT={{ .Values.multimaster.replicas}}
+    ##
+    ## OLD_MASTERS_COUNT - файл, в котором содержится число, указывающее текущее
+    ## количество мастеров. Используется в случае изменения количества подов.
+    ## TODO: добавить в следующей версии.
+    ##
+    ## LDAP_DEBUG - число. Уровень отладки slapd
+    ## Переменная наследуюется из среды окружения пода.
+    ##
+    ## LDAP_BACKEND - hdb или mdb
+    ## 
+    LDAP_BACKEND="{{ .Values.ldap.dbBackend }}"
+    ##
+    ## LDAP_PASS - пароль админа в незашифрованном виде.
+    ## Находится в сикрете в шаблоне чарта.
+    ## Переменная наследуюется из среды окружения пода.
+    ##
+    ## REPL_USER_PASSWORD - пароль пользователя для репликации
+    ## Находится в сикрете в шаблоне чарта.
+    ## Переменная наследуюется из среды окружения пода.
+    ##
+    ## LDAP_CUSTOM_SCHEME_ENABLE - разрешена загрузка кастомных схем.
+    LDAP_CUSTOM_SCHEME_ENABLE={{ .Values.ldap.schemas.customSchemas.enable }}
+    ## 
+    ## LDAP_CUSTOM_SCHEME_DOWNLOAD_TYPE - тип хранилища кастомных схем. 
+    ## На данный момент поддерживается только s3
+    LDAP_CUSTOM_SCHEME_DOWNLOAD_TYPE={{ .Values.ldap.schemas.customSchemas.type }}
+    ##
+    ##
+    ## Директория с базой данных 
+    LDAP_OLC_DB_DIRECTORY="/var/lib/openldap/data"
+    ## Директория с сокет файлами
+    LDAP_OLC_RUN_DIRECTORY="/var/lib/openldap/run"
+    ## Директория с файлами схем
+    LDAP_OLC_SCHEMAS_DIRECTORY="/var/lib/openldap/custom_schemas"
+    ## Директория с файлами конфигурации
+    LDAP_OLC_CONFIG_DIRECTORY="/var/lib/openldap/slapd.d"
+    ## 
+    LDAP_BACKUP_DIR="/var/lib/openldap/backups"
+
+    # if [ $MASTERS_COUNT -lt 2 ]; then
+    #     echo "ERROR: must be 2 and more replicas"
+    #     exit 1
+    # fi
+
+    # $1 facility
+    # $2 msg
+    # ERROR
+    # INFO
+    # DEBUG
+    msg(){
+        local normalise_msg=$(echo "$2" | sed -e 's/\\n/\n/g')
+        echo "{ \"date\": \"$(date -R)\", \"facility\": \"$1\", \"msg\": \"${normalise_msg}\"}"
+    }
+
+    # Загрузка кастомных схем из s3 хранилища.
+    load_custom_schemas_s3(){
+        msg "INFO" "Load custom schemas from s3"
+        local url="{{ .Values.ldap.schemas.customSchemas.s3.url }}"
+        local username="{{ .Values.ldap.schemas.customSchemas.s3.user }}"
+        local password="{{ .Values.ldap.schemas.customSchemas.s3.password }}"
+        local bucket="{{ .Values.ldap.schemas.customSchemas.s3.bucket }}"
+        local contenet_type='text/plain'
+
+        for F in {{ join " " .Values.ldap.schemas.customSchemas.files }}
+        do
+            local minio_path="/${bucket}/${F}"
+            local out_file=$LDAP_OLC_SCHEMAS_DIRECTORY/${F}
+            local DATE=$(date -R --utc)
+            local sig_string="GET\n\n${contenet_type}\n${DATE}\n${minio_path}"
+            local sig=`echo -en ${sig_string} | openssl sha1 -hmac ${password} -binary | base64`
+            
+            curl -s -o "${out_file}" \
+                -H "Host: $url" \
+                -H "Date: ${DATE}" \
+                -H "Content-Type: ${contenet_type}" \
+                -H "Authorization: AWS ${username}:${sig}" \
+                http://${url}${minio_path} 
+            
+            # Если при загрузке возникала ошибка - выходим из скрипта.
+            local ret=$?
+            if [ $ret -ne 0 ]; then
+                msg "ERROR" "Can't load http://${url}${minio_path}"
+                exit $ret
+            fi
+             msg "INFO" "Custom schema ${out_file} loaded"
+        done
+        msg "INFO" "Custom schemas loaded"
+        ##
+        ## ls -l $LDAP_OLC_SCHEMAS_DIRECTORY
+    }
+
+    init_config(){
+        msg "INFO" "Init config"
+        # Директории, необходимые для работы slapd
+        # Обычно устанавливаются при установке пакета
+        [ -d /etc/openldap/slapd.d ] && rm -rf /etc/openldap/slapd.d/*
+        [ -f /etc/openldap/ldap.conf ] && rm -f /etc/openldap/ldap.conf
+
+        if [ -d $LDAP_OLC_DB_DIRECTORY ]; then
+            rm -rf $LDAP_OLC_DB_DIRECTORY/*
+        else 
+            mkdir -p $LDAP_OLC_DB_DIRECTORY
+        fi
+        [ $LDAP_BACKEND = "hdb" ] &&  cp -f /etc/openldap/DB_CONFIG $LDAP_OLC_DB_DIRECTORY/DB_CONFIG
+        [ -d $LDAP_OLC_RUN_DIRECTORY ] || mkdir -p $LDAP_OLC_RUN_DIRECTORY
+        if [ -d $LDAP_OLC_SCHEMAS_DIRECTORY ]; then
+            rm -rf $LDAP_OLC_SCHEMAS_DIRECTORY/*
+        else
+           mkdir -p $LDAP_OLC_SCHEMAS_DIRECTORY
+        fi
+        if [ -d $LDAP_OLC_CONFIG_DIRECTORY ]; then
+            rm -rf $LDAP_OLC_CONFIG_DIRECTORY/*
+        else
+          mkdir -p $LDAP_OLC_CONFIG_DIRECTORY
+        fi
+        if [ -d $LDAP_BACKUP_DIR ]; then
+            rm -rf $LDAP_BACKUP_DIR/*
+        else
+           mkdir -p $LDAP_BACKUP_DIR
+        fi
+        # Подставляем пароль администратора
+        sed -e "s|PASSWORD|$(slappasswd -s ${LDAP_PASS})|" /etc/openldap/slapd.ldif > /var/lib/openldap/new_slapd.ldif
+        
+        # Если необходимо, загружаем кастомные схемы.
+        if [ $LDAP_CUSTOM_SCHEME_ENABLE = "true" ]; then
+            if [ $LDAP_CUSTOM_SCHEME_DOWNLOAD_TYPE = "s3" ]; then
+                load_custom_schemas_s3
+            else
+                msg "ERROR: не поддерживаемый тип хранилища - $LDAP_CUSTOM_SCHEME_DOWNLOAD_TYPE"
+                exit 10
+            fi
+        fi
+
+        # Создаем базовую конфигурацию
+        msg "INFO" "$(slapadd -n 0 -F $LDAP_OLC_CONFIG_DIRECTORY -l /var/lib/openldap/new_slapd.ldif)"
+
+        msg "INFO" "Config init done"
+    }
+
+    #################################################
+    ## Запускаем слапд в фоновом режиме
+    #################################################
+    start_slapd() {
+        msg "INFO" "Starting slapd"
+        (/usr/sbin/slapd -4 -u ldap -F $LDAP_OLC_CONFIG_DIRECTORY -h "ldap://0.0.0.0:10389/ $LDAPI_PATH" -d $LDAP_DEBUG > /dev/null 2>&1) &
+
+        ## wait to start service
+        while ! ldapsearch -LLL -Y EXTERNAL -H "$LDAPI_PATH" -b 'cn=Monitor' '(cn=Monitor)' dn > /dev/null 2>&1 ; do
+          sleep 2
+        done
+        msg "INFO" "Slapd started"
+    }
+
+    #################################################
+    ## Инициализация дерева (только на 1-м мастере)
+    ## только если новая установка.
+    #################################################
+    init_data() {
+        msg "INFO" "init data"
+
+        ## Make base domain information
+        msg "INFO" "Make base domain information"
+
+            cat > /tmp/addomain.ldif << EOF
+    dn: {{ .Values.ldap.olcSuffix }}
+    objectClass: top
+    objectClass: dcObject
+    objectclass: organization
+    o: {{ .Values.ldap.organization }}
+    {{ regexFind "^.*=.*,"  .Values.ldap.olcSuffix | trimSuffix "," | regexFind ".*=" | trimSuffix "=" }}: {{ regexFind ".*=.*,"  .Values.ldap.olcSuffix | trimSuffix "," | regexFind "=.*" | trimPrefix "=" }}
+    EOF
+
+        msg "INFO" "addomain.ldif"
+        # Add domain 
+        msg "INFO" "$(ldapadd -Q -Y EXTERNAL -H "$LDAPI_PATH" -f /tmp/addomain.ldif)"
+
+        msg "INFO" "init data done"
+    }
+
+    add_repl_user() {
+        msg "INFO" "add repl user"
+        cat > /tmp/repl_user.ldif << EOF
+
+    dn: cn=repluser,{{ .Values.ldap.olcSuffix }}
+    objectClass: inetOrgPerson
+    cn: repluser
+    sn: repluser
+    description: Account for LDAP replication
+    userPassword: $(slappasswd -s ${REPL_USER_PASSWORD})
+    EOF
+
+        # Add user 
+        msg "INFO" "$(ldapadd -Q -Y EXTERNAL -H "$LDAPI_PATH" -f /tmp/repl_user.ldif)"
+        msg "INFO" "add repl user done"
+
+    }
+
+    ################################################
+    ## Добавление репликации
+    ################################################
+    init_repl() {
+        msg "INFO" "init repl"
+        cat > /tmp/ldapmaster.ldif << EOF
+    dn: cn=config
+    changetype: modify
+    replace: olcServerID
+    olcServerID: 10${POD_NAME##*-}
+    
+    {{ if eq .Values.ldap.dbBackend "mdb" }}
+    dn: olcDatabase={1}mdb,cn=config
+    {{- else }}
+    dn: olcDatabase={1}hdb,cn=config
+    {{- end }}
+    changetype: modify
+    add: olcSyncRepl
+    EOF
+
+        for I in $(seq 1 ${MASTERS_COUNT}); do
+          if [ $(($I - 1)) -ne $(echo ${POD_NAME##*-}) ]; then
+            cat >> /tmp/ldapmaster.ldif << EOF
+    olcSyncRepl: rid=00$(($I - 1))
+      provider=ldap://${POD_NAME%-*}-$(($I - 1)).${POD_NAME%-*}-hl:10389/
+      bindmethod=simple
+      binddn="cn=repluser,{{ .Values.ldap.olcSuffix }}"
+      credentials={{ .Values.multimaster.ReplUserPassword }}
+      searchbase="{{ .Values.ldap.olcSuffix }}"
+      scope=sub
+      schemachecking={{ .Values.multimaster.replSchemaChecking }}
+      type=refreshAndPersist
+      retry="{{ .Values.multimaster.replRetry }}"
+      interval=00:00:05:00
+      sizelimit=unlimited
+    EOF
+          fi
+        done
+
+        cat >> /tmp/ldapmaster.ldif << EOF
+    -
+    add: olcMirrorMode
+    olcMirrorMode: TRUE
+    EOF
+        
+        msg "INFO" "$(ldapmodify -Q -Y EXTERNAL -H "$LDAPI_PATH" -f /tmp/ldapmaster.ldif)"
+        msg "INFO" "init repl done"
+    }
+
+    clear_db_files() {
+        msg "INFO" "clean old data"
+        # Удялем старые данные
+        rm -rf $LDAP_OLC_DB_DIRECTORY
+        mkdir -p $LDAP_OLC_DB_DIRECTORY
+        [ $LDAP_BACKEND = "hdb" ] &&  cp -f /etc/openldap/DB_CONFIG $LDAP_OLC_DB_DIRECTORY/DB_CONFIG
+    }
+
+    ldap_restore_from_backup(){
+        msg "INFO" "ldap_restore_from_backup"
+
+        local file_name={{ .Values.backup.restore.file }}
+        # Load backup file from s3
+        msg "INFO" "Load backup file from s3"
+        local url="{{ .Values.backup.s3.url }}"
+        local username="{{ .Values.backup.s3.user }}"
+        local password="{{ .Values.backup.s3.password }}"
+        local bucket="{{ .Values.backup.s3.bucket }}"
+        local contenet_type='application/gzip'
+
+        local minio_path="/${bucket}/$file_name"
+        local DATE=$(date -R --utc)
+        local sig_string="GET\n\n${contenet_type}\n${DATE}\n${minio_path}"
+        local sig=`echo -en ${sig_string} | openssl sha1 -hmac ${password} -binary | base64`
+        local fn=${file_name##*/}
+        
+        curl -s -o "${LDAP_BACKUP_DIR}/${fn}" \
+            -H "Host: $url" \
+            -H "Date: ${DATE}" \
+            -H "Content-Type: ${contenet_type}" \
+            -H "Authorization: AWS ${username}:${sig}" \
+            http://${url}${minio_path} 
+        
+        # Если при загрузке возникала ошибка - выходим из скрипта.
+        local ret=$?
+        if [ $ret -ne 0 ]; then
+            msg "ERROR" "Can't load http://${url}${minio_path}"
+            exit $ret
+        fi
+        msg "INFO" "Backup file loaded: ${fn}"
+        
+        msg "INFO" "Unpack backup ${LDAP_BACKUP_DIR}/$fn"
+        
+        cd ${LDAP_BACKUP_DIR}
+        gzip -d $fn
+        ret=$?
+        if [ $ret -ne 0 ]; then
+            msg ERROR "Can't gzip -d ${LDAP_BACKUP_DIR}/$fn"
+            exit $ret
+        fi
+
+        # Restore backup
+        msg "INFO" "Restore from backup"
+        msg "INFO" "$(slapadd -n 1 -l ${LDAP_BACKUP_DIR}/${fn%.gz} -F ${LDAP_OLC_CONFIG_DIRECTORY})"
+        rm -f ${LDAP_BACKUP_DIR}/*
+        msg "INFO" "Backup restored"
+    }
+
+    stop_slapd(){
+        msg "INFO" "Stop slapd"
+        ## Если запущен slapd, корректно его выключить
+        slapd_pid=$(pidof slapd)
+        if [ -n "$slapd_pid" ]; then
+            kill $slapd_pid
+            sleep 5
+        fi
+    }
+    
+    ##############################################################
+    # MAIN
+    ##############################################################
+    # Проверка наличия конфигурации
+    if [ ! -f ${LDAP_INIT_FLAG} ]; then
+        init_config
+        start_slapd
+
+        if [ $LDAP_RESTORE = "false" ]; then
+            init_data
+            add_repl_user
+        fi
+
+        init_repl
+        stop_slapd
+
+        # Устанавливаем флаг после завершения инициализации
+        msg "INFO" "TOUCH ${LDAP_INIT_FLAG}"
+        touch ${LDAP_INIT_FLAG}
+    else
+        msg "INFO" "init already done"
+    fi
+
+    # Проверка необходимости восстанолвения из резервной копии
+    # Восстановление проходит только при выключенном slapd.
+    # Восстанавливаем только на первом мастере.
+    if [ $LDAP_RESTORE = "true" ]; then
+        clear_db_files
+        ldap_restore_from_backup
+        # На всякий пожарный добавим пользователя для синхронизации,
+        # если его нет в бекапе
+        start_slapd
+        add_repl_user
+        stop_slapd
+    fi

@@ -1,0 +1,40 @@
+{{ if .Values.backup.save.enable }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "artopenldap.fullname" . }}-cronjob
+spec:
+  schedule: "{{ .Values.backup.save.cron }}"
+  failedJobHistoryLimit: {{ .Values.backup.save.failedJobHistoryLimit | default 3 }}
+  successfulJobsHistoryLimit: {{ .Values.backup.save.successfulJobsHistoryLimit | default 5 }}
+  backoffLimit: {{ .Values.backup.save.backoffLimit | default 3 }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          envFrom:
+            - configMapRef: 
+                name: {{ include "artopenldap.fullname" . }}-cronjob-env
+            - secretRef:
+                name: {{ include "artopenldap.fullname" . }}-cronjob-env
+          containers:
+          - name: cronjob
+            image: "{{ .Values.backup.save.image.repository }}:{{ .Values.backup.save.image.tag }}"
+            imagePullPolicy: {{ .Values.backup.save.image.pullPolicy }}
+            command: 
+            - /var/lib/openldap/bin/save.sh
+            volumeMounts:
+            - name: bin
+              mountPath: /var/lib/openldap/bin
+            - name: backup
+              mountPath: /var/lib/openldap/backup
+          restartPolicy: OnFailure
+          volumes:
+          - name: bin
+            configMap:
+              name: {{ include "artopenldap.fullname" . }}-cronjob-save
+              defaultMode: 0777
+          - name: backup
+            emptyDir: {}
+{{ end }}

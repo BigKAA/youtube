@@ -1,0 +1,327 @@
+# Default values for artopenldap.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: registry.kryukov.local/library/artopenldap
+  pullPolicy: Always
+  tag: "2.4.59"
+  # tag: "2.6.7"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+podManagementPolicy: Parallel
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  runAsNonRoot: true
+  # v2.6
+  # runAsUser: 100
+  # runAsGroup: 101
+  # v2.4
+  runAsUser: 55
+  runAsGroup: 55
+
+
+service:
+  # ClusterIP, LoadBalancer, NodePort
+  type: LoadBalancer
+  port: 389
+  # if service type NodePort
+  nodePort: 31389
+  annotations: {}
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# livenessProbe: {}
+# readinessProbe: {}
+
+livenessProbe: 
+  exec:
+    command:
+    - sh
+    - /var/lib/openldap/bin/probe.sh
+  initialDelaySeconds: 6
+  periodSeconds: 5
+  failureThreshold: 10
+readinessProbe: 
+  exec:
+    command:
+    - sh
+    - /var/lib/openldap/bin/probe.sh
+  initialDelaySeconds: 6
+  periodSeconds: 5
+  failureThreshold: 10
+
+nodeSelector: {}
+
+affinity: {}
+  # podAntiAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     - labelSelector:
+  #         matchExpressions:
+  #           - key: "app.kubernetes.io/name"
+  #             operator: In
+  #             values:
+  #             - artopenldap
+  #       topologyKey: "kubernetes.io/hostname"
+
+tolerations: []
+
+volumes:
+  data:
+   storageClassName: ""
+   storage: 256Mi
+
+debugLevel: '256'
+
+ldap:
+  # Для версии 2.4 возможные варианты mdb и hdb. 
+  # Для версии 2.6 - только mdb
+  dbBackend: hdb
+  # Максимальный размер - только для mdb.
+  # https://www.openldap.org/doc/admin26/guide.html#MDB%20Database%20Directives
+  # 10MB
+  olcDbMaxSize: '1073741824'
+  #
+  olcSuffix: 'dc=my-domain,dc=com'
+  olcRootDN: 'cn=Manager,dc=my-domain,dc=com'
+  organization: "example organization"
+
+  # Пароль админа.
+  # Можно тупо задать это поле:
+  adminPassword: password
+  # Но лучше использовать заранее сгенерированный secret
+  # Если определено имя secret, параметр adminPassword игнорируется
+  # ---
+  # apiVersion: v1
+  # kind: Secret
+  # metadata:
+  #   name: adminpw
+  # stringData:
+  #   ADMIN_PASSWORD: password
+  adminPasswodSecret: ""
+
+  # Значение по умолчанию 500. Должно быть больше, чем предполагаемое количество записей в базе.
+  # Если будет меньше - синхронизация не будет работать.
+  # https://www.openldap.org/doc/admin26/guide.html#Database-specific%20Directives
+  olcSizeLimit: 20000
+
+  # Overlay syncprov включен по умолчанию.
+  overlaysEnabled:
+    memberOf: true
+    refint: true
+    # TODO: добавить конфигурацию других overlays. Но не факт, что добавлю.
+
+  # Набор схем.
+  # Важно соблюдать порядок загрузки схем!
+  schemas:
+    files:
+    - core.ldif
+    - cosine.ldif
+    - inetorgperson.ldif
+    - nis.ldif
+    # - msuser.ldif
+    # - collective.ldif
+    # - corba.ldif
+    # - dsee.ldif
+    # - duaconf.ldif
+    # - dyngroup.ldif
+    # - java.ldif
+    # - misc.ldif
+    # - namedobject.ldif
+    # - openldap.ldif
+    # - pmi.ldif
+    
+    # При определении кастомной схемы, ее НЕ нужно добавлять выше в 'schemas.files'.
+    # Эти схемы автоматически добавляются в конфигурацию.
+    # Custom схемы грузятся после схем из 'schemas.files'.
+    customSchemas:
+      enable: false
+      # Тип хранилища, откуда будут загружаться файлы схем
+      # На данный момент, поддерживается только S3.
+      type: s3
+      s3:
+        url: "minio.minio.svc:9000"
+        user: openldap
+        # TODO: add secret
+        password: password
+        bucket: openldap
+      files:
+      - my_core.ldif
+      - my_cosine.ldif
+      - my_inetorgperson.ldif
+
+  # Набор индексов для olcDbIndex.
+  olcDbIndexes:
+  - "objectClass eq"
+  - "entryUUID,entryCSN eq"
+  - "ou,cn,mail,surname,givenname,uid eq,pres,sub"
+
+  # Набор olc для разных баз данных.
+  # Подробности смотрите в шаблоне cminitldif.yaml
+  olcAccess:
+    dbFrontend: |
+      olcAccess: to dn.base="" by * read
+      olcAccess: to dn.base="cn=Subschema" by * read
+      olcAccess: to *
+        by dn.exact="gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth" manage
+        by dn.exact="gidNumber=101+uidNumber=100,cn=peercred,cn=external,cn=auth" manage
+        by self write
+        by users read
+        by anonymous auth
+    dbConfig: |
+      olcAccess: to *
+        by dn.exact=gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth manage
+        by dn.exact=gidNumber=101+uidNumber=100,cn=peercred,cn=external,cn=auth manage
+        by * none     
+    mdbOrHdbConfig: |
+      olcAccess: to attrs=userPassword,shadowLastChange 
+        by dn="{{ .Values.ldap.olcRootDN }}" write 
+        by dn.base=gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth write
+        by dn.base=gidNumber=101+uidNumber=100,cn=peercred,cn=external,cn=auth write
+        by anonymous auth 
+        by self write 
+        by * none
+      olcAccess: to dn.base=""
+        by dn.base=gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth write
+        by dn.base=gidNumber=101+uidNumber=100,cn=peercred,cn=external,cn=auth write
+        by * read
+      olcAccess: to *
+        by dn={{ .Values.ldap.olcRootDN }} write
+        by dn.base=gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth write
+        by dn.base=gidNumber=101+uidNumber=100,cn=peercred,cn=external,cn=auth write
+        by * read
+    dbMonitor: |
+      olcAccess: to *
+        by dn.base="gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth" read
+        by dn.base="gidNumber=101+uidNumber=100,cn=peercred,cn=external,cn=auth" read
+        by dn.base={{ .Values.ldap.olcRootDN }} read 
+        by * none
+  
+  # Файл DB_CONFIG для hdb backend
+  dbConfig24: |
+    # one 0.25 GB cache
+    set_cachesize 0 268435456 1
+
+    # Data Directory
+    #set_data_dir db
+
+    # Transaction Log settings
+    set_lg_regionmax 262144
+    set_lg_bsize 2097152
+    #set_lg_dir logs
+
+    set_flags DB_LOG_AUTOREMOVE
+
+multimaster:
+  # Количество реплик.
+  replicas: 2
+  # Количество ожидаемых записей в журнале.
+  olcSpSessionLog: 100
+  replRetry: "30 +"
+  replSchemaChecking: "off"
+  # Пароль пользователя для репликации
+  ReplUserPassword: password
+  # Но лучше использовать заранее сгенерированный secret
+  # Если определено имя сикрета, параметр adminPassword игнорируется
+  # ---
+  # apiVersion: v1
+  # kind: Secret
+  # metadata:
+  #   name: repluserpw
+  # stringData:
+  #   REPL_USER_PASSWORD: password
+  ReplUserPasswodSecret: ""
+
+# Настройки экспортера
+# Контейнер экспортера создан на базе проекта 
+# https://github.com/tomcz/openldap_exporter/releases/tag/v2.2.2.
+exporter:
+  enable: false
+  image:
+    repository: registry.kryukov.local/library/artopenldapexporter
+    pullPolicy: Always
+    tag: "2.2.2"
+  interval: "30s"
+  # Аннотации для prometheus.io
+  # prometheus.io/path: "/metrics"
+  # prometheus.io/port: "9330"
+  # prometheus.io/scrape: "true"
+  annotationKeys:
+   path: "prometheus.io/path"
+   port: "prometheus.io/port"
+   scrape: "prometheus.io/scrape"
+  securityContext:
+    capabilities:
+      drop:
+      - ALL
+    runAsNonRoot: true
+    runAsUser: 5001
+    runAsGroup: 5001
+
+# Настройки backup. Пока костыль.
+# После восстановления из backup переключаем в -> enable: false
+# Дальше используем helm upgrade для чарта.
+#
+backup:
+  type: s3
+  s3:
+    url: "minio.minio.svc:9000"
+    user: openldap
+    # TODO: add secret
+    password: password
+    bucket: openldap
+  restore:
+    # Важно! После восстановления из backup переключаем в -> enable: false
+    # И дальше используем helm upgrade для чарта.
+    # Что бы в дальнейшем при рестарте контейнера не качались данные из backup.
+    # Это ускорит время старта приложения.
+    enable: true
+    # Файл бекапа должен быть сжат при помощи gzip
+    file: backup/backup.ldif.gz
+  # Пока не реализовано.
+  # CronJob создания бекапа и сохранения в хранилище.
+  save:
+    enable: false
+    image:
+      repository: registry.kryukov.local/library/artopenldap
+      pullPolicy: IfNotPresent
+      tag: "2.4.59"
+      # tag: "2.6.7"
+    #      ┌─ minute (0 - 59)
+    #      │ ┌ hour (0 - 23)
+    #      │ │ ┌─ day of the month (1 - 31)
+    #      │ │ │ ┌─ month (1 - 12)
+    #      │ │ │ │ ┌─ day of the week (0 - 6) (Sunday to Saturday) 
+    #      │ │ │ │ │  OR sun, mon, tue, wed, thu, fri, sat
+    #      │ │ │ │ │ 
+    #      │ │ │ │ │
+    #      │ │ │ │ │
+    cron: "0 1 * * *"
+    failedJobHistoryLimit: 3
+    successfulJobsHistoryLimit: 5
+    backoffLimit: 3
+    file:
+      path: backup
+      fileNameStartAt: ldap-data
+  

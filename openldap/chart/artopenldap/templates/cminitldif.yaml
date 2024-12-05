@@ -1,0 +1,152 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: {{ include "artopenldap.fullname" . }}-initldif
+data:
+  slapd.ldif: |
+    dn: cn=config
+    objectClass: olcGlobal
+    cn: config
+    olcLogLevel: {{ .Values.debugLevel }}
+    olcSizeLimit: {{ .Values.ldap.olcSizeLimit }}
+
+    #
+    # Load dynamic backend modules:
+    #
+    dn: cn=module,cn=config
+    objectClass: olcModuleList
+    cn: module
+    ###
+    ### Жесткая привязка к моим контейнерам по путям к модулям!!!!
+    ###
+    {{- if hasPrefix "2.6" .Values.image.tag }}
+    olcModulepath:	/usr/lib/openldap
+    {{- else }}
+    olcModulepath:	/usr/lib64/openldap
+    {{- end }}
+    {{- if eq .Values.ldap.dbBackend "mdb" }}
+    olcModuleload:	back_mdb.so
+    {{- else }}
+    olcModuleload:	back_hdb.so
+    {{- end }}
+    olcModuleLoad:  syncprov.so
+    {{- if .Values.ldap.overlaysEnabled.memberOf }}
+    olcModuleLoad:  memberof.so
+    {{- end }}
+    {{- if .Values.ldap.overlaysEnabled.refint }}
+    olcModuleLoad:  refint.so
+    {{- end }}
+
+    dn: cn=schema,cn=config
+    objectClass: olcSchemaConfig
+    cn: schema
+    
+    {{ range .Values.ldap.schemas.files }}
+    include: file:///etc/openldap/schema/{{ . }}
+    {{- end }}
+    {{- if .Values.ldap.schemas.customSchemas.enable }}
+    {{- range .Values.ldap.schemas.customSchemas.files }}
+    include: file:///var/lib/openldap/custom_schemas/{{ . }}
+    {{- end }}
+    {{- end }}
+
+    # Frontend settings
+    #
+    dn: olcDatabase=frontend,cn=config
+    objectClass: olcDatabaseConfig
+    objectClass: olcFrontendConfig
+    olcDatabase: frontend
+
+    dn: olcDatabase=config,cn=config
+    objectClass: olcDatabaseConfig
+    olcDatabase: config
+{{ tpl .Values.ldap.olcAccess.dbConfig $ | indent 4 }}
+
+
+    #######################################################################
+    # LMDB database definitions
+    #######################################################################
+    #
+    {{- if eq .Values.ldap.dbBackend "mdb" }}
+    dn: olcDatabase=mdb,cn=config
+    {{- else }}
+    dn: olcDatabase=hdb,cn=config
+    {{- end }}
+    objectClass: olcDatabaseConfig
+    {{- if eq .Values.ldap.dbBackend "mdb" }}
+    objectClass: olcMdbConfig
+    olcDatabase: mdb
+    olcDbMaxSize: {{ .Values.ldap.olcDbMaxSize }}
+    {{- else }}
+    objectClass: olcHdbConfig
+    olcDatabase: hdb
+    {{- end }}
+    olcSuffix: {{ .Values.ldap.olcSuffix }}
+    olcRootDN: {{ .Values.ldap.olcRootDN }}
+    # Cleartext passwords, especially for the rootdn, should
+    # be avoided.  See slappasswd(8) and slapd-config(5) for details.
+    # Use of strong authentication encouraged.
+    olcRootPW: PASSWORD
+    # The database directory MUST exist prior to running slapd AND 
+    # should only be accessible by the slapd and slap tools.
+    # Mode 700 recommended.
+    olcDbDirectory:	/var/lib/openldap/data
+    # Indices to maintain
+    # olcDbIndex: objectClass eq
+    {{- range .Values.ldap.olcDbIndexes }}
+    olcDbIndex: {{ . }}
+    {{- end }}
+    olcAccess: to dn.subtree="{{ .Values.ldap.olcSuffix }}" 
+      by dn.exact="cn=repluser,{{ .Values.ldap.olcSuffix }}" read
+      by * break
+{{ tpl .Values.ldap.olcAccess.mdbOrHdbConfig $ | indent 4 }}
+
+{{ if .Values.ldap.overlaysEnabled.memberOf }}
+{{- if eq .Values.ldap.dbBackend "mdb" }}
+    dn: olcOverlay=memberof,olcDatabase={1}mdb,cn=config
+{{- else }}
+    dn: olcOverlay=memberof,olcDatabase={1}hdb,cn=config
+{{- end }}
+    objectClass: olcOverlayConfig
+    objectClass: olcMemberOf
+    olcOverlay: memberof
+    olcMemberOfRefint: TRUE
+{{- end }}
+
+{{ if .Values.ldap.overlaysEnabled.refint }}
+{{ if eq .Values.ldap.dbBackend "mdb" }}
+    dn: olcOverlay=refint,olcDatabase={1}mdb,cn=config
+{{- else }}
+    dn: olcOverlay=refint,olcDatabase={1}hdb,cn=config
+{{- end }}
+    objectClass: olcConfig
+    objectClass: olcOverlayConfig
+    objectClass: olcRefintConfig
+    objectClass: top
+    olcOverlay: refint
+    olcRefintAttribute: memberof member manager owner
+{{- end }}
+
+{{ if eq .Values.ldap.dbBackend "mdb" }}
+    dn: olcOverlay=syncprov,olcDatabase={1}mdb,cn=config
+{{- else }}
+    dn: olcOverlay=syncprov,olcDatabase={1}hdb,cn=config
+{{- end }}
+    objectClass: olcOverlayConfig
+    objectClass: olcSyncProvConfig
+    olcOverlay: syncprov
+    # Количество ожидаемых записей в базе LDAP с запасом.
+    olcSpSessionLog: {{ .Values.multimaster.olcSpSessionLog }}
+
+    dn: olcDatabase=monitor,cn=config
+    objectClass: olcDatabaseConfig
+    olcDatabase: monitor
+    olcRootDN: cn=config
+    olcMonitoring: TRUE
+{{ tpl .Values.ldap.olcAccess.dbMonitor $ | indent 4 }}
+
+{{- if eq .Values.ldap.dbBackend "hdb" }}
+  DB_CONFIG : |
+{{ .Values.ldap.dbConfig24 | indent 4 }} 
+{{- end }}

@@ -18,9 +18,12 @@ ldapmodify -Q -Y EXTERNAL -f admin_password.ldif
 
 ```shell
 wget -q https://repo.symas.com/configs/SOLDAP/rhel9/release26.repo -O /etc/yum.repos.d/soldap-release26.repo
-dnf update
+dnf update -y
 dnf install -y symas-openldap-clients symas-openldap-servers
+exit
 ```
+
+Выходим для того, что бы применились изменения в среде окружения пользователя.
 
 Подготовим файл `slapd.ldif`. Содержимое файла аналогично файлу с первого сервера OpenLDAP:
 
@@ -44,7 +47,7 @@ cd /opt/symas/etc/openldap
 cat > ldap.conf << EOF
 BASE   dc=my-domain,dc=com
 URI    ldapi://%2Fvar%2Fsymas%2Frun%2Fsldap.sock/ ldap://127.0.0.1:389
-
+SASL_NOCANON    on
 EOF
 rm -f /etc/openldap/ldap.conf
 ln -s /opt/symas/etc/openldap/ldap.conf /etc/openldap/ldap.conf
@@ -53,15 +56,15 @@ ln -s /opt/symas/etc/openldap/ldap.conf /etc/openldap/ldap.conf
 Создание директорий и установка прав доступа:
 
 ```shell
+rm -rf /etc/openldap/slapd.d
 mkdir -p /etc/openldap/slapd.d
-chown ldap:ldap /var/symas/openldap-data /var/symas/run /etc/openldap/slapd.d
 ```
 
 Создание конфигурации:
 
 ```shell
 slapadd -b cn=config -l ~/slapd.ldif -F /etc/openldap/slapd.d/
-chown -R ldap:ldap /etc/openldap/slapd.d/
+chown -R ldap:ldap /var/symas/openldap-data /var/symas/run /etc/openldap/slapd.d
 ```
 
 Запуск сервера:
@@ -97,7 +100,9 @@ olcOverlay: syncprov
 olcSpSessionLog: 100
 ```
 
-`olcSpSessionlog` управляет размером журнала сеанса. Обычно рекомендуется, чтобы значение этого параметра было несколько больше, чем общее количество записей в реплицируемой базе данных.
+`olcSpSessionlog` Указывает, что на сервере-поставщике должен вестись журнал, в который записывается информация об операциях записи, производимых в базе данных. Аргумент определяет количество операций, которое можно поместить в данный журнал. Туда помещается информация о всех операциях записи (за исключением операций добавления add). Если такой журнал сессии используется, целесообразно назначить индекс eq на атрибут entryUUID в соответствующей базе данных поставщика.
+
+Данный журнал сессии может использоваться при репликации во время операций синхронизации, чтобы минимизировать обновления потребителя, в первую очередь в режиме refreshOnly. Поскольку на поставщике не настраивается количество потребителей репликации, которое будет запрашивать синхронизацию, для наибольшей эффективности значение аргумента, задаваемого в данной директиве, должно позволять сохранять в журнале предполагаемый максимум числа изменений, которые могут произойти в промежутке между синхронизациями потребителя с самым длинным интервалом пересинхронизации (устанавливается параметром interval директивы syncrepl). Если в журнале сессии недостаточно информации, поставщик вынужден будет выполнять полную последовательность ресинхронизации, начиная с последней известной точки.
 
 На обеих серверах вносим изменения в конфигурацию.
 
@@ -185,7 +190,7 @@ olcSyncRepl: rid=001
   credentials=password
   searchbase="dc=my-domain,dc=com"
   scope=sub
-  schemachecking=on
+  schemachecking=off
   type=refreshAndPersist
   retry="60 +"
   interval=00:00:05:00
@@ -198,7 +203,7 @@ olcMirrorMode: TRUE
 
 - `olcSyncRepl`
   - `schemachecking` - `on` каждая реплицируемая запись будет проверяться на соответствие ее схеме, на сервере-получателе. Если параметр отключен, записи будут сохранены без проверки соответствия схемы. Значение по умолчанию отключено.
-  - `type` - определяет, какой режим будет использовать клиент при подключении к провайдеру. Существует два режима: 
+  - `type` - определяет, какой режим будет использовать клиент при подключении к провайдеру. Существует два режима:
     - `refreshOnly` - следующая операция поиска синхронизации периодически переносится через определенный промежуток времени после завершения каждой операции синхронизации. Интервал определяется параметром `interval`.
     - `refreshAndPersist` - операция поиска является постоянной.
   - `retry` - Если во время репликации возникает ошибка, пользователь попытается повторно подключиться в соответствии с параметром `retry`, который представляет собой список пар <интервал повторных попыток> и <количество повторных попыток>. Например, параметр retry="30 5 300 3" позволяет пользователю повторять попытку каждые 30 секунд в течение первых 5 раз, а затем каждые 300 секунд в течение следующих трех раз, прежде чем прекратить повторные попытки. + в <числе повторных попыток> означает неопределенное количество попыток до достижения успеха.
@@ -211,6 +216,10 @@ ldapmodify -Y EXTERNAL -f 02ldapslave.ldif
 Подключаемся к slave LDAP серверу и наблюдаем записи с основного мастера.
 
 Если записей нет, значит вы где то ошиблись. Смотрите логи slave и мастер серверов.
+
+```shell
+journalctl -u symas-openldap-servers --no-pager
+```
 
 ## Multimaster
 
@@ -231,7 +240,7 @@ olcSyncRepl: rid=001
   credentials=password
   searchbase="dc=my-domain,dc=com"
   scope=sub
-  schemachecking=on
+  schemachecking=off
   type=refreshAndPersist
   retry="60 +"
   interval=00:00:05:00
@@ -261,7 +270,7 @@ olcSyncRepl: rid=001
   credentials=password
   searchbase="dc=my-domain,dc=com"
   scope=sub
-  schemachecking=on
+  schemachecking=off
   type=refreshAndPersist
   retry="60 +"
   interval=00:00:05:00
@@ -272,7 +281,7 @@ olcSyncRepl: rid=002
   credentials=password
   searchbase="dc=my-domain,dc=com"
   scope=sub
-  schemachecking=on
+  schemachecking=off
   type=refreshAndPersist
   retry="60 +"
   interval=00:00:05:00
