@@ -22,6 +22,7 @@ spec:
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        checksum/configmap: {{ include (print $.Template.BasePath "/cmbin.yaml") . | sha256sum }}
       labels:
         {{- include "artopenldap.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}

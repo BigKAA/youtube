@@ -296,13 +296,16 @@ backup:
     # И дальше используем helm upgrade для чарта.
     # Что бы в дальнейшем при рестарте контейнера не качались данные из backup.
     # Это ускорит время старта приложения.
-    enable: true
+    enable: false
     # Файл бекапа должен быть сжат при помощи gzip
     file: backup/backup.ldif.gz
   # Пока не реализовано.
   # CronJob создания бекапа и сохранения в хранилище.
   save:
     enable: false
+    # Начало имени файла бекапа.
+    # К нему автоматически будут добавлены дата создания и расширение.
+    fileNameStartAt: "ldap-data"
     image:
       repository: registry.kryukov.local/library/artopenldap
       pullPolicy: IfNotPresent

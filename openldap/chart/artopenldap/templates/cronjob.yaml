@@ -14,10 +14,12 @@ spec:
       template:
         spec:
           envFrom:
-            - configMapRef: 
-                name: {{ include "artopenldap.fullname" . }}-cronjob-env
             - secretRef:
                 name: {{ include "artopenldap.fullname" . }}-cronjob-env
+            {{- if not .Values.multimaster.ReplUserPasswod }}
+            - secretRef:
+                name: {{ include "artopenldap.fullname" . }}-repluserpw
+            {{- end }}
           containers:
           - name: cronjob
             image: "{{ .Values.backup.save.image.repository }}:{{ .Values.backup.save.image.tag }}"

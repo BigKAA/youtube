@@ -12,60 +12,60 @@ data:
     # set -e
 
     msg(){
-        local normalise_msg=$(echo "$2" | sed -e 's/\\n/\n/g')
-        echo "{ \"date\": \"$(date -R)\", \"facility\": \"$1\", \"msg\": \"${normalise_msg}\"}"
+        local normalised_msg=$(echo "$2" | sed -e 's/\n/\\n/g' -e 's/"/\\"/g' -e "s/'/\\'/g")
+        echo "{ \"date\": \"$(date -R)\", \"facility\": \"$1\", \"msg\": \"${normalised_msg}\"}"
     }
 
-    LDAP_URL=test-artopenldap:389
+    #### URL сервиса OpenLDAP
+    LDAP_URL="{{ include "artopenldap.fullname" . }}:389"
     LDAP_BIND_DN="cn=repluser,{{ .Values.ldap.olcSuffix }}"
-    # Получаем из глобального env
-    # LDAP_BIND_PASSWORD
+    #### Получаем из глобального env
+    # REPL_USER_PASSWORD
+    # S3_PASSWORD
+    #### Начало имени файла бекапа.
+    # S3_FILE_NAME_START_AT
+    S3_FILE_NAME_START_AT="{{ .Values.backup.save.fileNameStartAt}}"
     LDAP_SUFFIX="{{ .Values.ldap.olcSuffix }}"
 
     BACKUP_DIR="/var/lib/openldap/backup"
-    BACKUP_FILE=${S3_FILE_NAME_START_AT}-$(date +%F-%H-%M).gz
+    BACKUP_FILE=${BACKUP_DIR}/${S3_FILE_NAME_START_AT}-$(date +%F-%H-%M).gz
 
     msg "INFO" "Take backup file: $BACKUP_FILE"
     ldapsearch -x -D $LDAP_BIND_DN \
-      -w $LDAP_BIND_PASSWORD \
+      -w $REPL_USER_PASSWORD \
       -H ldap://$LDAP_URL \
-      -b $LDAP_SUFFIX + | gzip -c > $BACKUP_DIR/$BACKUP_FILE
+      -b $LDAP_SUFFIX + | gzip -c > $BACKUP_FILE
 
     msg "INFO" "Put $BACKUP_FILE to s3"
     local url="{{ .Values.backup.s3.url }}"
     local username="{{ .Values.backup.s3.user }}"
-    local password="{{ .Values.backup.s3.password }}"
+    local password="${S3_PASSWORD}"
     local bucket="{{ .Values.backup.s3.bucket }}"
     local contenet_type='application/gzip'
 
-    local minio_path="/openldap/backup/${BACKUP_FILE}"
+    local minio_path="/${bucket}/backup/${BACKUP_FILE}"
     local DATE=$(date -R --utc)
     local sig_string="PUT\n\n${contenet_type}\n${DATE}\n${minio_path}"
     local sig=`echo -en ${sig_string} | openssl sha1 -hmac ${password} -binary | base64`
     
-    curl -s -X PUT -T "$BACKUP_DIR/${BACKUP_FILE}" \
+    curl -s -X PUT -T "${BACKUP_FILE}" \
       -H "Host: ${url}" \
       -H "Date: ${DATE}" \
       -H "Content-Type: ${contenet_type}" \
       -H "Authorization: AWS ${username}:${sig}" \
-      https://${url}/openldap/backup/${BACKUP_FILE}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "artopenldap.fullname" . }}-cronjob-env
-data:
-  S3_URL: "minio.minio.svc:9000"
-  S3_USER: openldap
-  S3_BUCKET: openldap
-  S3_FILE_NAME_START_AT: backup/ldap-data
+      https://${url}/${minio_path}
+ 
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ include "artopenldap.fullname" . }}-cronjob-env
 stringData:
-  S3_PASSWORD: password
-  LDAP_BIND_PASSWORD: password
+  # Пока нет определения секрета в values file
+  S3_PASSWORD: {{ .Values.backup.s3.password }}
+  # password repluser
+  {{- if .Valuse.multimaster.ReplUserPassword }}
+  REPL_USER_PASSWORD: "{{ .Valuse.multimaster.ReplUserPassword }}"
+  {{- end }}
 type: opaque
 {{ end }}

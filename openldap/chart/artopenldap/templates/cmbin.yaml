@@ -33,9 +33,9 @@ data:
     ## MASTERS_COUNT - число. Количество подов с мастер сервером.
     MASTERS_COUNT={{ .Values.multimaster.replicas}}
     ##
+    ## TODO: добавить в следующей версии.
     ## OLD_MASTERS_COUNT - файл, в котором содержится число, указывающее текущее
     ## количество мастеров. Используется в случае изменения количества подов.
-    ## TODO: добавить в следующей версии.
     ##
     ## LDAP_DEBUG - число. Уровень отладки slapd
     ## Переменная наследуюется из среды окружения пода.
@@ -82,8 +82,8 @@ data:
     # INFO
     # DEBUG
     msg(){
-        local normalise_msg=$(echo "$2" | sed -e 's/\\n/\n/g')
-        echo "{ \"date\": \"$(date -R)\", \"facility\": \"$1\", \"msg\": \"${normalise_msg}\"}"
+        local normalised_msg=$(echo "$2" | sed -e 's/\n/\\n/g' -e 's/"/\\"/g' -e "s/'/\\'/g")
+        echo "{ \"date\": \"$(date -R)\", \"facility\": \"$1\", \"msg\": \"${normalised_msg}\"}"
     }
 
     # Загрузка кастомных схем из s3 хранилища.
@@ -166,7 +166,7 @@ data:
         fi
 
         # Создаем базовую конфигурацию
-        msg "INFO" "$(slapadd -n 0 -F $LDAP_OLC_CONFIG_DIRECTORY -l /var/lib/openldap/new_slapd.ldif)"
+        msg "INFO" "$(slapadd -n 0 -F $LDAP_OLC_CONFIG_DIRECTORY -l /var/lib/openldap/new_slapd.ldif 2>&1 )"
 
         msg "INFO" "Config init done"
     }
@@ -206,7 +206,7 @@ data:
 
         msg "INFO" "addomain.ldif"
         # Add domain 
-        msg "INFO" "$(ldapadd -Q -Y EXTERNAL -H "$LDAPI_PATH" -f /tmp/addomain.ldif)"
+        msg "INFO" "$(ldapadd -Q -Y EXTERNAL -H "$LDAPI_PATH" -f /tmp/addomain.ldif  2>&1 )"
 
         msg "INFO" "init data done"
     }
@@ -224,7 +224,7 @@ data:
     EOF
 
         # Add user 
-        msg "INFO" "$(ldapadd -Q -Y EXTERNAL -H "$LDAPI_PATH" -f /tmp/repl_user.ldif)"
+        msg "INFO" "$(ldapadd -Q -Y EXTERNAL -H "$LDAPI_PATH" -f /tmp/repl_user.ldif  2>&1 )"
         msg "INFO" "add repl user done"
 
     }
@@ -274,7 +274,7 @@ data:
     olcMirrorMode: TRUE
     EOF
         
-        msg "INFO" "$(ldapmodify -Q -Y EXTERNAL -H "$LDAPI_PATH" -f /tmp/ldapmaster.ldif)"
+        msg "INFO" "$(ldapmodify -Q -Y EXTERNAL -H "$LDAPI_PATH" -f /tmp/ldapmaster.ldif  2>&1 )"
         msg "INFO" "init repl done"
     }
 
@@ -331,7 +331,7 @@ data:
 
         # Restore backup
         msg "INFO" "Restore from backup"
-        msg "INFO" "$(slapadd -n 1 -l ${LDAP_BACKUP_DIR}/${fn%.gz} -F ${LDAP_OLC_CONFIG_DIRECTORY})"
+        msg "INFO" "$(slapadd -n 1 -l ${LDAP_BACKUP_DIR}/${fn%.gz} -F ${LDAP_OLC_CONFIG_DIRECTORY} 2>&1 )"
         rm -f ${LDAP_BACKUP_DIR}/*
         msg "INFO" "Backup restored"
     }
@@ -352,15 +352,14 @@ data:
     # Проверка наличия конфигурации
     if [ ! -f ${LDAP_INIT_FLAG} ]; then
         init_config
-        start_slapd
 
         if [ $LDAP_RESTORE = "false" ]; then
+            start_slapd
             init_data
             add_repl_user
+            init_repl
+            stop_slapd
         fi
-
-        init_repl
-        stop_slapd
 
         # Устанавливаем флаг после завершения инициализации
         msg "INFO" "TOUCH ${LDAP_INIT_FLAG}"
