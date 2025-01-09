@@ -1,0 +1,41 @@
+{{- if and .Values.ldap.ssl.enable .Values.ldap.ssl.certmanager.enable }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "artopenldap.fullname" . }}
+spec:
+  secretTemplate:
+    labels:
+      app: openldap
+  secretName: {{ .Values.ldap.ssl.secretName }}
+  duration: {{ .Values.ldap.ssl.certmanager.duration }}
+  renewBefore: {{ .Values.ldap.ssl.certmanager.renewBefore }}
+  subject:
+    {{- toYaml .Values.ldap.ssl.certmanager.subject | nindent 4 }}
+  isCA: false
+  commonName: {{ .Values.ldap.ssl.certmanager.commonName }}
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4092
+    rotationPolicy: Always
+  usages:
+    - server auth
+  dnsNames:
+    - "*.{{ include "artopenldap.fullname" . }}-hl"
+    {{- if .Values.ldap.ssl.certmanager.dnsNames }}
+    {{- range .Values.ldap.ssl.certmanager.dnsNames }}
+    - {{ . }}
+    {{- end }}
+    {{- end }}
+  ipAddresses:
+    - 127.0.0.1
+    {{- if .Values.ldap.ssl.certmanager.ipAddresses }}
+    {{- range .Values.ldap.ssl.certmanager.ipAddresses }}
+    - {{ . }}
+    {{- end }}
+    {{- end }}
+  issuerRef:
+    {{- toYaml .Values.ldap.ssl.certmanager.issuerRef | nindent 4 }}
+{{- end }}

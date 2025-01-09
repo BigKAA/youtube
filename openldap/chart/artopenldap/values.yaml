@@ -36,8 +36,12 @@ service:
   # ClusterIP, LoadBalancer, NodePort
   type: LoadBalancer
   port: 389
+  # Если включено .ldap.enable: true
+  portSSL: 636
   # if service type NodePort
   nodePort: 31389
+  # Если включено .ldap.enable: true
+  nodePortSSL: 31636
   annotations: {}
 
 resources: {}
@@ -52,25 +56,25 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-# livenessProbe: {}
-# readinessProbe: {}
+livenessProbe: {}
+readinessProbe: {}
 
-livenessProbe: 
-  exec:
-    command:
-    - sh
-    - /var/lib/openldap/bin/probe.sh
-  initialDelaySeconds: 6
-  periodSeconds: 5
-  failureThreshold: 10
-readinessProbe: 
-  exec:
-    command:
-    - sh
-    - /var/lib/openldap/bin/probe.sh
-  initialDelaySeconds: 6
-  periodSeconds: 5
-  failureThreshold: 10
+# livenessProbe: 
+#   exec:
+#     command:
+#     - sh
+#     - /var/lib/openldap/bin/probe.sh
+#   initialDelaySeconds: 6
+#   periodSeconds: 5
+#   failureThreshold: 10
+# readinessProbe: 
+#   exec:
+#     command:
+#     - sh
+#     - /var/lib/openldap/bin/probe.sh
+#   initialDelaySeconds: 6
+#   periodSeconds: 5
+#   failureThreshold: 10
 
 nodeSelector: {}
 
@@ -118,7 +122,7 @@ ldap:
   # metadata:
   #   name: adminpw
   # stringData:
-  #   ADMIN_PASSWORD: password
+  #   LDAP_PASS: password
   adminPasswodSecret: ""
 
   # Значение по умолчанию 500. Должно быть больше, чем предполагаемое количество записей в базе.
@@ -199,18 +203,22 @@ ldap:
         by dn="{{ .Values.ldap.olcRootDN }}" write 
         by dn.base=gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth write
         by dn.base=gidNumber=101+uidNumber=100,cn=peercred,cn=external,cn=auth write
-        by anonymous auth 
-        by self write 
-        by * none
+        by self write
+        by users read
+        by anonymous auth
       olcAccess: to dn.base=""
         by dn.base=gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth write
         by dn.base=gidNumber=101+uidNumber=100,cn=peercred,cn=external,cn=auth write
-        by * read
+        by self write
+        by users read
+        by anonymous auth
       olcAccess: to *
         by dn={{ .Values.ldap.olcRootDN }} write
         by dn.base=gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth write
         by dn.base=gidNumber=101+uidNumber=100,cn=peercred,cn=external,cn=auth write
-        by * read
+        by self write
+        by users read
+        by anonymous auth
     dbMonitor: |
       olcAccess: to *
         by dn.base="gidNumber=55+uidNumber=55,cn=peercred,cn=external,cn=auth" read
@@ -232,6 +240,55 @@ ldap:
     #set_lg_dir logs
 
     set_flags DB_LOG_AUTOREMOVE
+
+  # Включение TLS  
+  ssl:
+    enable: true
+    # Сертификат можно создать вручную.
+    # И поместить его в Secret
+    #
+    # Пример Secret
+    # apiVersion: v1
+    # kind: Secret
+    # metadata:
+    #   name: openldap-cert
+    #   namespace: default
+    # type: kubernetes.io/tls
+    # data:
+    #   ca.crt: CA_CRT_DATA
+    #   tls.crt: TLS_CRT_DATA
+    #   tls.key: TLS_KEY_DATA
+    secretName: openldap-cert
+    # Или создать при помощи Certmanager, установленного в кластере.
+    # Парамeтры Certificate
+    certmanager:
+      enable: true
+      # secretName - из параметра выше
+      duration: 9125h # 1y
+      renewBefore: 360h # 15d
+      subject:
+        organizations:
+          - "Artur's dev"
+        organizationalUnits:
+          - "Home lab"
+        localities:
+          - "Moscow"
+        countries:
+          - "RU"
+      commonName: "Openldap cert"
+      # Если известны имена DNS, по которым будут подключаться клиенты,
+      # добавьте их в сертификаты:
+      dnsNames: []
+      # - ldap.exaple.com
+      ipAddresses:
+        - 192.168.218.189
+      # Если известны IP адреса, по которым будут подключаться клиенты,
+      # добавьте их в сертификаты:
+      #  - 192.168.218.189
+      issuerRef:
+        name: ldap-issuer
+        kind: Issuer
+        group: cert-manager.io
 
 multimaster:
   # Количество реплик.

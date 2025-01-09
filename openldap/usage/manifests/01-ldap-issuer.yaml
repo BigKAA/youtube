@@ -1,0 +1,46 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: ldap-ss-issuer
+spec:
+  selfSigned: {}
+---
+# Самоподписанный сертификат CA
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ldap-ca
+spec:
+  secretTemplate:
+    labels:
+      app: openldap
+  isCA: true
+  duration: 87600h # 10y
+  subject:
+    organizations:
+      - "Artur's dev"
+    organizationalUnits:
+      - "Home lab"
+    localities:
+      - "Moscow"
+    countries:
+      - "RU"
+  commonName: "Artur home LDAP CA"
+  secretName: ldap-ca
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+  issuerRef:
+    name: ldap-ss-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: ldap-issuer
+spec:
+  ca:
+    secretName: ldap-ca

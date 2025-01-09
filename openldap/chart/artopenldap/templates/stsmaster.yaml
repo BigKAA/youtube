@@ -22,7 +22,11 @@ spec:
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        checksum/configmap: {{ include (print $.Template.BasePath "/cmbin.yaml") . | sha256sum }}
+        checksum/configmapBin: {{ include (print $.Template.BasePath "/cmbin.yaml") . | sha256sum }}
+        checksum/configmapLdif: {{ include (print $.Template.BasePath "/cminitldif.yaml") . | sha256sum }}
+        {{- if and .Values.ldap.ssl.enable .Values.ldap.ssl.certmanager.enable }}
+        checksum/cert: {{ include (print $.Template.BasePath "/certificate.yaml") . | sha256sum }}
+        {{- end }}
       labels:
         {{- include "artopenldap.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
@@ -77,6 +81,10 @@ spec:
             {{- end }}
             - name: bin
               mountPath: /var/lib/openldap/bin/
+            {{- if .Values.ldap.ssl.enable }}
+            - name: tls
+              mountPath: /var/lib/openldap/certs/
+            {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -93,7 +101,11 @@ spec:
             - "-F"
             - "/var/lib/openldap/slapd.d"
             - "-h"
+            {{- if .Values.ldap.ssl.enable }}
+            - "ldap://0.0.0.0:10389/ ldaps://0.0.0.0:10636/ ldapi://%2Fvar%2Flib%2Fopenldap%2Frun%2Fsldap.sock/"
+            {{- else }}
             - "ldap://0.0.0.0:10389/ ldapi://%2Fvar%2Flib%2Fopenldap%2Frun%2Fsldap.sock/"
+            {{- end }}
             - "-d"
             - "{{ .Values.debugLevel }}"
           # command: ["/bin/sh"]
@@ -102,6 +114,11 @@ spec:
             - name: ldap
               containerPort: 10389
               protocol: TCP
+            {{- if .Values.ldap.ssl.enable }}
+            - name: ldaps
+              containerPort: 10636
+              protocol: TCP
+            {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}  
@@ -127,6 +144,10 @@ spec:
             {{- end }}
             - name: bin
               mountPath: /var/lib/openldap/bin/
+            {{- if .Values.ldap.ssl.enable }}
+            - name: tls
+              mountPath: /var/lib/openldap/certs/
+            {{- end }}
         {{- if .Values.exporter.enable }}
         - name: exporter
           {{- with .Values.exporter.securityContext }}
@@ -174,6 +195,11 @@ spec:
           configMap:
             name: {{ include "artopenldap.fullname" . }}-bin
             defaultMode: 0777
+        {{- if .Values.ldap.ssl.enable }}
+        - name: tls
+          secret:
+            secretName: {{ .Values.ldap.ssl.secretName }}
+        {{- end }}
   volumeClaimTemplates:
   - metadata:
       name: data

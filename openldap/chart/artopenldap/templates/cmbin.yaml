@@ -152,6 +152,7 @@ data:
         else
            mkdir -p $LDAP_BACKUP_DIR
         fi
+
         # Подставляем пароль администратора
         sed -e "s|PASSWORD|$(slappasswd -s ${LDAP_PASS})|" /etc/openldap/slapd.ldif > /var/lib/openldap/new_slapd.ldif
         
@@ -177,6 +178,7 @@ data:
     start_slapd() {
         msg "INFO" "Starting slapd"
         (/usr/sbin/slapd -4 -u ldap -F $LDAP_OLC_CONFIG_DIRECTORY -h "ldap://0.0.0.0:10389/ $LDAPI_PATH" -d $LDAP_DEBUG > /dev/null 2>&1) &
+        #(/usr/sbin/slapd -4 -u ldap -F $LDAP_OLC_CONFIG_DIRECTORY -h "ldap://0.0.0.0:10389/ ldaps://0.0.0.0:10636/ $LDAPI_PATH" -d $LDAP_DEBUG ) &
 
         ## wait to start service
         while ! ldapsearch -LLL -Y EXTERNAL -H "$LDAPI_PATH" -b 'cn=Monitor' '(cn=Monitor)' dn > /dev/null 2>&1 ; do
@@ -253,7 +255,11 @@ data:
           if [ $(($I - 1)) -ne $(echo ${POD_NAME##*-}) ]; then
             cat >> /tmp/ldapmaster.ldif << EOF
     olcSyncRepl: rid=00$(($I - 1))
+{{- if .Values.ldap.ssl.enable }}
+      provider=ldaps://${POD_NAME%-*}-$(($I - 1)).${POD_NAME%-*}-hl:10636/
+{{- else }}
       provider=ldap://${POD_NAME%-*}-$(($I - 1)).${POD_NAME%-*}-hl:10389/
+{{- end }}
       bindmethod=simple
       binddn="cn=repluser,{{ .Values.ldap.olcSuffix }}"
       credentials={{ .Values.multimaster.ReplUserPassword }}
@@ -354,16 +360,16 @@ data:
         init_config
 
         if [ $LDAP_RESTORE = "false" ]; then
-            start_slapd
-            init_data
-            add_repl_user
-            init_repl
-            stop_slapd
+           start_slapd
+           init_data
+           add_repl_user
+           init_repl
+           stop_slapd
         fi
 
         # Устанавливаем флаг после завершения инициализации
         msg "INFO" "TOUCH ${LDAP_INIT_FLAG}"
-        touch ${LDAP_INIT_FLAG}
+        #touch ${LDAP_INIT_FLAG}
     else
         msg "INFO" "init already done"
     fi

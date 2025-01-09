@@ -1,0 +1,32 @@
+dn: ou=users,dc=my-domain,dc=com
+objectClass: top
+objectClass: organizationalUnit
+description: Users
+ou: users
+
+dn: ou=groups,dc=my-domain,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+description: Groups
+
+dn: cn=extusers,ou=groups,dc=my-domain,dc=com
+objectClass: top
+objectClass: posixGroup
+gidNumber: 10000
+description: External users
+cn: extusers
+memberUid: 10001
+
+dn: uid=user1,ou=users,dc=my-domain,dc=com
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: posixAccount
+uid: user1
+uidNumber: 10001
+homeDirectory: /home/user1
+gidNumber: 10000
+cn: user1
+sn: Simple1

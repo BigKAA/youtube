@@ -1,0 +1,48 @@
+image:
+  registry: docker.io
+  repository: bitnami/keycloak
+  tag: 26.0.5-debian-12-r0
+  digest: ""
+
+auth:
+  adminUser: admin
+  adminPassword: "password"
+
+adminRealm: "master"
+production: false
+replicaCount: 1
+
+ingress:
+  enabled: true
+  ingressClassName: "system-ingress"
+  pathType: Prefix
+  hostname: keycloak.kryukov.local
+  annotations:
+    cert-manager.io/cluster-issuer: dev-ca-issuer
+    cert-manager.io/common-name: keycloak.kryukov.local
+    cert-manager.io/duration: 9125h
+    cert-manager.io/private-key-algorithm: RSA
+    cert-manager.io/private-key-encoding: PKCS8
+    cert-manager.io/private-key-rotation-policy: Always
+    cert-manager.io/private-key-size: '4096'
+    cert-manager.io/renew-before: 360h
+    cert-manager.io/subject-countries: RU
+    cert-manager.io/subject-localities: Moscow
+    cert-manager.io/subject-organizations: home dev lab
+    cert-manager.io/usages: server auth
+  tls: true
+  selfSigned: false
+
+postgresql:
+  enabled: false
+
+externalDatabase:
+  host: "postgres-np.psql.svc"
+  port: 5432
+  user: artur
+  database: keycloak
+  password: "password"
+
+logging:
+  output: default
+  level: INFO

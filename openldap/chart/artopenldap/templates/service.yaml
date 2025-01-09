@@ -12,12 +12,22 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - name: ldap
+      port: {{ .Values.service.port }}
       targetPort: ldap
       protocol: TCP
-      name: ldap
       {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
+    {{- if .Values.ldap.ssl.enable }}
+    - name: ldaps
+      port: {{ .Values.service.portSSL }}
+      targetPort: ldaps
+      protocol: TCP
+      
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.nodePortSSL }}
+      {{- end }}
+    {{- end }}
   selector:
     {{- include "artopenldap.selectorLabels" . | nindent 4 }}

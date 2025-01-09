@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,9 +8,15 @@ metadata:
 spec:
   clusterIP: None
   ports:
-    - port: {{ .Values.service.port }}
+    - name: ldap
+      port: {{ .Values.service.port }}
       targetPort: ldap
       protocol: TCP
-      name: ldap
+    {{- if .Values.ldap.ssl.enable }}
+    - name: ldaps
+      port: {{ .Values.service.portSSL }}
+      targetPort: ldaps
+      protocol: TCP
+    {{- end }}
   selector:
     {{- include "artopenldap.selectorLabels" . | nindent 4 }}

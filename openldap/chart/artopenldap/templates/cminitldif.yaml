@@ -10,6 +10,11 @@ data:
     cn: config
     olcLogLevel: {{ .Values.debugLevel }}
     olcSizeLimit: {{ .Values.ldap.olcSizeLimit }}
+    {{- if .Values.ldap.ssl.enable }}
+    olcTLSCACertificateFile: /var/lib/openldap/certs/ca.crt
+    olcTLSCertificateKeyFile: /var/lib/openldap/certs/tls.key
+    olcTLSCertificateFile: /var/lib/openldap/certs/tls.crt
+    {{- end }}
 
     #
     # Load dynamic backend modules:
@@ -41,7 +46,7 @@ data:
     dn: cn=schema,cn=config
     objectClass: olcSchemaConfig
     cn: schema
-    
+
     {{ range .Values.ldap.schemas.files }}
     include: file:///etc/openldap/schema/{{ . }}
     {{- end }}
