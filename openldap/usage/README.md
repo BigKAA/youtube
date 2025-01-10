@@ -254,3 +254,10 @@ helm install keycloak bitnami/keycloak -n keycloak --create-namespace -f chart/k
     - `Full sync period`: `20`. _Для тестов сделаем период обновления 20 секунд_.
 
 Там же, смотрим раздел Mappers.
+
+## Видео
+
+- [VK](https://vkvideo.ru/video7111833_456239297)
+- [Telegram](https://t.me/arturkryukov/722)
+- [Rutube](https://rutube.ru/video/1b7abaeb8b31d3ae8cf789b45d0767e7/)
+- [Youtube](https://youtu.be/RFLmLwyoNxo)
