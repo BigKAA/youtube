@@ -1,0 +1,3 @@
+# Kyverno
+
+- [Установка](install.md).
