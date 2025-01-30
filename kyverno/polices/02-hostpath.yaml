@@ -1,0 +1,50 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disable-host-path-volumes
+  annotations:
+    policies.kyverno.io/title: Restrict HostPath volumes.
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod,Volume
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.22-1.32"
+    kyverno.io/kyverno-version: 1.13.1
+    policies.kyverno.io/description: Restricting HostPath volumes.      
+spec:
+  background: false
+  rules:
+    - name: restricted-volumes
+      match:
+        any:
+        - resources:
+            kinds:
+              - Pod
+            namespaces:
+              - default
+              - user1
+              - user2
+            operations:
+              - CREATE
+              - UPDATE
+      validate:
+        failureAction: Enforce
+        message: >-
+          Only the following types of volumes may be used: configMap, csi, downwardAPI,
+          emptyDir, ephemeral, persistentVolumeClaim, projected, and secret.          
+        deny:
+          conditions:
+            all:
+            - key: "{{ request.object.spec.volumes[].keys(@)[] }}"
+              operator: AnyNotIn
+              value:
+              - name
+              - configMap
+              - csi
+              - downwardAPI
+              - emptyDir
+              - ephemeral
+              - persistentVolumeClaim
+              - projected
+              - secret
+              - ''
