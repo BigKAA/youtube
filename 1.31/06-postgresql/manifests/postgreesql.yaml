@@ -150,7 +150,7 @@ spec:
             name: state
       containers:
       - name: pgadmin
-        image: dpage/pgadmin4:8.11
+        image: dpage/pgadmin4:8.14
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 80
