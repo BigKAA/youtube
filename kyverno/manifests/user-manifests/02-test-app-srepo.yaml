@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-secret
+  labels:
+    app: test-secret
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-secret
+  template:
+    metadata:
+      labels:
+        app: test-secret
+    spec:
+      containers:
+      - name: alpine
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+        image: lunar.kryukov.biz:10443/kyverno/demoapp:0.0.1
+        command: 
+          - sh
+          - -c
+          - 'sleep infinity'
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        volumeMounts:
+          - name: test
+            mountPath: /host_logs
+      volumes:
+        - name: test
+          emptyDir: {}

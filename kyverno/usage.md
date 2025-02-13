@@ -10,7 +10,7 @@
 
 Затем свои хотелки.
 
-- Работа с imagePullSecrets
+- [Работа с imagePullSecrets](mutate.md)
 
 ---
 [README.md](README.md)
