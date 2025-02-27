@@ -1,0 +1,41 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: traefik-gateway
+  namespace: sample
+  annotations:
+    cert-manager.io/cluster-issuer: dev-ca-issuer
+    cert-manager.io/common-name: sample.kryukov.local
+    cert-manager.io/subject-organizations: "home dev lab"
+    cert-manager.io/subject-countries: "RU"
+    cert-manager.io/subject-localities: "Moscow"
+    cert-manager.io/duration: "9125h"
+    cert-manager.io/renew-before: "360h"
+    cert-manager.io/usages: "server auth"
+    cert-manager.io/private-key-algorithm: RSA
+    cert-manager.io/private-key-encoding: "PKCS8"
+    cert-manager.io/private-key-size: "4096"
+    cert-manager.io/private-key-rotation-policy: Always
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: web
+      port: 8000
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 8443
+      # hostaname для HTTPS и TLS listeners обязательно!
+      hostname: sample.kryukov.local
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: sample-tls
+            namespace: sample
+      allowedRoutes:
+        namespaces:
+          from: Same
