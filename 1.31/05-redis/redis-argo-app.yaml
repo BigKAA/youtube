@@ -2,12 +2,15 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: redis
-  namespace: argocd
 spec:
-  project: default
+  destination:
+    namespace: redis
+    server: https://kubernetes.default.svc
   source:
-    repoURL: https://charts.bitnami.com/bitnami
+    path: ''
+    repoURL: registry-1.docker.io/bitnamicharts
     targetRevision: 20.0.5
+    chart: redis
     helm:
       values: |-
         global:
@@ -19,10 +22,8 @@ spec:
           create: true
         replica:
           replicaCount: 1
-    chart: redis
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: redis
+  sources: []
+  project: default
   syncPolicy:
     automated:
       prune: true

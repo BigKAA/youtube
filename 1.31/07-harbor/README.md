@@ -10,6 +10,14 @@ helm install harbor bitnami/harbor -f harbor-values.yaml --create-namespace --na
 
 ## ArgoCD
 
+Добавляем oci repo bitnami:
+
+```shell
+kubectl apply -f bitnami-argo-repo.yaml
+```
+
+Ставим приложение:
+
 ```shell
 kubectl apply -f harbor-argo-app.yaml
 ```
