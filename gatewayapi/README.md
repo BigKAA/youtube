@@ -25,7 +25,7 @@ helm repo update
 Для установки чарта использую ArgoCD:
 
 ```yaml
- kubectl applt -f manifests/01-application-treaefik.yaml
+ kubectl apply -f manifests/01-application-treaefik.yaml
 ```
 
 Обратите внимание на то, что в нашем случае чарт сам создаёт `GatewayClass` с именем `traefik`.
@@ -107,7 +107,7 @@ Cert-manager поддерживает `kind: Gateway`. Аннотации 100% �
 ```
 
 Добавляем Gateway в систему:
-7
+
 ```shell
 kubectl apply -f manifests/02-gateway.yaml
 ```
@@ -196,3 +196,7 @@ spec:
 ```shell
 kubectl apply -f manifests/05-https-route.yaml
 ```
+
+## Дополнительные материалы
+
+[Дополнительные материалы](update.md).

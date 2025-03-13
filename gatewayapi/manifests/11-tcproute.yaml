@@ -1,0 +1,16 @@
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: ssh
+  namespace: sample
+spec:
+  parentRefs:
+    - name: traefik-gateway-ssh
+      sectionName: ssh
+      kind: Gateway
+  rules:
+    - backendRefs:
+        - name: ubuntu-ssh
+          namespace: sample
+          port: 22

@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-ssh
+  namespace: sample
+  labels:
+    app: ubuntu-ssh
+spec:
+  selector:
+    matchLabels:
+      app: ubuntu-ssh
+  template:
+    metadata:
+      labels:
+        app: ubuntu-ssh
+    spec:
+      containers:
+        - name: ubuntu
+          image: "lunar.kryukov.biz:10443/library/ssh/ubuntu_ssh:24.04"
+          imagePullPolicy: Always
+          env:
+          - name: USER_NAME
+            value: "artur"
+          - name: USER_ID
+            value: "1001"
+          ports:
+            - name: ssh
+              containerPort: 22
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 22
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 22
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            limits:
+              memory: 1Gi 
+              cpu: 1
+            requests:
+              memory: 0.5Gi
+              cpu: 0.5
+          volumeMounts:
+            - name: home-dir
+              mountPath: /home/artur
+      volumes:
+        - name: home-dir
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-ssh
+  namespace: sample
+  labels:
+    app: ubuntu-ssh
+spec:
+  type: ClusterIP
+  ports:
+    - name: ssh
+      port: 22
+      targetPort: ssh
+      protocol: TCP
+  selector:
+    app: ubuntu-ssh

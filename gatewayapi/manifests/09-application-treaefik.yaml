@@ -26,6 +26,15 @@ spec:
         providers:
           kubernetesGateway:
             enabled: true
+            experimentalChannel: true
+        
+        ports:
+          ssh:
+            port: 3000
+            expose:
+              default: true
+            exposedPort: 3000
+            protocol: TCP
         
         gateway:
           enabled: false
@@ -33,7 +42,7 @@ spec:
         logs:
           general:
             format: json
-            level: "INFO"
+            level: "DEBUG"
             noColor: true
           access:
             enabled: true

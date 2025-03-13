@@ -1,0 +1,15 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: traefik-gateway-ssh
+  namespace: sample
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: ssh
+      protocol: TCP
+      port: 3000
+      allowedRoutes:
+        namespaces:
+          from: Same
