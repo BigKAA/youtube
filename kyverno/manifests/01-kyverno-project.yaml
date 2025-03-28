@@ -17,3 +17,4 @@ spec:
       kind: '*'
   sourceRepos:
     - https://kyverno.github.io/kyverno
+    - https://kyverno.github.io/policy-reporter
