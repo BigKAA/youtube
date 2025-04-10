@@ -1,0 +1,220 @@
+crds:
+  keep: false
+
+global:
+  domain: argocd.kryukov.local
+
+  logging:
+    format: json
+    level: info
+
+configs:
+  params:
+    server.insecure: true
+  repositories: 
+    artur-repo:
+      url: https://github.com/BigKAA/youtube
+      name: bigkaa
+      type: git
+  secret:
+    # -- Bcrypt hashed admin password
+    ## Argo expects the password in the secret to be bcrypt hashed. You can create this hash with
+    ## `htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'`
+    argocdServerAdminPassword: "$2a$10$L8OqGEFh3a0yxwfIha4DLuyq6GIYP119hlFM5wlSEsI.nviVAv/zq"
+  
+  cmp:
+    # -- Create the argocd-cmp-cm configmap
+    create: true
+
+    plugins:
+      avp-plugin-kustomize:
+        allowConcurrency: true
+        discover:
+          find:
+            command:
+              - find
+              - "."
+              - -name
+              - kustomization.yaml
+        generate:
+          command:
+            - sh
+            - "-c"
+            - "kustomize build . | argocd-vault-plugin generate -"
+        lockRepo: false
+      avp-plugin-helm:
+        allowConcurrency: true
+        discover:
+          find:
+            command:
+              - sh
+              - "-c"
+              - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
+        generate:
+          # **IMPORTANT**: passing `${ARGOCD_ENV_helm_args}` effectively allows users to run arbitrary code in the Argo CD 
+          # repo-server (or, if using a sidecar, in the plugin sidecar). Only use this when the users are completely trusted. If
+          # possible, determine which Helm arguments are needed by your users and explicitly pass only those arguments.
+          command:
+            - sh
+            - "-c"
+            - |
+              helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE ${ARGOCD_ENV_HELM_ARGS} . |
+              argocd-vault-plugin generate --verbose-sensitive-output -
+        lockRepo: false
+      avp-plugin:
+        allowConcurrency: true
+        discover:
+          find:
+            command:
+              - sh
+              - "-c"
+              - "find . -name '*.yaml' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep ."
+        generate:
+          command:
+            - argocd-vault-plugin
+            - generate
+            - "."
+        lockRepo: false
+
+server:
+  replicas: 1
+
+  certificate:
+    enabled: true
+    domain: "argocd.kryukov.local"
+    duration: "9125h"
+    renewBefore: "360h"
+    issuer:
+      group: "cert-manager.io"
+      kind: "ClusterIssuer"
+      name: "dev-ca-issuer"
+    privateKey:
+      rotationPolicy: Always
+      encoding: PKCS8
+      algorithm: RSA
+      size: 4096
+    usages:
+      - server auth
+      - client auth
+    
+  ingress:
+    enabled: true
+    controller: generic
+    annotations:
+      cert-manager.io/cluster-issuer: "argocd-issuer"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    ingressClassName: "system-ingress"
+    hostname: "argocd.kryukov.local"
+    paths:
+      - /
+    pathType: Prefix
+    tls: true
+
+repoServer:
+  name: repo-server
+  replicas: 1
+  
+  rbac:
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - ''
+    resources:
+      - secrets
+      - configmaps
+
+  # -- Init containers to add to the repo server pods
+  initContainers:
+  - name: download-tools
+    image: alpine:3.8
+    command: [sh, -c]
+
+    # Don't forget to update this to whatever the stable release version is
+    # Note the lack of the `v` prefix unlike the git tag
+    env:
+      - name: AVP_VERSION
+        value: "1.18.1"
+    args:
+      - >-
+        wget -O argocd-vault-plugin
+        https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v${AVP_VERSION}/argocd-vault-plugin_${AVP_VERSION}_linux_amd64 &&
+        chmod +x argocd-vault-plugin &&
+        mv argocd-vault-plugin /custom-tools/
+    volumeMounts:
+      - mountPath: /custom-tools
+        name: custom-tools
+  
+  extraContainers:
+  - name: avp-helm
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:v2.13.0
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+    env:
+      - name: HELM_CACHE_HOME
+        value: /helm-working-dir
+      - name: HELM_CONFIG_HOME
+        value: /helm-working-dir
+      - name: HELM_DATA_HOME
+        value: /helm-working-dir
+    volumeMounts:
+      - name: var-files
+        mountPath: /var/run/argocd
+      - name: plugins
+        mountPath: /home/argocd/cmp-server/plugins
+      - name: cmp-tmp
+        mountPath: /tmp
+      
+      # Register plugins into sidecar
+      - name: cmp-plugin
+        mountPath: /home/argocd/cmp-server/config/plugin.yaml
+        subPath: avp-plugin-helm.yaml
+        
+      - name: custom-tools
+        subPath: argocd-vault-plugin
+        mountPath: /usr/local/bin/argocd-vault-plugin
+      - name: helm-temp-dir
+        mountPath: /helm-working-dir
+  - name: avp-plain
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:v2.13.0
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+    volumeMounts:
+      - name: var-files
+        mountPath: /var/run/argocd
+      - name: plugins
+        mountPath: /home/argocd/cmp-server/plugins
+      - name: cmp-tmp
+        mountPath: /tmp
+      
+      # Register plugins into sidecar
+      - name: cmp-plugin
+        mountPath: /home/argocd/cmp-server/config/plugin.yaml
+        subPath: avp-plugin.yaml
+        
+      - name: custom-tools
+        subPath: argocd-vault-plugin
+        mountPath: /usr/local/bin/argocd-vault-plugin  
+
+  # -- Additional volumeMounts to the repo server main container
+  volumeMounts:
+  - name: custom-tools
+    mountPath: /usr/local/bin/argocd-vault-plugin
+    subPath: argocd-vault-plugin
+
+  # -- Additional volumes to the repo server pod
+  volumes: 
+  - name: custom-tools
+    emptyDir: {}
+  - name: cmp-plugin
+    configMap:
+      name: argocd-cmp-cm
+  - name: cmp-tmp
+    emptyDir: {}
+  - name: helm-temp-dir
+    emptyDir: {}

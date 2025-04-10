@@ -1,5 +1,16 @@
 # Argo CD
 
+- [Argo CD](#argo-cd)
+  - [Cert-manager](#cert-manager)
+  - [Установка](#установка)
+  - [Настраиваем ingress для доступа.](#настраиваем-ingress-для-доступа)
+  - [Установка CLI](#установка-cli)
+  - [Пароль админа](#пароль-админа)
+  - [Добавление пользователя](#добавление-пользователя)
+  - [Ссылка на видео.](#ссылка-на-видео)
+  - [Helm](#helm)
+  - [ArgoCD Vault plugin](#argocd-vault-plugin)
+
 [Документация](https://argo-cd.readthedocs.io/en/stable/)
 
 ![image](images/image1.jpg)
@@ -106,3 +117,7 @@ helm install argocd argocd/argo-cd -f argo-values.yaml -n argocd --create-namesp
 ```
 
 Как генерировать пароль для админа написано в комментариях к secret в файле `argo-values.yaml`.
+
+## ArgoCD Vault plugin
+
+[ArgoCD Vault plugin](avp/README.md).

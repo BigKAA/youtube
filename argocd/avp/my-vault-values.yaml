@@ -1,0 +1,19 @@
+injector:
+  enabled: false
+
+server:
+  enabled: true
+  logLevel: "info"
+  logFormat: "json"
+  dataStorage:
+    size: 1Gi
+    storageClass: managed-nfs-storage
+    labels:
+      application: vault
+  standalone:
+    enabled: true
+
+ui:
+  enabled: true
+  serviceType: "NodePort"
+  serviceNodePort: 31222

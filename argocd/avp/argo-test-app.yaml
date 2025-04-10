@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: avp-test
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  source:
+    path: argocd/avp/manifests
+    repoURL: https://github.com/BigKAA/youtube
+    targetRevision: master
+    plugin:
+      env:
+        - name: AVP_TYPE
+          value: vault
+        - name: AVP_AUTH_TYPE
+          value: k8s
+        - name: AVP_K8S_ROLE
+          value: argocd
+        - name: VAULT_ADDR
+          value: http://vault.vault.svc:8200
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
