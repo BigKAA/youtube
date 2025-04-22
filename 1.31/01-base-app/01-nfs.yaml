@@ -96,12 +96,12 @@ spec:
             - name: PROVISIONER_NAME
               value: kryukov.local/nfs
             - name: NFS_SERVER
-              value: 192.168.218.170
+              value: 192.168.218.13
             - name: NFS_PATH
-              value: /var/nfs-disk
+              value: /volume1/nfs
           
       volumes:
         - name: nfs-client-root
           nfs:
-            server: 192.168.218.170
-            path: /var/nfs-disk
+            server: 192.168.218.13
+            path: /volume1/nfs
