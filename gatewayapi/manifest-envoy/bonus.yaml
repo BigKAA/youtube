@@ -1,0 +1,127 @@
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: sample-proxy-config
+  namespace: sample
+spec:
+  logging:
+    level: 
+      default: warn
+      upstream: info
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        replicas: 2
+      envoyService:
+        name: sample-external-service
+        externalTrafficPolicy: Cluster
+        type: LoadBalancer
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: 192.168.218.184
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bonus-certificate
+  namespace: sample
+spec:
+  secretName: ev-sample-tls
+  duration: 9125h # 1y
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+    - home dev lab
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+    rotationPolicy: Always
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - sample.kryukov.local
+  issuerRef:
+    name: dev-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ev-sample-gw
+  namespace: sample
+spec:
+  gatewayClassName: eg
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: sample-proxy-config
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: ev-sample-tls
+            namespace: sample
+      allowedRoutes:
+        namespaces:
+          from: All
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ev-sample
+  namespace: sample
+spec:
+  parentRefs:
+    - name: ev-sample-gw
+      sectionName: http
+      kind: Gateway
+  hostnames:
+    - "sample.kryukov.local"
+  rules:
+    - backendRefs:
+        - kind: Service
+          name: whoami
+          namespace: sample
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ev-sample-http
+  namespace: sample
+spec:
+  parentRefs:
+    - name: ev-sample-gw
+      sectionName: https
+      kind: Gateway
+  hostnames:
+    - "sample.kryukov.local"
+  rules:
+    - backendRefs:
+        - kind: Service
+          name: whoami
+          namespace: sample
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /

@@ -199,4 +199,5 @@ kubectl apply -f manifests/05-https-route.yaml
 
 ## Дополнительные материалы
 
-[Дополнительные материалы](update.md).
+- [Дополнительные материалы](update.md).
+- [Реализация на envoy](envoy.md).
