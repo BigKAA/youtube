@@ -1,0 +1,65 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: testapp-http-route
+  namespace: sample
+spec:
+  parentRefs:
+  - name: testapp-gw
+    sectionName: http
+  hostnames:
+  - testapp.kryukov.local
+  rules:
+  - filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: https
+        statusCode: 301
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: testapp-https-route
+  namespace: sample
+spec:
+  parentRefs:
+  - name: testapp-gw
+    sectionName: https
+  hostnames:
+  - testapp.kryukov.local
+  rules:
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /
+    backendRefs:
+      - name: testapp-one
+        port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: testapp-rewrite
+  namespace: sample
+spec:
+  parentRefs:
+  - name: testapp-gw
+    sectionName: https
+  hostnames:
+  - testapp.kryukov.local
+  rules:
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /login
+    filters:
+      - type: URLRewrite
+        urlRewrite:
+          # hostname: anotherapp.kryukov.local
+          path:
+            type: ReplacePrefixMatch
+            replacePrefixMatch: /auth
+    backendRefs:
+      - name: testapp-one
+        port: 80

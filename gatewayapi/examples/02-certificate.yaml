@@ -1,0 +1,27 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: testapp
+  namespace: sample
+spec:
+  secretName: testapp-tls
+  duration: 9125h # 1y
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+    - home dev lab
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 4096
+    rotationPolicy: Always
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - testapp.kryukov.local
+  issuerRef:
+    name: dev-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

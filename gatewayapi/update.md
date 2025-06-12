@@ -139,7 +139,7 @@ providers:
 Применим изменения:
 
 ```bash
-kubectl apply -f manifests/09-application-treaefik.yaml
+kubectl apply -f manifests/06-application-treaefik.yaml
 ```
 
 ### Новый Gateway

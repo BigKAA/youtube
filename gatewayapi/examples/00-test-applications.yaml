@@ -1,0 +1,108 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testapp-one
+  namespace: sample
+  labels:
+    app.kubernetes.io/name: &name testapp-one
+    app.kubernetes.io/instance: &instance testapp
+    testapp/version: &version v0.0.1
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: *name
+      app.kubernetes.io/instance: *instance
+      testapp/version: *version
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: *name
+        app.kubernetes.io/instance: *instance
+        testapp/version: *version
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: testapp-one
+  namespace: sample
+  labels:
+    app.kubernetes.io/name: &name testapp-one
+    app.kubernetes.io/instance: &instance testapp
+    testapp/version: &version v0.0.1
+spec:
+  selector:
+    app.kubernetes.io/name: *name
+    app.kubernetes.io/instance: *instance
+    testapp/version: *version
+  ports:
+    - port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testapp-two
+  namespace: sample
+  labels:
+    app.kubernetes.io/name: &name testapp-two
+    app.kubernetes.io/instance: &instance testapp
+    testapp/version: &version v0.0.2
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: *name
+      app.kubernetes.io/instance: *instance
+      testapp/version: *version
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: *name
+        app.kubernetes.io/instance: *instance
+        testapp/version: *version
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: testapp-two
+  namespace: sample
+  labels:
+    app.kubernetes.io/name: &name testapp-two
+    app.kubernetes.io/instance: &instance testapp
+    testapp/version: &version v0.0.2
+spec:
+  selector:
+    app.kubernetes.io/name: *name
+    app.kubernetes.io/instance: *instance
+    testapp/version: *version
+  ports:
+    - port: 80
