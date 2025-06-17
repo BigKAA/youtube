@@ -202,3 +202,33 @@ kubectl apply -f manifests/05-https-route.yaml
 - [Дополнительные материалы](update.md).
 - [Реализация на envoy](envoy.md).
 - [Примеры использования](examples.md).
+
+## Видео
+
+### 01
+
+* VK: https://vkvideo.ru/video7111833_456239301
+* Telegram: https://t.me/arturkryukov/769
+* Rutube: https://rutube.ru/video/d8cb40436f7bc82891e02cc55b935ed9/
+* Youtube: https://youtu.be/VuouMbTEq18
+
+### 02
+
+* VK: https://vkvideo.ru/video7111833_456239302
+* Telegram: https://t.me/arturkryukov/791
+* Rutube: https://rutube.ru/video/be0b625a402df6a2479b6c2fcfa73e0c/
+* Youtube: https://youtu.be/1OMgaMG5J10
+
+### 03
+
+* VK: https://vkvideo.ru/video-230075008_456239051
+* Telegram: https://t.me/arturkryukov/877
+* Rutube: https://rutube.ru/video/ce2f806033e44e6c110e551476d1c26b/
+* Youtube: https://youtu.be/k50_hpAL1zU
+
+### 04
+
+* VK: https://vkvideo.ru/video-230075008_456239053
+* Telegram: https://t.me/arturkryukov/899
+* Rutube: https://rutube.ru/video/f79e14686066c1f9c1f837d1785af75b/
+* Youtube: https://youtu.be/BZL_KgwtCp0
