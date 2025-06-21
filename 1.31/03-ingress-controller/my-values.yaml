@@ -43,5 +43,7 @@ controller:
        prometheus.io/port: "10254"
 
   priorityClassName: "medium-priority"
+  extraArgs:
+    enable-ssl-passthrough: true
 
 revisionHistoryLimit: 2
