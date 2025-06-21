@@ -28,8 +28,9 @@ controller:
   service:
     enabled: true
     type: LoadBalancer
-    #annotations:
-    #  metallb.universe.tf/loadBalancerIPs: 192.168.218.180
+    annotations:
+      metallb.io/loadBalancerIPs: 192.168.218.180
+      metallb.io/address-pool: first-pool
 
   admissionWebhooks:
     enabled: false
