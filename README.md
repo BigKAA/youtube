@@ -11,6 +11,7 @@
   * **[Network Polices](net/04-NetworkPolicies)** - Встроенный firewall.
   * **[Network Polices calico](net/05-NetworkPolicy-calico)** - Реализация от проекта Calico.
   * **[Gateway API](gatewayapi)**.
+  * **[Istio](istio)**.
 * **[ArgoCD](argocd/README.md)** - приложение для CD в k8s.
 * **[Nexus](nexus)** - хороший пример для объяснения зачем нужен StatefulSet.
 Начало серии видео по devops инструментам в кубернетес.
