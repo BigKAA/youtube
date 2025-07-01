@@ -56,7 +56,7 @@ server:
     enabled: true
     controller: generic
     annotations:
-      cert-manager.io/cluster-issuer: "argocd-issuer"
+      # cert-manager.io/cluster-issuer: "argocd-issuer"
       nginx.ingress.kubernetes.io/ssl-redirect: "false"
     ingressClassName: "system-ingress"
     hostname: "argocd.kryukov.local"
