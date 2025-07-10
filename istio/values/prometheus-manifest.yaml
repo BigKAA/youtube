@@ -1,0 +1,40 @@
+
+server:
+  global:
+    scrape_interval: 15s
+
+  ingress:
+    enabled: false
+
+  persistentVolume:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
+    storageClass: "managed-nfs-storage"
+  replicaCount: 1
+  revisionHistoryLimit: 3
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  service:
+    enabled: true
+    servicePort: 80
+    type: ClusterIP
+
+  retention: "6d"
+  tcpSocketProbeEnabled: true
+
+alertmanager:
+  enabled: false
+kube-state-metrics:
+  enabled: false
+prometheus-node-exporter:
+  enabled: false
+prometheus-pushgateway:
+  enabled: false
+

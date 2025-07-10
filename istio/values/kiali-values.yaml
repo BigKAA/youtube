@@ -1,0 +1,86 @@
+kiali_route_url: ""
+
+istio_namespace: "istio-system" 
+
+additional_display_details:
+  - annotation: kiali.io/api-spec
+    icon_annotation: kiali.io/api-type
+    title: API Documentation
+
+auth:
+  strategy: "openid"
+  openid:
+    client_id: kiali
+    insecure_skip_verify_tls: true
+    issuer_uri: "https://dex.kryukov.local"
+    scopes: ["openid", "profile", "email", "groups"]
+    disable_rbac: true
+    username_claim: "email"
+
+login_token:
+  signing_key: "1764893526093526"
+
+deployment:
+  replicas: 1
+  image_pull_policy: "IfNotPresent"
+  ingress:
+    enabled: false
+  instance_name: "kiali"
+  logger:
+    log_format: "json"
+    log_level: "info"
+
+external_services:
+  custom_dashboards:
+    enabled: true
+  grafana:
+    auth:
+      insecure_skip_verify: true
+      password: "password"
+      username: "admin"
+      type: "basic"
+    enabled: true
+    internal_url: "http://grafana.monitoring.svc"
+    external_url: "https://grafana.kryukov.local"
+  istio:
+    root_namespace: "istio-system"
+  prometheus:
+    auth:
+      type: "none"
+    url: "http://prometheus-server.monitoring.svc"
+  tracing:
+    enabled: false
+
+identity: {}
+  #cert_file:
+  #private_key_file:
+
+kiali_feature_flags:
+  disabled_features: []
+  i18n:
+    language: "en"
+  validations:
+    ignore: 
+      - "KIA1301"
+
+kubernetes_config:
+  burst: 200
+  cache_duration: 300
+  cache_token_namespace_duration: 10
+  excluded_workloads:
+  - "CronJob"
+  - "DeploymentConfig"
+  - "Job"
+  - "ReplicationController"
+  qps: 175
+
+server:
+  web_fqdn: "kiali.kryukov.local"
+  # Если не указать порт, будет искать заголовок x-forwarded-port
+  web_port: "443"
+  web_schema: "https"
+  observability:
+    metrics:
+      enabled: true
+      port: 9090
+  

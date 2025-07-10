@@ -1,0 +1,52 @@
+replicas: 1
+
+testFramework:
+  enabled: false
+
+ingress:
+  enabled: false
+
+route:
+  main:
+    enabled: true
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    hostnames:
+      - grafana.kryukov.local
+    parentRefs:
+      - name: kiali-support
+        sectionName: https
+        namespace: istio-system
+    matches:
+      - path:
+          type: PathPrefix
+          value: /
+
+resources:
+ limits:
+   cpu: 1000m
+   memory: 512Mi
+ requests:
+   cpu: 100m
+   memory: 128Mi
+
+persistence:
+  type: pvc
+  enabled: true
+  storageClassName: managed-nfs-storage
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+
+adminUser: admin
+adminPassword: password
+
+datasources:
+ datasources.yaml:
+   apiVersion: 1
+   datasources:
+   - name: Prometheus
+     type: prometheus
+     url: http://prometheus-server.monitoring.svc
+     # access: proxy
+     isDefault: true

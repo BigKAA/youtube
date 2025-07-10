@@ -51,3 +51,10 @@ Istio разделяет свои функции на два отдельных 
 
 [Install Istio.](install.md)
 
+## Install Kiali
+
+[Install Kiali.](kiali.md)
+
+## Примеры использования Istio
+
+[Примеры использования](work.md)
