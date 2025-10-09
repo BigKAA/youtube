@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress
+  labels:
+    app.kubernetes.io/name: test-app
+    app.kubernetes.io/instance: test-app
+  annotations:
+    cert-manager.io/cluster-issuer: dev-ca-issuer
+    cert-manager.io/common-name: vc1-test-app.kryukov.local
+    cert-manager.io/subject-organizations: "home dev lab"
+    cert-manager.io/subject-countries: "RU"
+    cert-manager.io/subject-localities: "Moscow"
+    cert-manager.io/duration: "9125h"
+    cert-manager.io/renew-before: "360h"
+    cert-manager.io/usages: "server auth"
+    cert-manager.io/private-key-algorithm: RSA
+    cert-manager.io/private-key-encoding: "PKCS8"
+    cert-manager.io/private-key-size: "4096"
+    cert-manager.io/private-key-rotation-policy: Always
+spec:
+  ingressClassName: system-ingress
+  tls:
+    - hosts:
+        - vc1-test-app.kryukov.local
+      secretName: test-app-tls
+  rules:
+    - host: vc1-test-app.kryukov.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: test-app
+                port:
+                  number: 80

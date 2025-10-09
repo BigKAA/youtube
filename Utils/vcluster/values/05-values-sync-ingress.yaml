@@ -1,0 +1,54 @@
+controlPlane:
+  distro:
+   k8s:
+     enabled: true
+     image:
+       registry: ghcr.io
+       repository: "loft-sh/kubernetes"
+       tag: "v1.32.1"
+  backingStore:
+    etcd:
+      deploy:
+        enabled: true
+        statefulSet:
+          persistence:
+            volumeClaim:
+              enabled: true
+              storageClass: "managed-nfs-storage"
+              size: 5Gi
+  statefulSet:
+    persistence:
+      volumeClaim:
+        storageClass: "managed-nfs-storage"
+        size: 5Gi
+    security:
+      podSecurityContext:
+        fsGroup: 12345
+      containerSecurityContext:
+        runAsUser: 12345
+        runAsGroup: 12345
+        runAsNonRoot: true
+  ingress:
+    enabled: true
+    host: vc1.kryukov.local
+  proxy:
+    extraSANs:
+    - vc1.kryukov.local
+    # - 192.168.218.180
+exportKubeConfig:
+  context: "vc1"
+  server: https://vc1.kryukov.local
+integrations:
+  metricsServer:
+    enabled: true
+    nodes: true
+    pods: true
+sync:
+  toHost:
+    ingresses:
+      enabled: true
+  fromHost:
+    storageClasses:
+      enabled: true
+    ingressClasses:
+      enabled: true
