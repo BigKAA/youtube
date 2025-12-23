@@ -1,0 +1,24 @@
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 2000000
+globalDefault: false
+description: "System components. Like a pv, controllers, docker registry etc"
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: medium-priority
+value: 1005000
+globalDefault: false
+description: "Application productive env"
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: low-priority
+value: 1000000
+globalDefault: false
+description: "CI|CD components"
