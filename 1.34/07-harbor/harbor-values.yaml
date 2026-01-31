@@ -3,34 +3,20 @@ global:
   storageClass: "managed-nfs-storage"
 # initial admin password
 adminPassword: "password"
-externalURL: https://registry-cl.kryukov.local
+externalURL: https://harbor.kryukov.lan
 logLevel: debug
 ipFamily:
   ipv6:
     enabled: false
-exposureType: ingress
-ingress:
-  core:
-    ingressClassName: "system-ingress"
-    hostname: registry-cl.kryukov.local
-    annotations:
-      ingress.kubernetes.io/ssl-redirect: "true"
-      ingress.kubernetes.io/proxy-body-size: "0"
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      cert-manager.io/cluster-issuer: dev-ca-issuer
-      cert-manager.io/common-name: registry-cl.kryukov.local
-      cert-manager.io/subject-organizations: "home dev lab"
-      cert-manager.io/subject-countries: "RU"
-      cert-manager.io/subject-localities: "Moscow"
-      cert-manager.io/duration: "9125h"
-      cert-manager.io/renew-before: "360h"
-      cert-manager.io/usages: "server auth"
-      cert-manager.io/private-key-algorithm: RSA
-      cert-manager.io/private-key-encoding: "PKCS8"
-      cert-manager.io/private-key-size: "4096"
-      cert-manager.io/private-key-rotation-policy: Always
-    tls: true
+exposureType: proxy
+nginx:
+  tls:
+    enabled: false
+service:
+  type: ClusterIP
+  ports:
+    http: 80
+    https: 443
 persistence:
   enabled: true
   resourcePolicy: "keep"

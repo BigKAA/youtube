@@ -24,6 +24,11 @@ spec:
     - kryukov.lan
   ipAddresses:
     - 192.168.218.180
+    - 192.168.218.181
+    - 192.168.218.182
+    - 192.168.218.183
+    - 192.168.218.184
+    - 192.168.218.185
   issuerRef:
     name: dev-ca-issuer
     kind: ClusterIssuer

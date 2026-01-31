@@ -16,10 +16,12 @@ helm install harbor bitnami/harbor -f harbor-values.yaml --create-namespace --na
 kubectl apply -f bitnami-argo-repo.yaml
 ```
 
-Ставим приложение:
+Ставим приложение (включает Harbor и HTTPRoute для Gateway API):
 
 ```shell
 kubectl apply -f harbor-argo-app.yaml
 ```
 
 Версия чарта: 27.0.3 (Harbor 2.13.2)
+
+Harbor использует `exposureType: proxy` (nginx). TLS терминируется на Gateway API (Gateway `eg` в `envoy-gateway-system`).
