@@ -5,16 +5,11 @@
 ## Helm
 
 ```shell
-helm install harbor bitnami/harbor -f harbor-values.yaml --create-namespace --namespace harbor
+helm repo add harbor https://helm.goharbor.io
+helm install harbor harbor/harbor -f harbor-values.yaml --create-namespace --namespace harbor
 ```
 
 ## ArgoCD
-
-Добавляем oci repo bitnami:
-
-```shell
-kubectl apply -f bitnami-argo-repo.yaml
-```
 
 Ставим приложение (включает Harbor и HTTPRoute для Gateway API):
 
@@ -22,6 +17,6 @@ kubectl apply -f bitnami-argo-repo.yaml
 kubectl apply -f harbor-argo-app.yaml
 ```
 
-Версия чарта: 27.0.3 (Harbor 2.13.2)
+Версия чарта: 1.18.2 (Harbor 2.14.2)
 
-Harbor использует `exposureType: proxy` (nginx). TLS терминируется на Gateway API (Gateway `eg` в `envoy-gateway-system`).
+Harbor использует `expose.type: clusterIP`. TLS терминируется на Gateway API (Gateway `eg` в `envoy-gateway-system`).

@@ -6,87 +6,56 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: registry-1.docker.io/bitnamicharts
-    targetRevision: 27.0.3
+    repoURL: https://helm.goharbor.io
+    targetRevision: 1.18.2
     helm:
       values: |
-        global:
-          defaultStorageClass: "nfs-client"
-          storageClass: "nfs-client"
-        # initial admin password
-        adminPassword: "password"
-        externalURL: https://harbor.kryukov.lan
-        logLevel: debug
-        ipFamily:
-          ipv6:
-            enabled: false
-        exposureType: proxy
-        nginx:
+        expose:
+          type: clusterIP
           tls:
             enabled: false
-        service:
-          type: ClusterIP
-          ports:
-            http: 80
-            https: 443
+          clusterIP:
+            name: harbor
+            ports:
+              httpPort: 80
+              httpsPort: 443
+        externalURL: https://harbor.kryukov.lan
+        harborAdminPassword: "password"
+        logLevel: debug
         persistence:
           enabled: true
           resourcePolicy: "keep"
           persistentVolumeClaim:
             registry:
-              accessModes:
-                - ReadWriteOnce
+              storageClass: "nfs-client"
               size: 5Gi
             jobservice:
-              accessModes:
-                - ReadWriteOnce
-              size: 1Gi
+              jobLog:
+                storageClass: "nfs-client"
+                size: 1Gi
             trivy:
-              accessModes:
-                - ReadWriteOnce
+              storageClass: "nfs-client"
               size: 1Gi
           imageChartStorage:
             type: filesystem
-        volumePermissions:
-          enabled: true
-        portal:
-          networkPolicy:
-            enabled: false
-        core:
-          networkPolicy:
-            enabled: false
-        jobservice:
-          networkPolicy:
-            enabled: false
-        registry:
-          networkPolicy:
-            enabled: false
-        trivy:
-          networkPolicy:
-            enabled: false
-        exporter:
-          networkPolicy:
-            enabled: false
-        postgresql:
-          enabled: false
-        externalDatabase:
-          host: postgresql.pg.svc
-          port: 5432
-          user: artur
-          password: "password"
-          sslmode: disable
-          coreDatabase: "harbor"
+        database:
+          type: external
+          external:
+            host: postgresql.pg.svc
+            port: "5432"
+            username: artur
+            password: "password"
+            coreDatabase: "harbor"
+            sslmode: disable
         redis:
-          enabled: false
-        externalRedis:
-          host: redis-master.redis.svc
-          port: 6379
-          password: "qUwTt8g9it"
-          coreDatabaseIndex: "0"
-          jobserviceDatabaseIndex: "1"
-          registryDatabaseIndex: "2"
-          trivyAdapterDatabaseIndex: "5"
-
+          type: external
+          external:
+            addr: redis-master.redis.svc:6379
+            password: "qUwTt8g9it"
+            coreDatabaseIndex: "0"
+            jobserviceDatabaseIndex: "1"
+            registryDatabaseIndex: "2"
+            trivyAdapterIndex: "5"
     chart: harbor
   destination:
     server: https://kubernetes.default.svc
