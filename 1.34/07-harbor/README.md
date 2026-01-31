@@ -2,11 +2,13 @@
 
 Для работы Harbor должны быть запущены: [redis](../05-redis/) и [postgresql](../06-postgresql/).
 
+Используется официальный [helm chart](https://github.com/goharbor/harbor-helm) от goharbor.
+Chart помещён в директорию `chart/harbor/` в git-репозитории.
+
 ## Helm
 
 ```shell
-helm repo add harbor https://helm.goharbor.io
-helm install harbor harbor/harbor -f harbor-values.yaml --create-namespace --namespace harbor
+helm install harbor ./chart/harbor -f harbor-values.yaml --create-namespace --namespace harbor
 ```
 
 ## ArgoCD
