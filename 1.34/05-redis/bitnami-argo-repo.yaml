@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repository
+  name: docker-io-helm-oci
+  namespace: argocd
+stringData:
+  url: registry-1.docker.io/bitnamicharts
+  name: bitnamicharts
+  type: helm
+  enableOCI: "true"

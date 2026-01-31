@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis
+spec:
+  destination:
+    namespace: redis
+    server: https://kubernetes.default.svc
+  source:
+    path: ''
+    repoURL: registry-1.docker.io/bitnamicharts
+    targetRevision: 24.1.2
+    chart: redis
+    helm:
+      values: |-
+        global:
+          defaultStorageClass: "managed-nfs-storage"
+          storageClass: "managed-nfs-storage"
+          redis:
+            password: 'qUwTt8g9it'
+        pdb:
+          create: true
+        replica:
+          replicaCount: 1
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

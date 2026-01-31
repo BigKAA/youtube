@@ -44,7 +44,7 @@ server:
         namespace: envoy-gateway-system
         sectionName: https
     hostnames:
-      - argocd.kryukov.local
+      - argocd.kryukov.lan
     rules:
       - matches:
           - path:

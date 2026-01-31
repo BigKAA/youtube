@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgresql
+  namespace: argocd
+spec:
+  destination:
+    namespace: pg
+    server: https://kubernetes.default.svc
+  source:
+    path: ''
+    repoURL: registry-1.docker.io/bitnamicharts
+    targetRevision: 18.2.3
+    chart: postgresql
+    helm:
+      values: |-
+        global:
+          defaultStorageClass: "managed-nfs-storage"
+          storageClass: "managed-nfs-storage"
+        auth:
+          username: artur
+          password: "password"
+          database: "harbor"
+        primary:
+          service:
+            type: NodePort
+            nodePorts:
+              postgresql: 32543
+          persistence:
+            storageClass: "managed-nfs-storage"
+            size: 10Gi
+          resources:
+            requests:
+              cpu: "0.4"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "1024Mi"
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

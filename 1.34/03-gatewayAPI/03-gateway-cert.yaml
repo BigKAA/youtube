@@ -20,7 +20,8 @@ spec:
     - server auth
     - client auth
   dnsNames:
-    - argocd.kryukov.local
+    - "*.kryukov.lan"
+    - kryukov.lan
   ipAddresses:
     - 192.168.218.180
   issuerRef:
