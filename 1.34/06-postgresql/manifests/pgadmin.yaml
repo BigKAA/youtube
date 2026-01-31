@@ -6,7 +6,7 @@ metadata:
 spec:
   accessModes:
     - "ReadWriteOnce"
-  storageClassName: "managed-nfs-storage"
+  storageClassName: "nfs-client"
   resources:
     requests:
       storage: 500Mi

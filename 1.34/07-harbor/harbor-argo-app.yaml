@@ -11,8 +11,8 @@ spec:
     helm:
       values: |
         global:
-          defaultStorageClass: "managed-nfs-storage"
-          storageClass: "managed-nfs-storage"
+          defaultStorageClass: "nfs-client"
+          storageClass: "nfs-client"
         # initial admin password
         adminPassword: "password"
         externalURL: https://harbor.kryukov.lan

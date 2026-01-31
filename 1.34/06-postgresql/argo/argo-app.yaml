@@ -15,8 +15,8 @@ spec:
     helm:
       values: |-
         global:
-          defaultStorageClass: "managed-nfs-storage"
-          storageClass: "managed-nfs-storage"
+          defaultStorageClass: "nfs-client"
+          storageClass: "nfs-client"
         auth:
           username: artur
           password: "password"
@@ -27,7 +27,7 @@ spec:
             nodePorts:
               postgresql: 32543
           persistence:
-            storageClass: "managed-nfs-storage"
+            storageClass: "nfs-client"
             size: 10Gi
           resources:
             requests:

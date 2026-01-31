@@ -1,6 +1,6 @@
 global:
-  defaultStorageClass: "managed-nfs-storage"
-  storageClass: "managed-nfs-storage"
+  defaultStorageClass: "nfs-client"
+  storageClass: "nfs-client"
   redis:
     password: 'qUwTt8g9it'
 pdb:

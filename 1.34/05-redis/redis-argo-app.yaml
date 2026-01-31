@@ -2,6 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: redis
+  namespace: argocd
 spec:
   destination:
     namespace: redis
@@ -14,8 +15,8 @@ spec:
     helm:
       values: |-
         global:
-          defaultStorageClass: "managed-nfs-storage"
-          storageClass: "managed-nfs-storage"
+          defaultStorageClass: "nfs-client"
+          storageClass: "nfs-client"
           redis:
             password: 'qUwTt8g9it'
         pdb:
