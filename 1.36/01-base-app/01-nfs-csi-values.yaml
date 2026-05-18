@@ -1,0 +1,29 @@
+# NFS CSI Driver Helm values
+# Установка:
+# helm repo add csi-driver-nfs https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
+# helm repo update
+# helm upgrade --install csi-driver-nfs csi-driver-nfs/csi-driver-nfs \
+#   --namespace kube-system \
+#   --version v4.10.0 \
+#   -f 01-nfs-csi-values.yaml
+#
+# Проверка:
+# kubectl -n kube-system get deployment/csi-nfs-controller
+
+controller:
+  runOnControlPlane: true
+  priorityClassName: system-cluster-critical
+
+storageClass:
+  create: true
+  name: managed-nfs-storage
+  reclaimPolicy: Delete
+  volumeBindingMode: Immediate
+  parameters:
+    server: 192.168.218.13
+    share: /volume1/nfs
+    archiveOnDelete: "false"
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - noatime

@@ -1,0 +1,91 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: harbor
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/BigKAA/youtube
+    targetRevision: master
+    path: 1.34/07-harbor/chart/harbor
+    helm:
+      values: |
+        expose:
+          type: clusterIP
+          tls:
+            enabled: false
+          clusterIP:
+            name: harbor
+            ports:
+              httpPort: 80
+              httpsPort: 443
+        externalURL: https://harbor.kryukov.lan
+        harborAdminPassword: "password"
+        logLevel: debug
+        persistence:
+          enabled: true
+          resourcePolicy: "keep"
+          persistentVolumeClaim:
+            registry:
+              storageClass: "nfs-client"
+              size: 5Gi
+            jobservice:
+              jobLog:
+                storageClass: "nfs-client"
+                size: 1Gi
+            trivy:
+              storageClass: "nfs-client"
+              size: 1Gi
+          imageChartStorage:
+            type: filesystem
+        database:
+          type: external
+          external:
+            host: postgresql.pg.svc
+            port: "5432"
+            username: artur
+            password: "password"
+            coreDatabase: "harbor"
+            sslmode: disable
+        redis:
+          type: external
+          external:
+            addr: redis-master.redis.svc:6379
+            password: "qUwTt8g9it"
+            coreDatabaseIndex: "0"
+            jobserviceDatabaseIndex: "1"
+            registryDatabaseIndex: "2"
+            trivyAdapterIndex: "5"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: harbor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: harbor-httproute
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/BigKAA/youtube
+    targetRevision: master
+    path: 1.34/07-harbor
+    directory:
+      include: 'harbor-httproute.yaml'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: harbor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

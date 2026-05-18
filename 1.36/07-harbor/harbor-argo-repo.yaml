@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repository
+  name: harbor-helm-repo
+  namespace: argocd
+stringData:
+  url: https://helm.goharbor.io
+  name: harbor
+  type: helm

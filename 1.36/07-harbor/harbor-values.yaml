@@ -1,0 +1,46 @@
+expose:
+  type: clusterIP
+  tls:
+    enabled: false
+  clusterIP:
+    name: harbor
+    ports:
+      httpPort: 80
+      httpsPort: 443
+externalURL: https://harbor.kryukov.lan
+harborAdminPassword: "password"
+logLevel: debug
+persistence:
+  enabled: true
+  resourcePolicy: "keep"
+  persistentVolumeClaim:
+    registry:
+      storageClass: "nfs-client"
+      size: 5Gi
+    jobservice:
+      jobLog:
+        storageClass: "nfs-client"
+        size: 1Gi
+    trivy:
+      storageClass: "nfs-client"
+      size: 1Gi
+  imageChartStorage:
+    type: filesystem
+database:
+  type: external
+  external:
+    host: postgresql.pg.svc
+    port: "5432"
+    username: artur
+    password: "password"
+    coreDatabase: "harbor"
+    sslmode: disable
+redis:
+  type: external
+  external:
+    addr: redis-master.redis.svc:6379
+    password: "qUwTt8g9it"
+    coreDatabaseIndex: "0"
+    jobserviceDatabaseIndex: "1"
+    registryDatabaseIndex: "2"
+    trivyAdapterIndex: "5"
