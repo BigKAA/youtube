@@ -66,3 +66,5 @@ kubectl apply -f 01-EnvoyProxy-Config.yaml \
 ```
 
 Остальные приложения ставим на свой вкус. Я обычно добавляю в кластер: ArgoCD и PostgreSQL. Для этого есть соответствующие манифесты в директориях `04-argocd` и `05-postgresql`.
+
+Мой другой проект по автоматизации установки калстера kubernetes при помоищи ansible: [00-kube-ansible](https://github.com/BigKAA/00-kube-ansible).
