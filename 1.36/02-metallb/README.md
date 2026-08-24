@@ -2,7 +2,7 @@
 
 Контроллер для поддержки сервисов типа LoadBalancer.
 
-[https://metallb.universe.tf/](https://metallb.universe.tf/)
+[https://metallb.io/](https://metallb.io/)
 
 **Важно!** Если `kubeproxy` запущен без параметра `strictARP: true`. Исправим это, отредактировав
 соответствующий configmap:
@@ -16,13 +16,13 @@ apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
 mode: "ipvs"
 ipvs:
-  strictARP: true
+    strictARP: true
 ```
 
 Установим последнюю (на момент написания этого руководства) версию metallb:
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.15.3/config/manifests/metallb-native.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.16.1/config/manifests/metallb-native.yaml
 ```
 
 Подождем пока применятся все CRD и запустятся все поды:
@@ -36,3 +36,11 @@ kubectl wait -n metallb-system --for=condition=Ready pods --selector "app=metall
 ```shell
 kubectl -n metallb-system apply -f mlb.yaml
 ```
+
+Проверка:
+
+```shell
+kubectl -n metallb-system get ipaddresspool,l2advertisement
+```
+
+**Примечание.** Для указания конкретного IP сервиса LoadBalancer используйте аннотацию `metallb.io/loadBalancerIPs` (старый префикс `metallb.universe.tf` считается устаревшим). Пример см. в `../03-gatewayAPI/01-EnvoyProxy-Config.yaml`.

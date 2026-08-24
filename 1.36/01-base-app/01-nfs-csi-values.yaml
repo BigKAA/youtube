@@ -4,7 +4,7 @@
 # helm repo update
 # helm upgrade --install csi-driver-nfs csi-driver-nfs/csi-driver-nfs \
 #   --namespace kube-system \
-#   --version v4.10.0 \
+#   --version v4.13.4 \
 #   -f 01-nfs-csi-values.yaml
 #
 # Проверка:

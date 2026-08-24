@@ -6,7 +6,7 @@ metadata:
   namespace: envoy-gateway-system
 spec:
   logging:
-    level: 
+    level:
       default: warn
       upstream: info
   provider:
@@ -16,4 +16,4 @@ spec:
         externalTrafficPolicy: Cluster
         type: LoadBalancer
         annotations:
-          metallb.universe.tf/loadBalancerIPs: 192.168.218.180
+          metallb.io/loadBalancerIPs: 192.168.218.180
