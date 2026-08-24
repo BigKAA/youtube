@@ -28,5 +28,5 @@ kubectl apply -f argo/pgadmin-argo-app.yaml
 - Service: `postgresql.pg.svc:5432` (NodePort: 32543)
 - User: `artur`
 - Database: `harbor`
-- StorageClass: `managed-nfs-storage`
+- StorageClass: `nfs-storage`
 - pgAdmin доступен по адресу: `pg.kryukov.lan`

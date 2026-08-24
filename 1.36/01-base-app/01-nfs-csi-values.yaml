@@ -16,7 +16,7 @@ controller:
 
 storageClass:
   create: true
-  name: managed-nfs-storage
+  name: nfs-storage
   reclaimPolicy: Delete
   volumeBindingMode: Immediate
   parameters:

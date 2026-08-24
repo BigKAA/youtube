@@ -15,14 +15,14 @@ persistence:
   resourcePolicy: "keep"
   persistentVolumeClaim:
     registry:
-      storageClass: "nfs-client"
+      storageClass: "nfs-storage"
       size: 5Gi
     jobservice:
       jobLog:
-        storageClass: "nfs-client"
+        storageClass: "nfs-storage"
         size: 1Gi
     trivy:
-      storageClass: "nfs-client"
+      storageClass: "nfs-storage"
       size: 1Gi
   imageChartStorage:
     type: filesystem

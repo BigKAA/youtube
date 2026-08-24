@@ -15,8 +15,8 @@ spec:
     helm:
       values: |-
         global:
-          defaultStorageClass: "nfs-client"
-          storageClass: "nfs-client"
+          defaultStorageClass: "nfs-storage"
+          storageClass: "nfs-storage"
           redis:
             password: 'qUwTt8g9it'
         pdb:
