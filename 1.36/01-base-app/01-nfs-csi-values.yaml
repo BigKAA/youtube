@@ -22,8 +22,7 @@ storageClass:
   parameters:
     server: 192.168.218.13
     share: /volume1/nfs
-    archiveOnDelete: "false"
   mountOptions:
-    - nfsvers=4.1
+    - nfsvers=4.0
     - hard
     - noatime
