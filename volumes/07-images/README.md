@@ -2,7 +2,7 @@
 
 **Внимание! Работает только с Container runtime, которые поддерживают этот механизм. Например, CRI-O ≥ v1.31.**
 
-В kubernetes v1.31 появился новый тип volume - [image](https://kubernetes.io/docs/concepts/storage/volumes/#image).
+В kubernetes v1.31 появился новый тип volume - [image](https://kubernetes.io/docs/reference/storage/volume-types/#image).
 
 > Тома типа image представляют собой объект [OCI](https://github.com/opencontainers/distribution-spec/) (образ контейнера или артефакт), который доступен на хост-компьютере kubelet.
 
